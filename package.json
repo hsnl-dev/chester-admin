@@ -1,8 +1,8 @@
 {
-  "name": "pick-bazar",
-  "version": "3.0.3",
+  "name": "chester-admin",
+  "version": "0.0.1",
   "private": true,
-  "author": "RedQ, Inc.",
+  "author": "HSNL",
   "workspaces": [
     "packages/*"
   ],
