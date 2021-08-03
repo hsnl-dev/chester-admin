@@ -32,7 +32,7 @@ const ContentBox = styled('div', () => ({
 const Heading = styled('span', ({ $theme }) => ({
   ...$theme.typography.fontBold24,
   color: $theme.colors.textDark,
-  marginBottom: '50px',
+  marginBottom: '20px',
   width: "100%",
   display: "flex",
 }));

@@ -1,10 +1,16 @@
 import * as React from 'react';
+import { styled } from 'baseui';
 import { Select } from 'baseui/select';
 import { CaretDownIcon } from '../../assets/icons/CaretDownIcon';
+import { width } from 'styled-system';
 
 export const getContainerFontStyle = ({ $theme }) => {
   return $theme.typography.fontBold14;
 };
+
+export const SelectBox = styled('div', ({ ...props }) => ({
+  width: props.width
+}));
 
 export default ({ ...props }) => {
   return (

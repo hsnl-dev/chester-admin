@@ -1,8 +1,13 @@
 import React, { useCallback } from 'react';
-import SettingsCard from '../../components/SettingsCard/SettingsCard';
-import { useDrawerDispatch } from '../../context/DrawerContext';
-import { STAFF_MEMBERS, SITE_SETTINGS } from '../../settings/constants';
-import { withStyle } from 'baseui';
+import  SearchCard  from '../../components/SearchCard/SearchCard';
+import Select from '../../components/Select/Select';
+import Input from '../../components/Input/Input';
+import Button from '../../components/Button/Button';
+import { SelectBox } from '../../components/Select/Select';
+import DisplayTable from '../../components/DisplayTable/DisplayTable';
+import { Wrapper, Heading, SubHeadingLeft, SubHeadingRight, Title } from '../../components/DisplayTable/DisplayTable';
+import { useState } from 'react';
+import { styled, withStyle } from 'baseui';
 import {
   SiteSettings,
   Members,
@@ -13,6 +18,7 @@ import {
 } from '../../components/AllSvgIcon';
 import { Grid, Row, Col as Column } from '../../components/FlexBox/FlexBox';
 import { useHistory } from 'react-router-dom';
+import { ADDUSER } from '../../settings/constants';
 
 const Col = withStyle(Column, () => ({
   '@media only screen and (max-width: 767px)': {
@@ -24,89 +30,108 @@ const Col = withStyle(Column, () => ({
   },
 }));
 
+const SearchBox = styled('div', () => ({
+  width: '50%',
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+}));
+
+const ButtonBox = styled('div', () => ({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'flex-end',
+}))
+
+const Text = styled('span', ({ $theme }) => ({
+  ...$theme.typography.fontBold24,
+  color: $theme.colors.textDark,
+  marginBottom: '20px',
+  width: "100%",
+  display: "flex",
+}));
+
 export default function Settings() {
-  let history = useHistory();
+  const column_names = ['帳號', '姓名', '權限角色', '操作'];
+  const amountSelectOptions = [
+    { value: 10, label: '10' },
+    { value: 25, label: '25' },
+    { value: 50, label: '50' },
+    { value: 100, label: '100' },
+  ];
+  const [displayAmount, setDisplayAmount] = useState([]);
+  const data = [{'account': '123456789','name': 'ABC', 'authority': '店家管理者'}]
+  const history = useHistory();
 
-  const dispatch = useDrawerDispatch();
+  function amountChange({ value }) {
+    setDisplayAmount(value);
+    console.log(displayAmount)
+  }
 
-  const openStaffForm = useCallback(
-    () =>
-      dispatch({ type: 'OPEN_DRAWER', drawerComponent: 'STAFF_MEMBER_FORM' }),
-    [dispatch]
-  );
+  const editUser = () => {
 
-  const openCategoryForm = useCallback(
-    () => dispatch({ type: 'OPEN_DRAWER', drawerComponent: 'CATEGORY_FORM' }),
-    [dispatch]
-  );
+  }
 
-  const openProductForm = useCallback(
-    () => dispatch({ type: 'OPEN_DRAWER', drawerComponent: 'PRODUCT_FORM' }),
-    [dispatch]
-  );
+  const deleteUser = () => {
 
-  const openCouponForm = useCallback(
-    () => dispatch({ type: 'OPEN_DRAWER', drawerComponent: 'CAMPAING_FORM' }),
-    [dispatch]
-  );
+  }
+
+  const handleSearch =() => {
+
+  }
 
   return (
     <Grid fluid={true}>
       <Row>
-        <Col md={6}>
-          <SettingsCard
-            icon={<Members />}
-            title='Staff Members'
-            subtitle='Manage your employees and their permission'
-            onClick={() => history.push(STAFF_MEMBERS)}
-          />
-        </Col>
-        <Col md={6}>
-          <SettingsCard
-            icon={<SiteSettings />}
-            title='Site Settings'
-            subtitle='View and update your site settings'
-            onClick={() => history.push(SITE_SETTINGS)}
-          />
+        <Col md={12}>
+          <Title>
+            系統管理
+          </Title>
         </Col>
       </Row>
-
       <Row>
-        <Col md={6}>
-          <SettingsCard
-            icon={<ProductIcon width='56px' height='56px' />}
-            title='Add Products'
-            subtitle='Add products from here'
-            onClick={openProductForm}
-          />
-        </Col>
-
-        <Col md={6}>
-          <SettingsCard
-            icon={<SidebarCategoryIcon width='56px' height='56px' />}
-            title='Add Categories'
-            subtitle='Add product categories from here'
-            onClick={openCategoryForm}
-          />
-        </Col>
-      </Row>
-
-      <Row>
-        <Col md={6}>
-          <SettingsCard
-            icon={<OrderIcon width='56px' height='56px' />}
-            title='Add Staff Members'
-            subtitle='Add your staff members from here'
-            onClick={openStaffForm}
-          />
-        </Col>
-        <Col md={6}>
-          <SettingsCard
-            icon={<CouponIcon width='56px' height='56px' />}
-            title='Add Coupons'
-            subtitle='Add coupons from here'
-            onClick={openCouponForm}
-          />
+        <Col md={12}>
+          <Wrapper>
+            <Text>帳號管理</Text>
+            <ButtonBox>
+              <Button 
+                background_color={'#FF902B'}
+                color={'#FFFFFF'}
+                margin={'5px'}
+                height={'70%'}
+                width={'15%'}
+                onClick={()=>{history.push(ADDUSER)}}
+              >新增使用者</Button>
+            </ButtonBox>
+            <Heading>
+              <SubHeadingLeft>Show
+                <SelectBox width="15%">
+                  <Select
+                    options = {amountSelectOptions}
+                    labelKey="label"
+                    valueKey="value"
+                    placeholder={10}
+                    value={displayAmount}
+                    searchable={false}
+                    onChange={amountChange}
+                  />
+                </SelectBox>
+                entries
+              </SubHeadingLeft>
+              <SubHeadingRight><SearchBox>Search:<Input onChange={handleSearch}/></SearchBox></SubHeadingRight>
+              
+            </Heading>
+            <DisplayTable
+              columnNames = {column_names}
+              columnData = {data}
+              Button1_function = {null}
+              Button1_text = ''
+              Button2_function = {editUser}
+              Button2_text = '編輯'
+              Button3_function = {deleteUser}
+              Button3_text = '刪除'
+            />
+          </Wrapper>
         </Col>
       </Row>
     </Grid>
