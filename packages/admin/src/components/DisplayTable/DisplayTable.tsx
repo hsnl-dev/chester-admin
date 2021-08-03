@@ -68,10 +68,12 @@ export const SubHeadingRight = styled('div', ({ $theme }) => ({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'center',
+    fontSize: '20px',
+    fontFamily: "'Lato', sans-serif",
+    fontWeight: 400,
 }));
 
 export const SubHeadingLeft = styled('div', ({ $theme }) => ({
-    padding: '20px',
     color: '#342E49',
     marginBottom: '10px',
     width: "100%",
@@ -79,6 +81,9 @@ export const SubHeadingLeft = styled('div', ({ $theme }) => ({
     flexDirection: 'row',
     justifyContent: 'flex-start',
     alignItems: 'center',
+    fontSize: '20px',
+    fontFamily: "'Lato', sans-serif",
+    fontWeight: 400,
 }));
 
 export const Title = styled('div', ({ $theme }) => ({
