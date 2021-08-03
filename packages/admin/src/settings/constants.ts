@@ -11,6 +11,8 @@ export const COUPONS = '/coupons';
 export const SETTINGS = '/settings';
 export const STAFF_MEMBERS = '/staff-members';
 export const SITE_SETTINGS = '/site-settings';
+export const FORGET_PASSWORD = '/password-reset';
+export const PASSWORD_RESET = '/password-reset/:user_id/:token';
 // **************** ROUTE CONSTANT END **************************
 
 export const CURRENCY = '$';

@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { Client as Styletron } from 'styletron-engine-atomic';
 import { Provider as StyletronProvider } from 'styletron-react';
 import { BaseProvider } from 'baseui';
+import { ToasterContainer } from 'baseui/toast';
 import { ApolloProvider } from '@apollo/react-hooks';
 import { theme } from './theme';
 import Routes from './routes';
@@ -23,7 +24,9 @@ function App() {
       <StyletronProvider value={engine}>
         <BaseProvider theme={theme}>
           <BrowserRouter>
-            <Routes />
+            <ToasterContainer autoHideDuration={3000}>
+              <Routes />
+            </ToasterContainer>
           </BrowserRouter>
         </BaseProvider>
       </StyletronProvider>
