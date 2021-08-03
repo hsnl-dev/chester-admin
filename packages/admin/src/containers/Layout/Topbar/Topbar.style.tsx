@@ -25,7 +25,7 @@ export const AlertDot = styled('div', ({ $theme }) => ({
 }));
 
 export const TopbarWrapper = styled('div', () => ({
-  width: '100%',
+  width: 'auto',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',

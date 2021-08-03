@@ -21,7 +21,7 @@
     "cookie": "^0.4.1",
     "currency.js": "^1.2.2",
     "formik": "^2.1.4",
-    "graphql": "^15.1.0",
+    "graphql": "^15.0.0",
     "graphql-tag": "2.10.3",
     "js-cookie": "^2.2.1",
     "localforage": "^1.7.4",

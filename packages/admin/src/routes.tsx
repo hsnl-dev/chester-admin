@@ -4,7 +4,8 @@ import {
   LOGIN,
   PRODUCTS,
   CATEGORY,
-  DASHBOARD,
+  PURCHASING,
+  ADDPURCHASING,
   ORDERS,
   SETTINGS,
   CUSTOMERS,
@@ -16,7 +17,8 @@ import AuthProvider, { AuthContext } from './context/auth';
 import { InLineLoader } from './components/InlineLoader/InlineLoader';
 const Products = lazy(() => import('./containers/Products/Products'));
 const AdminLayout = lazy(() => import('./containers/Layout/Layout'));
-const Dashboard = lazy(() => import('./containers/Dashboard/Dashboard'));
+const Purchasing = lazy(() => import('./containers/Purchasing/Purchasing'));
+const AddPurchasing = lazy(() => import('./containers/Purchasing/AddPurchasing'));
 const Category = lazy(() => import('./containers/Category/Category'));
 const Orders = lazy(() => import('./containers/Orders/Orders'));
 const Settings = lazy(() => import('./containers/Settings/Settings'));
@@ -65,10 +67,17 @@ const Routes = () => {
     <AuthProvider>
       <Suspense fallback={<InLineLoader />}>
         <Switch>
-          <PrivateRoute exact={true} path={DASHBOARD}>
+          <PrivateRoute exact={true} path={PURCHASING}>
             <AdminLayout>
               <Suspense fallback={<InLineLoader />}>
-                <Dashboard />
+                <Purchasing />
+              </Suspense>
+            </AdminLayout>
+          </PrivateRoute>
+          <PrivateRoute path={ADDPURCHASING}>
+            <AdminLayout>
+              <Suspense fallback={<InLineLoader />}>
+                <AddPurchasing />
               </Suspense>
             </AdminLayout>
           </PrivateRoute>

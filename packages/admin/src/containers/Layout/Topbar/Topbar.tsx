@@ -100,8 +100,6 @@ const Topbar = ({ refs }: any) => {
       </DrawerWrapper>
 
       <TopbarRightSide>
-        <Button onClick={openDrawer}>Add Products</Button>
-
         <Popover
           content={({ close }) => <Notification data={data} onClear={close} />}
           accessibilityType={'tooltip'}

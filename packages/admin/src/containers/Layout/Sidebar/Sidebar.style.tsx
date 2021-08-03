@@ -3,11 +3,12 @@ import { NavLink as NavLinks } from "react-router-dom";
 
 export const SidebarWrapper = styled("div", ({ $theme }) => ({
   width: "270px",
-  height: "auto",
+  height: "100%",
   display: "flex",
   flexShrink: "0",
-  backgroundColor: "#ffffff",
+  // backgroundColor: "#ffffff",
   flexDirection: "column",
+  backgroundImage: "url(../../assets/image/sidebar-bg/01.jpg)",
 
   "@media only screen and (max-width: 767px)": {
     // width: 'calc(100% - 65px)',
@@ -51,7 +52,7 @@ export const NavLink = styled(NavLinks, ({ $theme }) => ({
   "&.active": {
     color: $theme.colors.primary,
     backgroundColor: $theme.colors.backgroundF7,
-    borderRadius: "50px 0 0 50px"
+    borderRadius: "50px 0 0 50px",
   }
 }));
 

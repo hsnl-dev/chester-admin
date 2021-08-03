@@ -16,6 +16,16 @@ const Input = ({ ...props }) => {
           style: ({ $theme }) => {
             return {
               ...getInputFontStyle({ $theme }),
+              display: 'block',
+              width: '100%',
+              height: props.height? props.height: 'calc(1.5em + 0.75rem + 3px)',
+              fontSize: '1rem',
+              fontWeight: '400',
+              lineHeight: '1.5',
+              color: '#75787d',
+              backgroundColor: '#FFFFFF',
+              
+              
             };
           },
         },

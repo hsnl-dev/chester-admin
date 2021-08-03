@@ -8,7 +8,7 @@ import {
   LogoutBtn,
 } from './Sidebar.style';
 import {
-  DASHBOARD,
+  PURCHASING,
   PRODUCTS,
   CATEGORY,
   ORDERS,
@@ -27,46 +27,29 @@ import {
   SettingIcon,
   LogoutIcon,
 } from '../../../components/AllSvgIcon';
+import backgroundImage from '../../../assets/image/sidebar-bg/01.jpg';
 
 const sidebarMenus = [
   {
-    name: 'Dashboard',
-    path: DASHBOARD,
+    name: '進貨管理',
+    path: PURCHASING,
     exact: true,
     icon: <DashboardIcon />,
   },
   {
-    name: 'Products',
+    name: '商品管理',
     path: PRODUCTS,
     exact: false,
     icon: <ProductIcon />,
   },
   {
-    name: 'Category',
+    name: '履歷管理',
     path: CATEGORY,
     exact: false,
     icon: <SidebarCategoryIcon />,
   },
   {
-    name: 'Orders',
-    path: ORDERS,
-    exact: false,
-    icon: <OrderIcon />,
-  },
-  {
-    name: 'Customers',
-    path: CUSTOMERS,
-    exact: false,
-    icon: <CustomerIcon />,
-  },
-  {
-    name: 'Coupons',
-    path: COUPONS,
-    exact: false,
-    icon: <CouponIcon />,
-  },
-  {
-    name: 'Settings',
+    name: '系統管理',
     path: SETTINGS,
     exact: false,
     icon: <SettingIcon />,
