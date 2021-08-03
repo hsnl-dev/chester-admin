@@ -1,10 +1,12 @@
 import React from 'react';
-import { withStyle, useStyletron } from 'baseui';
+import { styled, withStyle, useStyletron } from 'baseui';
 import { Grid, Row, Col as Column } from '../../components/FlexBox/FlexBox';
 import  SearchCard  from '../../components/SearchCard/SearchCard';
 import DisplayTable from '../../components/DisplayTable/DisplayTable';
 import { Wrapper, Heading, SubHeadingLeft, SubHeadingRight, Title } from '../../components/DisplayTable/DisplayTable';
 import Select from '../../components/Select/Select';
+import Input from '../../components/Input/Input';
+import { SelectBox } from '../../components/Select/Select';
 import { ADDPURCHASING } from '../../settings/constants';
 import { useState } from 'react';
 import { useHistory } from 'react-router-dom';
@@ -19,8 +21,12 @@ const Col = withStyle(Column, () => ({
   },
 }));
 
-
-
+const SearchBox = styled('div', () => ({
+  width: '50%',
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+}))
 
 const Purchasing = () => {
   const column_names = ['廠商編號', '廠商名稱', '進貨日期', '操作'];
@@ -66,6 +72,10 @@ const deletePurchase = () => {
 
 }
 
+const handleSearch =() => {
+
+}
+
   return (
     <Grid fluid={true}>
       <Row>
@@ -88,17 +98,21 @@ const deletePurchase = () => {
           <Wrapper>
             <Heading>
               <SubHeadingLeft>Show
-                {/* <Select
-                  options = {amountSelectOptions}
-                  labelKey="label"
-                  valueKey="value"
-                  placeholder={10}
-                  value={displayAmount}
-                  searchable={false}
-                  onchange={amountChange}
-                /> */}
+                <SelectBox width="15%">
+                  <Select
+                    options = {amountSelectOptions}
+                    labelKey="label"
+                    valueKey="value"
+                    placeholder={10}
+                    value={displayAmount}
+                    searchable={false}
+                    onChange={amountChange}
+                  />
+                </SelectBox>
+                entries
               </SubHeadingLeft>
-              <SubHeadingRight>Search</SubHeadingRight>
+              <SubHeadingRight><SearchBox>Search:<Input onChange={handleSearch}/></SearchBox></SubHeadingRight>
+              
             </Heading>
             <DisplayTable
               columnNames = {column_names}

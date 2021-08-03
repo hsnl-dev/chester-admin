@@ -6,9 +6,13 @@ import Button from '../../components/Button/Button';
 import Input from '../../components/Input/Input';
 import { Heading, SubHeadingLeft, SubHeadingRight, Title, Text } from '../../components/DisplayTable/DisplayTable';
 import Select from '../../components/Select/Select';
-import { ADDPURCHASING } from '../../settings/constants';
+import { PURCHASING } from '../../settings/constants';
 import { useState } from 'react';
 import { Datepicker } from 'baseui/datepicker';
+import { useEffect } from 'react';
+import tw from 'date-fns/locale/zh-TW';
+import dayjs from 'dayjs';
+import { useHistory } from 'react-router-dom';
 
 const Col = withStyle(Column, () => ({
     '@media only screen and (max-width: 574px)': {
@@ -29,6 +33,19 @@ const Wrapper = styled('div', () => ({
     backgroundColor: "#ffffff",
     boxShadow: "-3px 3px 5px 1px #E0E0E0",
   }));
+
+const BottomWrapper = styled('div', () => ({
+    width: '100%',
+    display: "flex",
+    flexDirection: "column",
+    paddingTop: "5px",
+    paddingBottom: "5px",
+    paddingRight: "30px",
+    paddingLeft: "30px",
+    borderRadius: "6px",
+    backgroundColor: "#ffffff",
+    boxShadow: "-3px 3px 5px 1px #E0E0E0",
+}));
 
 const VendorBox = styled('div', () => ({
     display: 'flex',
@@ -70,16 +87,37 @@ const unitList = [
 
 const AddPurchasing = () => {
     
+    const itemsInfoTemp = {"name": "", "batchNumber":"", "origin": "", "brand": "", "amount": "", "unit": "g", "PD": "", "Exp": "", "unitPrice": "", "totalPrice": "", "remark": ""}
     const [vendor, setVendor] = useState([]);
     const [unit, setUnit] = useState([]);
+    const [itemsInfo, setItemsInfo] = useState([]);
+    const [date, setDate] = useState([]);
+    const history = useHistory();
 
-    function handleVendor({ value }) {
+    const handleVendor = ({ value }) => {
       setVendor(value);
     }
 
-    function handleUnit({ value }) {
-      setUnit(value);
+    const addOneItems = () => {
+      setItemsInfo([...itemsInfo, itemsInfoTemp]);
     }
+
+    const handleInfoChange = (e) => {
+      console.log(e.target.id);
+      let temp = e.target.id.split("_");
+      let type = temp[0];
+      let index = temp[1];
+      itemsInfo[index][type] = e.target.value;
+      setItemsInfo([...itemsInfo]);
+    }
+
+    const handleSubmit = () => {
+
+    }
+
+    useEffect(()=>{
+      console.log(itemsInfo)
+    }, [itemsInfo])
   
 
     return (
@@ -110,12 +148,15 @@ const AddPurchasing = () => {
                     </VendorBox>
                     <RowBox>
                       <div>
-                        <Button
+                        {itemsInfo.length == 0? (
+                          <Button
                             background_color={'#FF902B'}
                             color={'#FFFFFF'}
                             margin={'5px'}
                             height={'60%'}
-                        >新增品項</Button>
+                            onClick={addOneItems}
+                          >新增品項</Button>
+                        ):(null)}
                         <Button
                             background_color={'#40C057'}
                             color={'#FFFFFF'}
@@ -135,49 +176,93 @@ const AddPurchasing = () => {
                             color={'#FFFFFF'}
                             margin={'5px'}
                             height={'60%'}
+                            onClick={()=> history.push(PURCHASING)}
                         >取消</Button>
                         <Button
                             background_color={'#FF902B'}
                             color={'#FFFFFF'}
                             margin={'5px'}
                             height={'60%'}
+                            onClick={handleSubmit}
                         >確認送出</Button>
                       </div>
                     </RowBox>
                 </Wrapper>
             </Col>
           </Row>
-        
-          <Row>
-            <Col md={12}>
-                <Wrapper>
-                    <Heading>新增品項</Heading>
-                    <RowBox>
-                      <InputBox><Text>進貨品名</Text><Input placeholder="輸入品名"/></InputBox>
-                      <InputBox><Text>批號</Text><Input placeholder="輸入批號"/></InputBox>
-                    </RowBox>
-                    <RowBox>
-                      <InputBox><Text>原產地</Text><Input placeholder="輸入原產地"/></InputBox>
-                      <InputBox><Text>品牌</Text><Input placeholder="輸入品牌"/></InputBox>
-                    </RowBox>
-                    <RowBox>
-                      <InputBox><Text>數量</Text><Input placeholder="輸入數量"/></InputBox>
-                      <InputBox><Text>單位</Text><Select placeholder="g" labelKey="label" valueKey="value" searchable={false} options={unitList} value={unit} onChange={handleUnit}/></InputBox>
-                    </RowBox>
-                    <RowBox>
-                      <InputBox><Text>製造日期</Text><Datepicker/></InputBox>
-                      <InputBox><Text>有效日期</Text><Datepicker/></InputBox>
-                    </RowBox>
-                    <RowBox>
-                      <InputBox><Text>單價</Text><Input placeholder="輸入單價"/></InputBox>
-                      <InputBox><Text>總價</Text><Input placeholder="輸入總價"/></InputBox>
-                    </RowBox>
-                    <RowBox>
-                      <InputBox><Text>備註</Text><Input placeholder="" height="100px"/></InputBox>
-                    </RowBox>
-                </Wrapper>
-            </Col>
-          </Row>
+
+          {itemsInfo.length != 0? Object(itemsInfo).map((item, index) =>{
+            return (
+              <Row>
+                <Col md={12}>
+                    <Wrapper onChange={handleInfoChange}>
+                        <Heading>新增品項</Heading>
+                        <RowBox>
+                          <InputBox><Text>進貨品名</Text><Input id={"name_" + index} placeholder="輸入品名"/></InputBox>
+                          <InputBox><Text>批號</Text><Input id={"batchNumber_" + index} placeholder="輸入批號"/></InputBox>
+                        </RowBox>
+                        <RowBox>
+                          <InputBox><Text>原產地</Text><Input id={"origin_" + index} placeholder="輸入原產地"/></InputBox>
+                          <InputBox><Text>品牌</Text><Input id={"brand_" + index} placeholder="輸入品牌"/></InputBox>
+                        </RowBox>
+                        <RowBox>
+                          <InputBox><Text>數量</Text><Input id={"amount_" + index} placeholder="輸入數量"/></InputBox>
+                          <InputBox><Text>單位</Text><Select placeholder="g" labelKey="label" valueKey="value" searchable={false} options={unitList} value={unit}
+                            onChange={({ value }) => {itemsInfo[index]["unit"]=value[0]['value']; setItemsInfo([...itemsInfo])}}/></InputBox>
+                        </RowBox>
+                        <RowBox>
+                          <InputBox><Text>製造日期</Text><Datepicker locale={tw} onChange={({date})=>{itemsInfo[index]["PD"]=date; setItemsInfo([...itemsInfo])}}/></InputBox>
+                          <InputBox><Text>有效日期</Text><Datepicker locale={tw} onChange={({date})=>{itemsInfo[index]["Exp"]=date; setItemsInfo([...itemsInfo])}} /></InputBox>
+                        </RowBox>
+                        <RowBox>
+                          <InputBox><Text>單價</Text><Input id={"unitPrice_" + index} placeholder="輸入單價"/></InputBox>
+                          <InputBox><Text>總價</Text><Input id={"totalPrice_" + index} placeholder="輸入總價"/></InputBox>
+                        </RowBox>
+                        <RowBox>
+                          <InputBox><Text>備註</Text><Input id={"remark_" + index} placeholder="" height="100px"/></InputBox>
+                        </RowBox>
+                    </Wrapper>
+                </Col>
+              </Row>
+            )}) : (
+            null
+          )}
+          {itemsInfo.length != 0? (
+            <Row>
+              <Col md={12}>
+                <BottomWrapper>
+                  <RowBox>
+                    <div>
+                      <Button
+                        background_color={'#FF902B'}
+                        color={'#FFFFFF'}
+                        margin={'5px'}
+                        height={'60%'}
+                        onClick={addOneItems}
+                      >新增品項</Button>
+                    </div>
+                    <div>
+                      <Button
+                        background_color={'#616D89'}
+                        color={'#FFFFFF'}
+                        margin={'5px'}
+                        height={'60%'}
+                        onClick={()=> history.push(PURCHASING)}
+                      >取消</Button>
+                      <Button
+                        background_color={'#FF902B'}
+                        color={'#FFFFFF'}
+                        margin={'5px'}
+                        height={'60%'}
+                        onClick={handleSubmit}
+                      >確認送出</Button>
+                    </div>
+                  </RowBox>      
+                </BottomWrapper>
+              </Col>
+            </Row>):(
+            null
+          )}
         </Grid>
       );
   };
