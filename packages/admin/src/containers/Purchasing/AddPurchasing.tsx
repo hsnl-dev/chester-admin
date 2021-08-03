@@ -208,7 +208,7 @@ const AddPurchasing = () => {
                         <RowBox>
                           <InputBox><Text>數量</Text><Input id={"amount_" + index} placeholder="輸入數量"/></InputBox>
                           <InputBox><Text>單位</Text><Select placeholder="g" labelKey="label" valueKey="value" searchable={false} options={unitList} value={unit}
-                            onChange={({ value }) => {itemsInfo[index]["unit"]=value[0]['value']; setItemsInfo([...itemsInfo])}}/></InputBox>
+                            onChange={({ value }) => {setUnit(value); itemsInfo[index]["unit"]=value[0]['value']; setItemsInfo([...itemsInfo])}}/></InputBox>
                         </RowBox>
                         <RowBox>
                           <InputBox><Text>製造日期</Text><Datepicker locale={tw} onChange={({date})=>{itemsInfo[index]["PD"]=date; setItemsInfo([...itemsInfo])}}/></InputBox>

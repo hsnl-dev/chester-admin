@@ -8,6 +8,7 @@ import {
   ADDPURCHASING,
   ORDERS,
   SETTINGS,
+  ADDUSER,
   CUSTOMERS,
   COUPONS,
   STAFF_MEMBERS,
@@ -19,6 +20,7 @@ const Products = lazy(() => import('./containers/Products/Products'));
 const AdminLayout = lazy(() => import('./containers/Layout/Layout'));
 const Purchasing = lazy(() => import('./containers/Purchasing/Purchasing'));
 const AddPurchasing = lazy(() => import('./containers/Purchasing/AddPurchasing'));
+const AddUser = lazy(() => import('./containers/Settings/AddUser'));
 const Category = lazy(() => import('./containers/Category/Category'));
 const Orders = lazy(() => import('./containers/Orders/Orders'));
 const Settings = lazy(() => import('./containers/Settings/Settings'));
@@ -120,6 +122,13 @@ const Routes = () => {
             <AdminLayout>
               <Suspense fallback={<InLineLoader />}>
                 <Settings />
+              </Suspense>
+            </AdminLayout>
+          </PrivateRoute>
+          <PrivateRoute path={ADDUSER}>
+            <AdminLayout>
+              <Suspense fallback={<InLineLoader />}>
+                <AddUser />
               </Suspense>
             </AdminLayout>
           </PrivateRoute>

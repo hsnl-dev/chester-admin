@@ -52,29 +52,29 @@ const Purchasing = () => {
   }
 
   
-const handleDate = () => { 
-  console.log("change date")
-}
+  const handleDate = () => { 
+    console.log("change date")
+  }
 
-const searchPurchase = () =>{
+  const searchPurchase = () =>{
 
-}
+  }
 
-const checkPurchase = () => {
+  const checkPurchase = () => {
 
-}
+  }
 
-const editPurchase = () => {
+  const editPurchase = () => {
 
-}
+  }
 
-const deletePurchase = () => {
+  const deletePurchase = () => {
 
-}
+  }
 
-const handleSearch =() => {
+  const handleSearch =() => {
 
-}
+  }
 
   return (
     <Grid fluid={true}>
