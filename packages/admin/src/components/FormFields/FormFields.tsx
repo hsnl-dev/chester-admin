@@ -1,9 +1,10 @@
 import React from "react";
 import { Block } from "baseui/block";
+import { StyledLink } from 'baseui/link';
 import { styled } from "baseui";
 
-const Title = styled("h3", ({ $theme }) => ({
-  ...$theme.typography.font18,
+const Title = styled("h2", ({ $theme }) => ({
+  ...$theme.typography.fontBold32,
   marginTop: "0",
   marginBottom: "0",
   color: $theme.colors.textDark,
@@ -11,16 +12,23 @@ const Title = styled("h3", ({ $theme }) => ({
 }));
 
 const Label = styled("label", ({ $theme }) => ({
-  ...$theme.typography.fontBold14,
+  ...$theme.typography.fontBold18,
   marginBottom: "10px",
   color: $theme.colors.textDark
 }));
 
 const Msg = styled("span", ({ $theme }) => ({
-  ...$theme.typography.fontBold12,
+  ...$theme.typography.fontBold16,
   color: $theme.colors.red400,
   marginTop: "5px",
   marginLeft: "auto"
+}));
+
+const Ahref = styled(StyledLink, ({ $theme }) => ({
+  ...$theme.typography.fontBold14,
+  marginBottom: "30px",
+  color: $theme.colors.textDark,
+  textDecoration: "underline",
 }));
 
 export const FormFields = ({ children }) => {
@@ -60,6 +68,23 @@ export const FormLabel = ({ children }) => {
 
 export const FormTitle = ({ children }) => {
   return <Title>{children}</Title>;
+};
+
+export const FormLink = ({  children }) => {
+  return (
+    <Block overrides={{
+      Block: {
+        style: {
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          textAlign: "right"
+        }
+      }
+    }}>
+      <Ahref href={children.link}>{children.text}</Ahref>
+    </Block>
+  )
 };
 
 export const Error = ({ children }) => {

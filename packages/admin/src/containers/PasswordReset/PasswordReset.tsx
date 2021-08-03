@@ -1,98 +1,100 @@
-import React, { useContext } from 'react';
-import { Redirect, useHistory, useLocation } from 'react-router-dom';
+import React from 'react';
+import { Redirect, useLocation, useParams, useHistory } from 'react-router-dom';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
-import { AuthContext } from '../../context/auth';
 import {
   FormFields,
   FormLabel,
   FormTitle,
   Error,
-  FormLink
 } from '../../components/FormFields/FormFields';
-import { Wrapper, FormWrapper, LogoImage, LogoWrapper } from './Login.style';
+import { Wrapper, FormWrapper, LogoImage, LogoWrapper } from '../Login/Login.style';
 import Input from '../../components/Input/Input';
 import Button from '../../components/Button/Button';
 import Logoimage from '../../assets/image/PickBazar.png';
+import { request } from "../../utils/request";
 
-const initialValues = {
-  username: '',
-  password: '',
+interface RouteParams {
+  user_id: string,
+  token: string
 };
 
-const getLoginValidationSchema = () => {
-  return Yup.object().shape({
-    username: Yup.string().required('Username is Required!'),
-    password: Yup.string().required('Password is Required!'),
-  });
+const initialValues = {
+  newpassword: '',
+  repeatpassword: '',
 };
 
 const MyInput = ({ field, form, ...props }) => {
   return <Input {...field} {...props} />;
 };
 
-const message = {
-  link: "/password-reset",
-  text: "忘記密碼?"
+const resetPasswordValidationSchema = () => {
+  return Yup.object().shape({
+    newpassword: Yup.string().required('This field is required!'),
+    repeatpassword: Yup.string().required('This field is required').when("newpassword", {
+      is: val => (val && val.length > 0 ? true : false),
+      then: Yup.string().oneOf(
+        [Yup.ref("newpassword")],
+        "Both password need to be the same"
+      )
+    })
+  });
 };
 
 export default () => {
   let history = useHistory();
-  let location = useLocation();
-  const { authenticate, isAuthenticated } = useContext(AuthContext);
-  if (isAuthenticated) return <Redirect to={{ pathname: '/' }} />;
-
-  let { from } = (location.state as any) || { from: { pathname: '/' } };
-  let login = async ({ username, password }, {setSubmitting, setErrors, resetForm}) => {
-    try { 
-      await authenticate({ username, password }, () => {
-        history.replace(from);
+  let params = useParams<RouteParams>();
+  let resetPassword = async ({ newpassword, repeatpassword }, {resetForm}) => {
+    try {
+      const response = await request.post(`/password-reset/${params.user_id}/${params.token}`, {
+        newpassword,
       });
-      resetForm({});
+      history.push('/login');
     } catch (err) {
-      setSubmitting(false);
-      setErrors({submit: err.message});
+      console.log(err);
+      resetForm({});
     }
   };
+
   return (
     <Wrapper>
       <FormWrapper>
         <Formik
           initialValues={initialValues}
-          onSubmit={login}
+          onSubmit={resetPassword}
+          validationSchema={resetPasswordValidationSchema}
           render={({ errors, status, touched, isSubmitting }) => (
             <Form>
               <FormFields>
                 <LogoWrapper>
                   <LogoImage src={Logoimage} alt='admin' />
                 </LogoWrapper>
-                <FormTitle>登入管理平台</FormTitle>
+                <FormTitle>重新設定密碼</FormTitle>
               </FormFields>
               <FormFields>
-                <FormLabel>帳號</FormLabel>
-                <Field
-                  type='text'
-                  name='username'
-                  component={MyInput}
-                  placeholder='Enter username'
-                />
-                {errors.username && touched.username && (
-                  <Error>{errors.username}</Error>
-                )}
-              </FormFields>
-              <FormFields>
-                <FormLabel>密碼</FormLabel>
+                <FormLabel>新密碼</FormLabel>
                 <Field
                   type='password'
-                  name='password'
+                  name='newpassword'
                   component={MyInput}
-                  placeholder='Enter password'
+                  placeholder='Enter new password'
                 />
-                {errors.password && touched.password && (
-                  <Error>{errors.password}</Error>
+                {errors.newpassword && touched.newpassword && (
+                  <Error>{errors.newpassword}</Error>
                 )}
               </FormFields>
-              <FormLink>{message}</FormLink>
+              <FormFields>
+                <FormLabel>重複新密碼</FormLabel>
+                <Field
+                  type='password'
+                  name='repeatpassword'
+                  component={MyInput}
+                  placeholder='Enter password again'
+                />
+                {errors.repeatpassword && touched.repeatpassword && (
+                  <Error>{errors.repeatpassword}</Error>
+                )}
+              </FormFields>
               <Button
                 type='submit'
                 disabled={isSubmitting}
@@ -113,7 +115,6 @@ export default () => {
               </Button>
             </Form>
           )}
-          validationSchema={getLoginValidationSchema}
         />
       </FormWrapper>
     </Wrapper>

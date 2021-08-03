@@ -12,6 +12,8 @@ import {
   COUPONS,
   STAFF_MEMBERS,
   SITE_SETTINGS,
+  PASSWORD_RESET,
+  FORGET_PASSWORD
 } from './settings/constants';
 import AuthProvider, { AuthContext } from './context/auth';
 import { InLineLoader } from './components/InlineLoader/InlineLoader';
@@ -32,6 +34,8 @@ const Customers = lazy(() => import('./containers/Customers/Customers'));
 const Coupons = lazy(() => import('./containers/Coupons/Coupons'));
 const Login = lazy(() => import('./containers/Login/Login'));
 const NotFound = lazy(() => import('./containers/NotFound/NotFound'));
+const ForgetPassword = lazy(() => import('./containers/PasswordReset/ForgetPassword'));
+const PasswordReset = lazy(() => import('./containers/PasswordReset/PasswordReset'));
 
 /**
  *
@@ -139,6 +143,12 @@ const Routes = () => {
           </PrivateRoute>
           <Route path={LOGIN}>
             <Login />
+          </Route>
+          <Route path={PASSWORD_RESET}>
+            <PasswordReset />
+          </Route>
+          <Route path={FORGET_PASSWORD}>
+            <ForgetPassword />
           </Route>
           <Route component={NotFound} />
         </Switch>

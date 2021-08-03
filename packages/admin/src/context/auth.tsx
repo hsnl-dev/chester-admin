@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { request } from "../utils/request"
 
 type AuthProps = {
   isAuthenticated: boolean;
@@ -8,25 +9,50 @@ type AuthProps = {
 
 export const AuthContext = React.createContext({} as AuthProps);
 
-const isValidToken = () => {
-  const token = localStorage.getItem('pickbazar_token');
-  // JWT decode & check token validity & expiration.
-  if (token) return true;
-  return false;
+const isValidToken = async() => {
+  const token = localStorage.getItem('access_token');
+  request.defaults.headers.common.Authorization = `Bearer ${token}`;
+  try {
+    const response = await request.get('/users/roles');
+    const {
+      data: {role},
+    } = response;
+    return true;
+  } catch (err) {
+    //console.log(err);
+    return false;
+  }
 };
 
 const AuthProvider = (props: any) => {
-  const [isAuthenticated, makeAuthenticated] = React.useState(isValidToken());
-  function authenticate({ email, password }, cb) {
-    makeAuthenticated(true);
-    localStorage.setItem('pickbazar_token', `${email}.${password}`);
-    setTimeout(cb, 100); // fake async
+  const [isAuthenticated, makeAuthenticated] = React.useState(false);
+
+  useEffect(() => {
+    isValidToken().then(data => makeAuthenticated(data));
+  }, []);
+
+  async function authenticate({username, password}, cb) {
+    try {
+      const response = await request.post('/users/signin', {
+        username,
+        password,
+      });
+      const {data} = response;
+      localStorage.setItem('access_token', data.access_token);
+      localStorage.setItem('name', username);
+      request.defaults.headers.common.Authorization = `Bearer ${data.access_token}`;
+      makeAuthenticated(true);
+    } catch (error) {
+      console.log(error);
+    }
   }
+
   function signout(cb) {
     makeAuthenticated(false);
-    localStorage.removeItem('pickbazar_token');
+    localStorage.removeItem('access_token');
     setTimeout(cb, 100);
   }
+
   return (
     <AuthContext.Provider
       value={{
