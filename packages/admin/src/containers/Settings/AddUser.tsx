@@ -13,6 +13,7 @@ import { useEffect } from 'react';
 import tw from 'date-fns/locale/zh-TW';
 import dayjs from 'dayjs';
 import { useHistory } from 'react-router-dom';
+import { request } from "../../utils/request";
 
 const Col = withStyle(Column, () => ({
     '@media only screen and (max-width: 574px)': {
@@ -87,14 +88,11 @@ const authorityList = [
 
 
 const AddUser = () => {
-    
     const [vendor, setVendor] = useState([]);
     const [authority, setAuthority] = useState([]);
     const [userInfo, setUserInfo] = useState({"account": "", "authority":"", "name": "", "phone": "", "email": "", "storeName": "", "storePhone": "", "regNumber": "", "address": "", "remark": ""});
     const [date, setDate] = useState([]);
     const history = useHistory();
-
-    
 
     const handleInfoChange = (e) => {
       console.log(e.target.id);
@@ -110,8 +108,34 @@ const AddUser = () => {
       console.log(value);
     }
 
-    const handleSubmit = () => {
-
+    const handleSubmit = async () => {
+      let role = 2;
+      if (userInfo.authority === "店家管理者") {
+        role = 1;
+      } 
+      console.log(role);
+      try {
+        const response = await request.post(`/users/create`, {
+          username: userInfo.account,
+          role: role,
+          name: userInfo.name,
+          phone: userInfo.phone,
+          email: userInfo.email,
+          partner_name: userInfo.storeName,
+          partner_phone:  userInfo.storePhone,
+          food_industry_id: userInfo.regNumber,
+          address: userInfo.address,
+          note: userInfo.remark
+        });
+        history.push(SETTINGS);
+        if (response) {
+          console.log("Add user success");
+        } else {
+          console.log("Add user failed");
+        }
+      } catch (err) {
+        console.log(err);
+      }
     }
 
     useEffect(()=>{
@@ -123,55 +147,82 @@ const AddUser = () => {
         <Grid fluid={true}>
           <Row>
             <Col md={12}>
-                <Title>
-                    新增
-                </Title>
+                <Title>新增</Title>
             </Col>
           </Row>
           <Row>
             <Col md={12}>
-                <Wrapper onChange={handleInfoChange}>
-                    <Heading>新增使用者</Heading>
-                    <RowBox>
-                      <InputBox><Text>帳號</Text><Input id={"account"} placeholder="輸入帳號"/></InputBox>
-                      <InputBox><Text>權限角色</Text><Select placeholder="選擇" labelKey="label" valueKey="value" searchable={false} options={authorityList} value={authority}
-                            onChange={handleAuthority}/></InputBox>
-                    </RowBox>
-                    <RowBox>
-                      <InputBox><Text>姓名</Text><Input id={"name"} placeholder="輸入姓名"/></InputBox>
-                      <InputBox><Text>電話</Text><Input id={"phone"} placeholder="輸入電話"/></InputBox>
-                    </RowBox>
-                    <RowBox>
-                      <InputBox><Text>E-MAIL</Text><Input id={"email"} placeholder="輸入E-mail"/></InputBox>
-                      <InputBox><Text>店家名稱</Text><Input id={"storeName"} placeholder="輸入店家名稱"/></InputBox>
-                    </RowBox>
-                    <RowBox>
-                      <InputBox><Text>店家電話</Text><Input id={"storePhone"} placeholder="輸入店家電話"/></InputBox>
-                      <InputBox><Text>食品業者登錄字號</Text><Input id={"regNumber"} placeholder="輸入食品業者登錄字號"/></InputBox>
-                    </RowBox>
-                    <RowBox>
-                      <InputBox><Text>地址</Text><Input id={"address"} placeholder="輸入地址"/></InputBox>
-                    </RowBox>
-                    <RowBox>
-                      <InputBox><Text>備註</Text><Input id={"remark"} placeholder="" height="100px"/></InputBox>
-                    </RowBox>
-                    <ButtonBox>
-                      <Button
-                        background_color={'#616D89'}
-                        color={'#FFFFFF'}
-                        margin={'5px'}
-                        height={'60%'}
-                        onClick={()=> history.push(SETTINGS)}
-                      >取消</Button>
-                      <Button
-                        background_color={'#FF902B'}
-                        color={'#FFFFFF'}
-                        margin={'5px'}
-                        height={'60%'}
-                        onClick={handleSubmit}
-                      >確認送出</Button>
-                    </ButtonBox>
-                </Wrapper>
+              <Wrapper onChange={handleInfoChange}>
+                <Heading>新增使用者</Heading>
+                <RowBox>
+                  <InputBox>
+                    <Text>帳號</Text>
+                    <Input id={"account"} placeholder="輸入帳號"/></InputBox>
+                  <InputBox>
+                    <Text>權限角色</Text>
+                    <Select id={"role"} placeholder="選擇" labelKey="label" valueKey="value" searchable={false} options={authorityList} value={authority}
+                    onChange={handleAuthority}/>
+                  </InputBox>
+                </RowBox>
+                <RowBox>
+                  <InputBox>
+                    <Text>姓名</Text>
+                    <Input id={"name"} placeholder="輸入姓名"/>
+                  </InputBox>
+                  <InputBox>
+                    <Text>電話</Text>
+                    <Input id={"phone"} placeholder="輸入電話"/>
+                  </InputBox>
+                </RowBox>
+                <RowBox>
+                  <InputBox>
+                    <Text>E-MAIL</Text>
+                    <Input id={"email"} placeholder="輸入E-mail"/>
+                  </InputBox>
+                  <InputBox>
+                    <Text>店家名稱</Text>
+                    <Input id={"storeName"} placeholder="輸入店家名稱"/>
+                  </InputBox>
+                </RowBox>
+                <RowBox>
+                  <InputBox>
+                    <Text>店家電話</Text>
+                    <Input id={"storePhone"} placeholder="輸入店家電話"/>
+                  </InputBox>
+                  <InputBox>
+                    <Text>食品業者登錄字號</Text>
+                    <Input id={"regNumber"} placeholder="輸入食品業者登錄字號"/>
+                  </InputBox>
+                </RowBox>
+                <RowBox>
+                  <InputBox>
+                    <Text>地址</Text>
+                    <Input id={"address"} placeholder="輸入地址"/>
+                  </InputBox>
+                </RowBox>
+                <RowBox>
+                  <InputBox>
+                  <Text>備註</Text>
+                  <Input id={"remark"} placeholder="" height="100px"/>
+                </InputBox>
+                </RowBox>
+                <ButtonBox>
+                  <Button
+                    background_color={'#616D89'}
+                    color={'#FFFFFF'}
+                    margin={'5px'}
+                    height={'60%'}
+                    onClick={()=> history.push(SETTINGS)}
+                  >取消</Button>
+                  <Button
+                    background_color={'#FF902B'}
+                    color={'#FFFFFF'}
+                    margin={'5px'}
+                    height={'60%'}
+                    onClick={handleSubmit}
+                  >確認送出</Button>
+                </ButtonBox>
+              </Wrapper>
             </Col>
           </Row>
         </Grid>

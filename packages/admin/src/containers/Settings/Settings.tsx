@@ -6,7 +6,7 @@ import Button from '../../components/Button/Button';
 import { SelectBox } from '../../components/Select/Select';
 import DisplayTable from '../../components/DisplayTable/DisplayTable';
 import { Wrapper, Heading, SubHeadingLeft, SubHeadingRight, Title } from '../../components/DisplayTable/DisplayTable';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { styled, withStyle } from 'baseui';
 import {
   SiteSettings,
@@ -19,6 +19,8 @@ import {
 import { Grid, Row, Col as Column } from '../../components/FlexBox/FlexBox';
 import { useHistory } from 'react-router-dom';
 import { ADDUSER } from '../../settings/constants';
+import { request } from '../../utils/request';
+import { userInfo } from 'os';
 
 const Col = withStyle(Column, () => ({
   '@media only screen and (max-width: 767px)': {
@@ -60,6 +62,7 @@ export default function Settings() {
     { value: 100, label: '100' },
   ];
   const [displayAmount, setDisplayAmount] = useState([]);
+  const [members, setMembers] = useState([]);
   const data = [{'account': '123456789','name': 'ABC', 'authority': '店家管理者'}]
   const history = useHistory();
 
@@ -68,17 +71,38 @@ export default function Settings() {
     console.log(displayAmount)
   }
 
-  const editUser = () => {
+  const editUser = async () => {  // 跳到有form的頁面
 
   }
 
-  const deleteUser = () => {
-
+  const deleteUser = async ({ user_id }) => {   // 需要 user_id
+    try {
+      const result = await request.post(`/users/${user_id}/delete`);
+      console.log(result);
+      getMembers();
+    } catch (err) {
+      console.log(err);
+    }
   }
 
-  const handleSearch =() => {
-
+  const handleSearch = () => {  // 資料全部都在members裡面，前端根據條件filter就可以
+    
   }
+
+  async function getMembers() {
+    try {
+      const result = await request.get(`/users`);
+      const member_arr = result.data;
+      console.log(member_arr);
+      setMembers(member_arr);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  useEffect(() => {
+    getMembers();
+  }, []);
 
   return (
     <Grid fluid={true}>
@@ -118,12 +142,16 @@ export default function Settings() {
                 </SelectBox>
                 entries
               </SubHeadingLeft>
-              <SubHeadingRight><SearchBox>Search:<Input onChange={handleSearch}/></SearchBox></SubHeadingRight>
-              
+              <SubHeadingRight>
+                <SearchBox>
+                  Search:
+                  <Input onChange={handleSearch}/>
+                </SearchBox>
+              </SubHeadingRight>
             </Heading>
             <DisplayTable
               columnNames = {column_names}
-              columnData = {data}
+              columnData = {members}
               Button1_function = {null}
               Button1_text = ''
               Button2_function = {editUser}
