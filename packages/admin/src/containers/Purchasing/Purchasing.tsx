@@ -8,8 +8,10 @@ import Select from '../../components/Select/Select';
 import Input from '../../components/Input/Input';
 import { SelectBox } from '../../components/Select/Select';
 import { ADDPURCHASING } from '../../settings/constants';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
+
+import { request } from '../../utils/request';
 
 const Col = withStyle(Column, () => ({
   '@media only screen and (max-width: 574px)': {
@@ -37,6 +39,7 @@ const Purchasing = () => {
     { value: 100, label: '100' },
   ];
   const [displayAmount, setDisplayAmount] = useState([]);
+  const [commodities, setCommodities] = useState([]);
   const data = [{'廠商編號': '123456789','廠商名稱': 'ABC', '進貨日期': '2020/12/02'}]
   const [css] = useStyletron();
   const history = useHistory();
@@ -68,13 +71,34 @@ const Purchasing = () => {
 
   }
 
-  const deletePurchase = () => {
-
+  const deletePurchase = async ({ commodity_id }) => {   // 需要 commodity_id
+    try {
+      const result = await request.post(`/commodity/${commodity_id}/delete`);
+      console.log(result);
+      getCommodities();
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   const handleSearch =() => {
 
   }
+
+  async function getCommodities() {
+    try {
+      const result = await request.get(`/commodity`);
+      const commodity_arr = result.data;
+      console.log(commodity_arr);
+      setCommodities(commodity_arr);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  useEffect(() => {
+    getCommodities();
+  }, []);
 
   return (
     <Grid fluid={true}>
@@ -116,7 +140,7 @@ const Purchasing = () => {
             </Heading>
             <DisplayTable
               columnNames = {column_names}
-              columnData = {data}
+              columnData = {commodities}
               Button1_function = {checkPurchase}
               Button1_text = '查看'
               Button2_function = {editPurchase}

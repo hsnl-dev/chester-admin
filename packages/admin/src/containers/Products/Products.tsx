@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { styled, withStyle } from 'baseui';
 import  SearchCard  from '../../components/SearchCard/SearchCard';
 import Button from '../../components/Button/Button';
@@ -11,6 +11,7 @@ import { SelectBox } from '../../components/Select/Select';
 import { Heading, SubHeadingLeft, SubHeadingRight, Title } from '../../components/DisplayTable/DisplayTable';
 import { useHistory } from 'react-router-dom';
 import { ADDPRODUCT } from '../../settings/constants';
+import { request } from '../../utils/request';
 
 const Col = withStyle(Column, () => ({
   '@media only screen and (max-width: 574px)': {
@@ -64,6 +65,7 @@ const Products = () => {
     { value: 100, label: '100' },
   ];
   const [displayAmount, setDisplayAmount] = useState([]);
+  const [products, setProducts] = useState([]);
   const data = [{'商品編號': '123456789','商品名稱': 'ABC', '單價': '100', '規格': '規格A'}]
   const history = useHistory();
 
@@ -84,8 +86,14 @@ const Products = () => {
 
   }
 
-  const deactivatePurchase = () => {
-
+  const deactivatePurchase = async ({ product_id }) => {   // 需要 product_id
+    try {
+      const result = await request.post(`/product/${product_id}/deactivate`);
+      console.log(result);
+      getProducts();
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   const handleSearch =() => {
@@ -95,6 +103,21 @@ const Products = () => {
   const handleChange = () => {
     
   }
+
+  async function getProducts() {
+    try {
+      const result = await request.get(`/product`);
+      const product_arr = result.data;
+      console.log(product_arr);
+      setProducts(product_arr);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  useEffect(() => {
+    getProducts();
+  }, []);
 
   return (
     <Grid fluid={true}>
@@ -150,7 +173,7 @@ const Products = () => {
             </Heading>
             <DisplayTable
               columnNames = {column_names}
-              columnData = {data}
+              columnData = {products}
               Button1_function = {checkPurchase}
               Button1_text = '查看'
               Button2_function = {editPurchase}

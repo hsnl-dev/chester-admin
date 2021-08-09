@@ -119,7 +119,7 @@ export default function DisplayTable({
     
     return (
       <div>
-        {columnData.length != 0? (
+        {columnData.length !== 0 ? (
           <StyledTable>
             <tr>
                 {columnNames.map((columnName: Array<string>) => (
@@ -134,10 +134,10 @@ export default function DisplayTable({
                       <StyledTd>{row[0]}</StyledTd>
                       <StyledTd>{row[1]}</StyledTd>
                       <StyledTd>{row[2]}</StyledTd>
-                      {row.length == 4? <StyledTd>{row[3]}</StyledTd>: null}
+                      {row.length == 4 ? <StyledTd>{row[3]}</StyledTd>: null}
                       <StyledTd>
                         <StyledButtonBox>
-                          {Button1_text.length != 0? (
+                          {Button1_text.length !== 0 ? (
                             <Button margin='5px' width='80px' height='45px' background_color='#40C057' color={'#FFFFFF'} onClick={Button1_function}>{Button1_text}</Button>
                           ):(null)}
                           <Button margin='5px' width='80px' height='45px' background_color='#2F8BE6' color={'#FFFFFF'} onClick={Button2_function}>{Button2_text}</Button>
