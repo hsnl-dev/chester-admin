@@ -3,6 +3,7 @@
 export const PURCHASING = '/';
 export const ADDPURCHASING = '/addPurchasing';
 export const PRODUCTS = '/products';
+export const ADDPRODUCT = '/addProduct';
 export const CATEGORY = '/category';
 export const LOGIN = '/login';
 export const LOGOUT = '/logout';

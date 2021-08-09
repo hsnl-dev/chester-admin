@@ -26,7 +26,7 @@ const SearchBox = styled('div', () => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-}))
+}));
 
 const Purchasing = () => {
   const column_names = ['廠商編號', '廠商名稱', '進貨日期', '操作'];

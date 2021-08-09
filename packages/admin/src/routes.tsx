@@ -3,6 +3,7 @@ import { Route, Switch, Redirect } from 'react-router-dom';
 import {
   LOGIN,
   PRODUCTS,
+  ADDPRODUCT,
   CATEGORY,
   PURCHASING,
   ADDPURCHASING,
@@ -19,6 +20,7 @@ import {
 import AuthProvider, { AuthContext } from './context/auth';
 import { InLineLoader } from './components/InlineLoader/InlineLoader';
 const Products = lazy(() => import('./containers/Products/Products'));
+const AddProduct = lazy(() => import('./containers/Products/AddProduct'))
 const AdminLayout = lazy(() => import('./containers/Layout/Layout'));
 const Purchasing = lazy(() => import('./containers/Purchasing/Purchasing'));
 const AddPurchasing = lazy(() => import('./containers/Purchasing/AddPurchasing'));
@@ -91,6 +93,13 @@ const Routes = () => {
             <AdminLayout>
               <Suspense fallback={<InLineLoader />}>
                 <Products />
+              </Suspense>
+            </AdminLayout>
+          </PrivateRoute>
+          <PrivateRoute path={ADDPRODUCT}>
+            <AdminLayout>
+              <Suspense fallback={<InLineLoader />}>
+                <AddProduct />
               </Suspense>
             </AdminLayout>
           </PrivateRoute>

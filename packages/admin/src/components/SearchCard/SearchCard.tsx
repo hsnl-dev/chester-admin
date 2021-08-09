@@ -4,6 +4,7 @@ import { Datepicker } from 'baseui/datepicker';
 import Button from '../../components/Button/Button';
 
 const Wrapper = styled('div', () => ({
+    fontFamily: "Montserrat",
     width: "100%",
     display: "flex",
     flexDirection: "column",
@@ -23,7 +24,7 @@ const IconBox = styled('div', ({ $theme }) => ({
   marginRight: '10px',
 }));
 
-const ContentBox = styled('div', () => ({
+export const ContentBox = styled('div', () => ({
   display: 'flex',
   flexDirection: 'column',
   width: '30%',
@@ -43,12 +44,12 @@ const SubHeading = styled('span', ({ $theme }) => ({
   margin: '0',
 }));
 
-const Text = styled('div', ({ $theme }) => ({
+export const Text = styled('div', ({ $theme }) => ({
     ...$theme.typography.fontBold15,
     color: $theme.colors.textDark,
 }));
 
-const ButtonBox = styled('div', ({}) => ({
+export const ButtonBox = styled('div', ({}) => ({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'flex-end',

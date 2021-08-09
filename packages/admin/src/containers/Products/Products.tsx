@@ -1,40 +1,20 @@
 import React, { useState } from 'react';
 import { styled, withStyle } from 'baseui';
+import  SearchCard  from '../../components/SearchCard/SearchCard';
 import Button from '../../components/Button/Button';
-import {
-  Grid,
-  Row as Rows,
-  Col as Column,
-} from '../../components/FlexBox/FlexBox';
+import { ButtonBox, Text } from '../../components/SearchCard/SearchCard';
+import { Grid, Row, Col as Column } from '../../components/FlexBox/FlexBox';
+import DisplayTable from '../../components/DisplayTable/DisplayTable';
 import Input from '../../components/Input/Input';
 import Select from '../../components/Select/Select';
-import gql from 'graphql-tag';
-import { useQuery } from '@apollo/react-hooks';
-import { Header, Heading } from '../../components/WrapperStyle';
-import Fade from 'react-reveal/Fade';
-import ProductCard from '../../components/ProductCard/ProductCard';
-import NoResult from '../../components/NoResult/NoResult';
-import { CURRENCY } from '../../settings/constants';
-import Placeholder from '../../components/Placeholder/Placeholder';
+import { SelectBox } from '../../components/Select/Select';
+import { Heading, SubHeadingLeft, SubHeadingRight, Title } from '../../components/DisplayTable/DisplayTable';
+import { useHistory } from 'react-router-dom';
+import { ADDPRODUCT } from '../../settings/constants';
 
-export const ProductsRow = styled('div', ({ $theme }) => ({
-  display: 'flex',
-  flexWrap: 'wrap',
-  marginTop: '25px',
-  backgroundColor: $theme.colors.backgroundF7,
-  position: 'relative',
-  zIndex: '1',
-
-  '@media only screen and (max-width: 767px)': {
-    marginLeft: '-7.5px',
-    marginRight: '-7.5px',
-    marginTop: '15px',
-  },
-}));
-
-export const Col = withStyle(Column, () => ({
-  '@media only screen and (max-width: 767px)': {
-    marginBottom: '20px',
+const Col = withStyle(Column, () => ({
+  '@media only screen and (max-width: 574px)': {
+    marginBottom: '30px',
 
     ':last-child': {
       marginBottom: 0,
@@ -42,236 +22,148 @@ export const Col = withStyle(Column, () => ({
   },
 }));
 
-const Row = withStyle(Rows, () => ({
-  '@media only screen and (min-width: 768px) and (max-width: 991px)': {
-    alignItems: 'center',
-  },
-}));
-
-export const ProductCardWrapper = styled('div', () => ({
-  height: '100%',
-}));
-
-export const LoaderWrapper = styled('div', () => ({
-  width: '100%',
-  height: '100vh',
+const SearchBox = styled('div', () => ({
+  width: '50%',
   display: 'flex',
-  flexWrap: 'wrap',
+  flexDirection: 'row',
+  alignItems: 'center',
 }));
 
-export const LoaderItem = styled('div', () => ({
-  width: '25%',
-  padding: '0 15px',
-  marginBottom: '30px',
+const SearchProductBox = styled('div', () => ({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  paddingRight: '10px'
 }));
 
-const GET_PRODUCTS = gql`
-  query getProducts(
-    $type: String
-    $sortByPrice: String
-    $searchText: String
-    $offset: Int
-  ) {
-    products(
-      type: $type
-      sortByPrice: $sortByPrice
-      searchText: $searchText
-      offset: $offset
-    ) {
-      items {
-        id
-        name
-        description
-        image
-        type
-        price
-        unit
-        salePrice
-        discountInPercent
-      }
-      totalCount
-      hasMore
-    }
-  }
-`;
+const ContentBox = styled('div', () => ({
+  display: 'flex',
+  flexDirection: 'column',
+  width: '90%',
+  marginRight: '10px',
+}));
 
-const typeSelectOptions = [
-  { value: 'grocery', label: 'Grocery' },
-  { value: 'women-cloths', label: 'Women Cloths' },
-  { value: 'bags', label: 'Bags' },
-  { value: 'makeup', label: 'Makeup' },
-];
-const priceSelectOptions = [
-  { value: 'highestToLowest', label: 'Highest To Lowest' },
-  { value: 'lowestToHighest', label: 'Lowest To Highest' },
-];
+const Wrapper = styled('div', () => ({
+  width: '100%',
+  fontFamily: "Montserrat",
+  display: "flex",
+  flexDirection: "column",
+  padding: "30px",
+  borderRadius: "6px",
+  backgroundColor: "#ffffff",
+  boxShadow: "-3px 3px 5px 1px #E0E0E0",
+  marginBottom: '20px',
+}));
 
-export default function Products() {
-  const { data, error, refetch, fetchMore } = useQuery(GET_PRODUCTS);
-  const [loadingMore, toggleLoading] = useState(false);
-  const [type, setType] = useState([]);
-  const [priceOrder, setPriceOrder] = useState([]);
-  const [search, setSearch] = useState([]);
+const Products = () => {
+  const column_names = ['商品編號', '商品名稱', '單價', '規格', '操作'];
+  const amountSelectOptions = [
+    { value: 10, label: '10' },
+    { value: 25, label: '25' },
+    { value: 50, label: '50' },
+    { value: 100, label: '100' },
+  ];
+  const [displayAmount, setDisplayAmount] = useState([]);
+  const data = [{'商品編號': '123456789','商品名稱': 'ABC', '單價': '100', '規格': '規格A'}]
+  const history = useHistory();
 
-  if (error) {
-    return <div>Error! {error.message}</div>;
+  function amountChange({ value }) {
+    setDisplayAmount(value);
+    console.log(displayAmount)
   }
-  function loadMore() {
-    toggleLoading(true);
-    fetchMore({
-      variables: {
-        offset: data.products.items.length,
-      },
-      updateQuery: (prev, { fetchMoreResult }) => {
-        toggleLoading(false);
-        if (!fetchMoreResult) return prev;
-        return Object.assign({}, prev, {
-          products: {
-            __typename: prev.products.__typename,
-            items: [...prev.products.items, ...fetchMoreResult.products.items],
-            hasMore: fetchMoreResult.products.hasMore,
-          },
-        });
-      },
-    });
+
+  const searchPurchase = () =>{
+
   }
-  function handlePriceSort({ value }) {
-    setPriceOrder(value);
-    if (value.length) {
-      refetch({
-        sortByPrice: value[0].value,
-      });
-    } else {
-      refetch({
-        sortByPrice: null,
-      });
-    }
+
+  const checkPurchase = () => {
+
   }
-  function handleCategoryType({ value }) {
-    setType(value);
-    if (value.length) {
-      refetch({
-        type: value[0].value,
-      });
-    } else {
-      refetch({
-        type: null,
-      });
-    }
+
+  const editPurchase = () => {
+
   }
-  function handleSearch(event) {
-    const value = event.currentTarget.value;
-    setSearch(value);
-    refetch({ searchText: value });
+
+  const deactivatePurchase = () => {
+
+  }
+
+  const handleSearch =() => {
+
+  }
+
+  const handleChange = () => {
+    
   }
 
   return (
     <Grid fluid={true}>
       <Row>
         <Col md={12}>
-          <Header style={{ marginBottom: 15 }}>
-            <Col md={2} xs={12}>
-              <Heading>Products</Heading>
-            </Col>
-
-            <Col md={10} xs={12}>
-              <Row>
-                <Col md={3} xs={12}>
+          <Title>
+            商品管理
+          </Title>
+          <Wrapper>
+            <Heading>商品查詢</Heading>
+            <SearchProductBox>
+              <ContentBox>
+                  <Text>商品編號</Text>
+                  <Input 
+                      placeholder = '輸入商品編號'
+                      onChange = {handleChange}
+                  />
+              </ContentBox>
+              <ContentBox>
+                  <Text>商品名稱</Text>
+                  <Input 
+                      placeholder = '輸入商品名稱'
+                      onChange = {handleChange}
+                  />
+              </ContentBox>
+            </SearchProductBox>
+            <ButtonBox>
+                <Button margin='5px' width='80px' height='45px' background_color='#FF902B' color={'#FFFFFF'} onClick={() => history.push(ADDPRODUCT)}>新增</Button>
+                <Button margin='5px' width='80px' height='45px' background_color='#FF902B' color={'#FFFFFF'} onClick={searchPurchase}>查詢</Button>
+            </ButtonBox>
+          </Wrapper>
+        </Col>
+      </Row>
+      <Row>
+        <Col md={12}>
+          <Wrapper>
+            <Heading>
+              <SubHeadingLeft>Show
+                <SelectBox width="15%">
                   <Select
-                    options={typeSelectOptions}
-                    labelKey='label'
-                    valueKey='value'
-                    placeholder='Category Type'
-                    value={type}
+                    options = {amountSelectOptions}
+                    labelKey="label"
+                    valueKey="value"
+                    placeholder={10}
+                    value={displayAmount}
                     searchable={false}
-                    onChange={handleCategoryType}
+                    onChange={amountChange}
                   />
-                </Col>
-
-                <Col md={3} xs={12}>
-                  <Select
-                    options={priceSelectOptions}
-                    labelKey='label'
-                    valueKey='value'
-                    value={priceOrder}
-                    placeholder='Price'
-                    searchable={false}
-                    onChange={handlePriceSort}
-                  />
-                </Col>
-
-                <Col md={6} xs={12}>
-                  <Input
-                    value={search}
-                    placeholder='Ex: Search By Name'
-                    onChange={handleSearch}
-                    clearable
-                  />
-                </Col>
-              </Row>
-            </Col>
-          </Header>
-
-          <Row>
-            {data ? (
-              data.products && data.products.items.length !== 0 ? (
-                data.products.items.map((item: any, index: number) => (
-                  <Col
-                    md={4}
-                    lg={3}
-                    sm={6}
-                    xs={12}
-                    key={index}
-                    style={{ margin: '15px 0' }}
-                  >
-                    <Fade bottom duration={800} delay={index * 10}>
-                      <ProductCard
-                        title={item.name}
-                        weight={item.unit}
-                        image={item.image}
-                        currency={CURRENCY}
-                        price={item.price}
-                        salePrice={item.salePrice}
-                        discountInPercent={item.discountInPercent}
-                        data={item}
-                      />
-                    </Fade>
-                  </Col>
-                ))
-              ) : (
-                <NoResult />
-              )
-            ) : (
-              <LoaderWrapper>
-                <LoaderItem>
-                  <Placeholder />
-                </LoaderItem>
-                <LoaderItem>
-                  <Placeholder />
-                </LoaderItem>
-                <LoaderItem>
-                  <Placeholder />
-                </LoaderItem>
-                <LoaderItem>
-                  <Placeholder />
-                </LoaderItem>
-              </LoaderWrapper>
-            )}
-          </Row>
-          {data && data.products && data.products.hasMore && (
-            <Row>
-              <Col
-                md={12}
-                style={{ display: 'flex', justifyContent: 'center' }}
-              >
-                <Button onClick={loadMore} isLoading={loadingMore}>
-                  Load More
-                </Button>
-              </Col>
-            </Row>
-          )}
+                </SelectBox>
+                entries
+              </SubHeadingLeft>
+              <SubHeadingRight><SearchBox>Search:<Input onChange={handleSearch}/></SearchBox></SubHeadingRight>
+            </Heading>
+            <DisplayTable
+              columnNames = {column_names}
+              columnData = {data}
+              Button1_function = {checkPurchase}
+              Button1_text = '查看'
+              Button2_function = {editPurchase}
+              Button2_text = '編輯'
+              Button3_function = {deactivatePurchase}
+              Button3_text = '停用'
+            />
+          </Wrapper>
         </Col>
       </Row>
     </Grid>
-  );
+  )
 }
+
+
+export default Products;

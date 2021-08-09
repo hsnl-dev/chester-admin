@@ -18,7 +18,8 @@ export const Wrapper = styled('div', () => ({
   borderRadius: "6px",
   backgroundColor: "#ffffff",
   boxShadow: "-3px 3px 5px 1px #E0E0E0",
-  marginTop: '20px',
+  fontFamily: "Montserrat",
+  marginTop: '15px',
 }));
 
 export const StyledTable = styled('table', () => ({
@@ -31,9 +32,8 @@ export const StyledTable = styled('table', () => ({
 export const StyledTh = styled('th', () => ({
   verticalAlign: 'top',
   border: '1px solid #E0E0E0',
-  fontFamily: "'Lato', sans-serif",
   fontWeight: 700,
-  fontSize: '20px'
+  fontSize: '15px'
   
 }))
 
@@ -41,7 +41,6 @@ export const StyledTd = styled('td', () => ({
   verticalAlign: 'center',
   border: '1px solid #E0E0E0',
   padding: '10px',
-  fontFamily: "'Lato', sans-serif",
   fontWeight: 400,
 }))
 
@@ -68,8 +67,7 @@ export const SubHeadingRight = styled('div', ({ $theme }) => ({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'center',
-    fontSize: '20px',
-    fontFamily: "'Lato', sans-serif",
+    fontSize: '15px',
     fontWeight: 400,
 }));
 
@@ -81,8 +79,7 @@ export const SubHeadingLeft = styled('div', ({ $theme }) => ({
     flexDirection: 'row',
     justifyContent: 'flex-start',
     alignItems: 'center',
-    fontSize: '20px',
-    fontFamily: "'Lato', sans-serif",
+    fontSize: '15px',
     fontWeight: 400,
 }));
 
@@ -122,48 +119,50 @@ export default function DisplayTable({
     
     return (
       <div>
+        {columnData.length != 0? (
           <StyledTable>
             <tr>
                 {columnNames.map((columnName: Array<string>) => (
                     <StyledTh>{columnName}</StyledTh>
                 ))}
             </tr>
-            {columnData? (
-                columnData.map((item) => Object.values(item))
-                .map((row: Array<string>, index) => (
-                    <tr>
-                        <React.Fragment key={index}>
-                            <StyledTd>{row[0]}</StyledTd>
-                            <StyledTd>{row[1]}</StyledTd>
-                            <StyledTd>{row[2]}</StyledTd>
-                            {row.length == 4? <StyledTd>{row[3]}</StyledTd>: null}
-                            <StyledTd>
-                                <StyledButtonBox>
-                                    {Button1_text.length != 0? (
-                                      <Button margin='5px' width='80px' height='45px' background_color='#40C057' color={'#FFFFFF'} onClick={Button1_function}>{Button1_text}</Button>
-                                    ):(null)}
-                                    <Button margin='5px' width='80px' height='45px' background_color='#2F8BE6' color={'#FFFFFF'} onClick={Button2_function}>{Button2_text}</Button>
-                                    <Button margin='5px' width='80px' height='45px' background_color='#F55252' color={'#FFFFFF'} onClick={Button3_function}>{Button3_text}</Button>
-                                </StyledButtonBox>
-                            </StyledTd>
-                        </React.Fragment>
-                    </tr>
+            
+              {columnData.map((item) => Object.values(item))
+              .map((row: Array<string>, index) => (
+                  <tr>
+                    <React.Fragment key={index}>
+                      <StyledTd>{row[0]}</StyledTd>
+                      <StyledTd>{row[1]}</StyledTd>
+                      <StyledTd>{row[2]}</StyledTd>
+                      {row.length == 4? <StyledTd>{row[3]}</StyledTd>: null}
+                      <StyledTd>
+                        <StyledButtonBox>
+                          {Button1_text.length != 0? (
+                            <Button margin='5px' width='80px' height='45px' background_color='#40C057' color={'#FFFFFF'} onClick={Button1_function}>{Button1_text}</Button>
+                          ):(null)}
+                          <Button margin='5px' width='80px' height='45px' background_color='#2F8BE6' color={'#FFFFFF'} onClick={Button2_function}>{Button2_text}</Button>
+                          <Button margin='5px' width='80px' height='45px' background_color='#F55252' color={'#FFFFFF'} onClick={Button3_function}>{Button3_text}</Button>
+                        </StyledButtonBox>
+                      </StyledTd>
+                    </React.Fragment>
+                  </tr>
                 ))
-              ) : (
-                <NoResult
-                  hideButton={false}
-                    style={{
-                      gridColumnStart: '1',
-                      gridColumnEnd: 'one',
-                    }}
-                />
-              )}
+              }
               <tr>
                 {columnNames.map((columnName: Array<string>) => (
                     <StyledTh>{columnName}</StyledTh>
                 ))}
             </tr>
           </StyledTable>
+          ) : (
+            <NoResult
+              hideButton={false}
+                style={{
+                  gridColumnStart: '1',
+                  gridColumnEnd: 'one',
+                }}
+            />
+          )}
       </div>
     );
   }
