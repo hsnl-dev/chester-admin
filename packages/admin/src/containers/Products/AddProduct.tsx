@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 import { styled, withStyle, useStyletron } from 'baseui';
 import { Grid, Row, Col as Column } from '../../components/FlexBox/FlexBox';
 import DisplayTable from '../../components/DisplayTable/DisplayTable';
@@ -109,138 +110,163 @@ interface LocationState {
 };
 
 const AddProduct = () => {
+  const [specification, setSpecification] = useState([]);
+  const [finalUnit, setFinalUnit] = useState([]);
+  const [preservation, setPreservation] = useState([]);
+  const [PDUnit, setPDUnit] = useState([]);
+  const [unit, setUnit] = useState([]);
+  const [itemsInfo, setItemsInfo] = useState({"productNumber": "", "productName":"", "specification": "", "unitPrice": "", "finalUnit": "", "weight": "", "unit": "", "PD": "", "PDUnit": "",  "preservation": "", "image": undefined, "imageInfo": "", "remark": ""});
+  const [productSpecs, setProductSpecs] = useState([]);
+  const [productUnits, setProductUnits] = useState([]);
+  const [image, setImage] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const history = useHistory();
+  const location = useLocation<LocationState>();
 
-    const [specification, setSpecification] = useState([]);
-    const [finalUnit, setFinalUnit] = useState([]);
-    const [preservation, setPreservation] = useState([]);
-    const [PDUnit, setPDUnit] = useState([]);
-    const [unit, setUnit] = useState([]);
-    const [itemsInfo, setItemsInfo] = useState({"productNumber": "", "productName":"", "specification": "", "unitPrice": "", "finalUnit": "", "weight": "", "unit": "", "PD": "", "PDUnit": "",  "preservation": "", "image": "", "imageInfo": "", "remark": ""});
-    const [productSpecs, setProductSpecs] = useState([]);
-    const [productUnits, setProductUnits] = useState([]);
-    const history = useHistory();
-    const location = useLocation<LocationState>();
+  const handleInfoChange = (e) => {
+    console.log(e.target.id);
+    let temp = e.target.id.split("_");
+    let type = temp[0];
+    itemsInfo[type] = e.target.value;
+    setItemsInfo({...itemsInfo});
+  }
 
-    const handleInfoChange = (e) => {
-      console.log(e.target.id);
-      let temp = e.target.id.split("_");
-      let type = temp[0];
-      itemsInfo[type] = e.target.value;
-      setItemsInfo({...itemsInfo});
-    }
-
-    const handleSubmit = async () => {
-      try {
-        const response = await request.post(`/product/create`, {
-          product_no: itemsInfo.productNumber,
-          name: itemsInfo.productName,
-          spec: itemsInfo.specification,
-          product_unit: itemsInfo.finalUnit,
-          price: itemsInfo.unitPrice,
-          weight: itemsInfo.weight,
-          weight_unit:  itemsInfo.unit,
-          shelf_life: itemsInfo.PD,
-          shelf_life_unit: itemsInfo.PDUnit,
-          storage: itemsInfo.preservation,
-          picture: itemsInfo.image,
-          picture_description: itemsInfo.imageInfo,
-          note: itemsInfo.remark
-        });
-        history.push(PRODUCTS);
-        if (response) {
-          console.log("Add product success");
-        } else {
-          console.log("Add product failed");
-        }
-      } catch (err) {
-        console.log(err);
+  const handleSubmit = async () => {
+    try {
+      // upload image
+      if (image) {
+        uploadImage();
+        console.log("imageurl: ", imageUrl);
       }
-    }
-
-    async function getProductSpecs() {
-      const product_specs = location.state.specs;
-      const spec_list = product_specs.map(element => {
-        return {
-          value: element["spec"],
-          label: element["spec"]
-        };
+      const response = await request.post(`/product/create`, {
+        product_no: itemsInfo.productNumber,
+        name: itemsInfo.productName,
+        spec: itemsInfo.specification,
+        product_unit: itemsInfo.finalUnit,
+        price: itemsInfo.unitPrice,
+        weight: itemsInfo.weight,
+        weight_unit:  itemsInfo.unit,
+        shelf_life: itemsInfo.PD,
+        shelf_life_unit: itemsInfo.PDUnit,
+        storage: itemsInfo.preservation,
+        picture: imageUrl,
+        picture_description: itemsInfo.imageInfo,
+        note: itemsInfo.remark
       });
-      console.log(spec_list);
-      setProductSpecs(spec_list);
+      history.push(PRODUCTS);
+      if (response) {
+        console.log("Add product success");
+      } else {
+        console.log("Add product failed");
+      }
+    } catch (err) {
+      console.log(err);
     }
+  }
 
-    async function getProductUnits() {
-      const product_units = location.state.units;
-      const unit_list = product_units.map(element => {
-        return {
-          value: element["unit"],
-          label: element["unit"]
-        };
-      });
-      console.log(unit_list);
-      setProductUnits(unit_list);
+  async function getProductSpecs() {
+    const product_specs = location.state.specs;
+    const spec_list = product_specs.map(element => {
+      return {
+        value: element["spec"],
+        label: element["spec"]
+      };
+    });
+    console.log(spec_list);
+    setProductSpecs(spec_list);
+  }
+
+  async function getProductUnits() {
+    const product_units = location.state.units;
+    const unit_list = product_units.map(element => {
+      return {
+        value: element["unit"],
+        label: element["unit"]
+      };
+    });
+    console.log(unit_list);
+    setProductUnits(unit_list);
+  }
+
+
+  const uploadImage = async () => {
+    let data = new FormData();
+    console.log(image);
+    data.append("file", image);
+    data.append("upload_preset", "chester");
+    data.append("cloud_name", "ktgincot");
+    const config = {
+      headers: {"X-Requested-With": "XMLHttpRequest"},
+    };
+    const response = await axios.post("https://api.cloudinary.com/v1_1/ktgincot/image/upload", data, config);
+    if (response) {
+      console.log(response);
+      console.log(response.data.url);
+      setImageUrl(response.data.url);
     }
-
-    useEffect(() => {
-      getProductSpecs();
-      getProductUnits();
-      console.log(itemsInfo);
-    }, [itemsInfo])
-  
-
-    return (
-        <Grid fluid={true}>
-          <Row>
-            <Col md={12}>
-                <Title>
-                    新增
-                </Title>
-                <Wrapper onChange={handleInfoChange}>
-                  <Heading>新增商品</Heading>
-                  <RowBox>
-                  
-                    <InputBox><Text>商品編號</Text><Input height='100%' id={"productNumber"} placeholder="輸入商品編號"/></InputBox>
-                    <InputBox><Text>商品名稱</Text><Input height='100%' id={"productName"} placeholder="輸入商品名稱"/></InputBox>
-                  </RowBox>
-                  <RowBox>
-                    <InputBox><Text>規格</Text><Select placeholder="選擇" labelKey="label" valueKey="value" searchable={false} options={productSpecs} value={specification}
-                      onChange={({ value }) => {setSpecification(value); itemsInfo["specification"]=value[0]['value']; setItemsInfo({...itemsInfo})}}/></InputBox>
-                    <InputBox><Text>單價</Text><Input height="100%" id={"unitPrice"} placeholder="輸入單價"/></InputBox>
-                  </RowBox>
-                  <RowBox>
-                    <InputBox><Text>成品單位</Text><Select placeholder="選擇" labelKey="label" valueKey="value" searchable={false} options={productUnits} value={finalUnit}
-                      onChange={({ value }) => {setFinalUnit(value); itemsInfo["finalUnit"]=value[0]['value']; setItemsInfo({...itemsInfo})}}/></InputBox>
-                    <InputBox><Text>成品重量</Text>
-                      <ContentBox>
-                        <Input height="100%" id={"weight"} placeholder="輸入數字"/>
-                        <Select placeholder="選擇" labelKey="label" valueKey="value" searchable={false} options={unitList} value={unit}
-                          onChange={({ value }) => {setUnit(value); itemsInfo["unit"]=value[0]['value']; setItemsInfo({...itemsInfo})}}/>
-                      </ContentBox>
-                    </InputBox>
-                  </RowBox>
-                  <RowBox>
-                    <InputBox><Text>保存期限</Text>
-                      <ContentBox>
-                        <Input height="100%" id={"PD"} placeholder="輸入數字"/>
-                        <Select placeholder="選擇" labelKey="label" valueKey="value" searchable={false} options={PDUnitList} value={PDUnit}
-                          onChange={({ value }) => {setPDUnit(value); itemsInfo["PDUnit"]=value[0]['value']; setItemsInfo({...itemsInfo})}}/>
-                      </ContentBox>
-                    </InputBox>
-                    <InputBox><Text>保存性質</Text><Select placeholder="選擇" labelKey="label" valueKey="value" searchable={false} options={preservationList} value={preservation}
-                          onChange={({ value }) => {setPreservation(value); itemsInfo["preservation"]=value[0]['value']; setItemsInfo({...itemsInfo})}}/></InputBox>
-                  </RowBox>
-                  <RowBox>
-                    <InputBox><Text>照片</Text><Input height="100%" id={"image"} placeholder="選擇檔案"/></InputBox>
-                    <InputBox><Text>相片說明</Text><Input height="100%" id={"imageInfo"} placeholder="輸入相片說明"/></InputBox>
-                  </RowBox>
-                  <RowBox>
-                    <InputBox><Text>備註</Text><Input height="100px" id={"remark"} placeholder="" /></InputBox>
-                  </RowBox>
-                </Wrapper>
-            </Col>
-          </Row>
-        </Grid>
-      );
   };
-  
-  export default AddProduct;
+
+  useEffect(() => {
+    getProductSpecs();
+    getProductUnits();
+    console.log(itemsInfo);
+  }, [itemsInfo])
+
+  return (
+    <Grid fluid={true}>
+      <Row>
+        <Col md={12}>
+            <Title>
+                新增
+            </Title>
+            <Wrapper onChange={handleInfoChange}>
+              <Heading>新增商品</Heading>
+              <RowBox>
+                <InputBox><Text>商品編號</Text><Input height='100%' id={"productNumber"} placeholder="輸入商品編號"/></InputBox>
+                <InputBox><Text>商品名稱</Text><Input height='100%' id={"productName"} placeholder="輸入商品名稱"/></InputBox>
+              </RowBox>
+              <RowBox>
+                <InputBox><Text>規格</Text><Select placeholder="選擇" labelKey="label" valueKey="value" searchable={false} options={productSpecs} value={specification}
+                  onChange={({ value }) => {setSpecification(value); itemsInfo["specification"]=value[0]['value']; setItemsInfo({...itemsInfo})}}/></InputBox>
+                <InputBox><Text>單價</Text><Input height="100%" id={"unitPrice"} placeholder="輸入單價"/></InputBox>
+              </RowBox>
+              <RowBox>
+                <InputBox><Text>成品單位</Text><Select placeholder="選擇" labelKey="label" valueKey="value" searchable={false} options={productUnits} value={finalUnit}
+                  onChange={({ value }) => {setFinalUnit(value); itemsInfo["finalUnit"]=value[0]['value']; setItemsInfo({...itemsInfo})}}/></InputBox>
+                <InputBox><Text>成品重量</Text>
+                  <ContentBox>
+                    <Input height="100%" id={"weight"} placeholder="輸入數字"/>
+                    <Select placeholder="選擇" labelKey="label" valueKey="value" searchable={false} options={unitList} value={unit}
+                      onChange={({ value }) => {setUnit(value); itemsInfo["unit"]=value[0]['value']; setItemsInfo({...itemsInfo})}}/>
+                  </ContentBox>
+                </InputBox>
+              </RowBox>
+              <RowBox>
+                <InputBox><Text>保存期限</Text>
+                  <ContentBox>
+                    <Input height="100%" id={"PD"} placeholder="輸入數字"/>
+                    <Select placeholder="選擇" labelKey="label" valueKey="value" searchable={false} options={PDUnitList} value={PDUnit}
+                      onChange={({ value }) => {setPDUnit(value); itemsInfo["PDUnit"]=value[0]['value']; setItemsInfo({...itemsInfo})}}/>
+                  </ContentBox>
+                </InputBox>
+                <InputBox><Text>保存性質</Text><Select placeholder="選擇" labelKey="label" valueKey="value" searchable={false} options={preservationList} value={preservation}
+                      onChange={({ value }) => {setPreservation(value); itemsInfo["preservation"]=value[0]['value']; setItemsInfo({...itemsInfo})}}/></InputBox>
+              </RowBox>
+              <RowBox>
+                <InputBox>
+                  <Text>照片</Text>
+                  <Input height="100%" id={"image"} placeholder="選擇檔案" />
+                </InputBox>
+                <InputBox><Text>相片說明</Text><Input height="100%" id={"imageInfo"} placeholder="輸入相片說明"/></InputBox>
+              </RowBox>
+              <RowBox>
+                <InputBox><Text>備註</Text><Input height="100px" id={"remark"} placeholder="" /></InputBox>
+              </RowBox>
+            </Wrapper>
+        </Col>
+      </Row>
+    </Grid>
+  );
+};
+
+export default AddProduct;

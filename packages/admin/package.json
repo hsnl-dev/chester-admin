@@ -8,6 +8,7 @@
     "apollo-boost": "^0.4.9",
     "axios": "^0.21.1",
     "baseui": "^9.80.2",
+    "cloudinary-react": "^1.7.0",
     "crypto-js": "^4.0.0",
     "dayjs": "^1.8.28",
     "formik": "^2.1.4",
