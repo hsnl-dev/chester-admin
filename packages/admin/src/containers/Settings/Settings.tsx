@@ -63,6 +63,7 @@ export default function Settings() {
   ];
   const [displayAmount, setDisplayAmount] = useState([]);
   const [members, setMembers] = useState([]);
+  const [partnerData, setPartnerData] = useState([]);
   const data = [{'account': '123456789','name': 'ABC', 'authority': '店家管理者'}]
   const history = useHistory();
 
@@ -92,9 +93,12 @@ export default function Settings() {
   async function getMembers() {
     try {
       const result = await request.get(`/users`);
-      const member_arr = result.data;
+      const member_arr = result.data.members;
+      const partner_data = result.data.partner;
       console.log(member_arr);
+      console.log(partner_data);
       setMembers(member_arr);
+      setPartnerData(partner_data);
     } catch (err) {
       console.log(err);
     }
