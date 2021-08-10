@@ -12,7 +12,10 @@ import { Datepicker } from 'baseui/datepicker';
 import { useEffect } from 'react';
 import tw from 'date-fns/locale/zh-TW';
 import dayjs from 'dayjs';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
+import { request } from "../../utils/request";
+import { getUnpackedSettings } from 'http2';
+import { getHeapSpaceStatistics } from 'v8';
 
 const Col = withStyle(Column, () => ({
     '@media only screen and (max-width: 574px)': {
@@ -80,22 +83,12 @@ const ContentBox = styled('div', () => ({
   
 }));
 
-const specificationList = [
-  { value: 'A', label: '規格A' },
-  { value: 'B', label: '規格B' },
-];
-
 const preservationList = [
   { value: '常溫', label: '常溫' },
   { value: '冷藏', label: '冷藏' },
   { value: '冷凍', label: '冷凍' },
 ];
 
-const finalUnitList = [
-  { value: '碗', label: '碗' },
-  { value: '盤', label: '盤' },
-  { value: '杯', label: '杯' },
-];
 
 const PDUnitList = [
   { value: '天', label: '天' },
@@ -110,7 +103,10 @@ const unitList = [
   { value: '杯', label: '杯' },
 ];
 
-
+interface LocationState {
+  specs: string[],
+  units: string[]
+};
 
 const AddProduct = () => {
 
@@ -119,8 +115,11 @@ const AddProduct = () => {
     const [preservation, setPreservation] = useState([]);
     const [PDUnit, setPDUnit] = useState([]);
     const [unit, setUnit] = useState([]);
-    const [itemsInfo, setItemsInfo] = useState({"productNumber": "", "productName":"", "specification": "", "unitPrice": "", "finalUnit": "", "weight": "", "PD": "", "preservation": "", "image": "", "imageInfo": "", "remark": ""});
+    const [itemsInfo, setItemsInfo] = useState({"productNumber": "", "productName":"", "specification": "", "unitPrice": "", "finalUnit": "", "weight": "", "unit": "", "PD": "", "PDUnit": "",  "preservation": "", "image": "", "imageInfo": "", "remark": ""});
+    const [productSpecs, setProductSpecs] = useState([]);
+    const [productUnits, setProductUnits] = useState([]);
     const history = useHistory();
+    const location = useLocation<LocationState>();
 
     const handleInfoChange = (e) => {
       console.log(e.target.id);
@@ -130,12 +129,62 @@ const AddProduct = () => {
       setItemsInfo({...itemsInfo});
     }
 
-    const handleSubmit = () => {
-
+    const handleSubmit = async () => {
+      try {
+        const response = await request.post(`/product/create`, {
+          product_no: itemsInfo.productNumber,
+          name: itemsInfo.productName,
+          spec: itemsInfo.specification,
+          product_unit: itemsInfo.finalUnit,
+          price: itemsInfo.unitPrice,
+          weight: itemsInfo.weight,
+          weight_unit:  itemsInfo.unit,
+          shelf_life: itemsInfo.PD,
+          shelf_life_unit: itemsInfo.PDUnit,
+          storage: itemsInfo.preservation,
+          picture: itemsInfo.image,
+          picture_description: itemsInfo.imageInfo,
+          note: itemsInfo.remark
+        });
+        history.push(PRODUCTS);
+        if (response) {
+          console.log("Add product success");
+        } else {
+          console.log("Add product failed");
+        }
+      } catch (err) {
+        console.log(err);
+      }
     }
 
-    useEffect(()=>{
-      console.log(itemsInfo)
+    async function getProductSpecs() {
+      const product_specs = location.state.specs;
+      const spec_list = product_specs.map(element => {
+        return {
+          value: element["spec"],
+          label: element["spec"]
+        };
+      });
+      console.log(spec_list);
+      setProductSpecs(spec_list);
+    }
+
+    async function getProductUnits() {
+      const product_units = location.state.units;
+      const unit_list = product_units.map(element => {
+        return {
+          value: element["unit"],
+          label: element["unit"]
+        };
+      });
+      console.log(unit_list);
+      setProductUnits(unit_list);
+    }
+
+    useEffect(() => {
+      getProductSpecs();
+      getProductUnits();
+      console.log(itemsInfo);
     }, [itemsInfo])
   
 
@@ -154,12 +203,12 @@ const AddProduct = () => {
                     <InputBox><Text>商品名稱</Text><Input height='100%' id={"productName"} placeholder="輸入商品名稱"/></InputBox>
                   </RowBox>
                   <RowBox>
-                    <InputBox><Text>規格</Text><Select placeholder="選擇" labelKey="label" valueKey="value" searchable={false} options={specificationList} value={specification}
+                    <InputBox><Text>規格</Text><Select placeholder="選擇" labelKey="label" valueKey="value" searchable={false} options={productSpecs} value={specification}
                       onChange={({ value }) => {setSpecification(value); itemsInfo["specification"]=value[0]['value']; setItemsInfo({...itemsInfo})}}/></InputBox>
                     <InputBox><Text>單價</Text><Input height="100%" id={"unitPrice"} placeholder="輸入單價"/></InputBox>
                   </RowBox>
                   <RowBox>
-                    <InputBox><Text>成品單位</Text><Select placeholder="選擇" labelKey="label" valueKey="value" searchable={false} options={finalUnitList} value={finalUnit}
+                    <InputBox><Text>成品單位</Text><Select placeholder="選擇" labelKey="label" valueKey="value" searchable={false} options={productUnits} value={finalUnit}
                       onChange={({ value }) => {setFinalUnit(value); itemsInfo["finalUnit"]=value[0]['value']; setItemsInfo({...itemsInfo})}}/></InputBox>
                     <InputBox><Text>成品重量</Text>
                       <ContentBox>

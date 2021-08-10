@@ -12,6 +12,7 @@ import { Heading, SubHeadingLeft, SubHeadingRight, Title } from '../../component
 import { useHistory } from 'react-router-dom';
 import { ADDPRODUCT } from '../../settings/constants';
 import { request } from '../../utils/request';
+import { SSL_OP_NETSCAPE_REUSE_CIPHER_CHANGE_BUG } from 'constants';
 
 const Col = withStyle(Column, () => ({
   '@media only screen and (max-width: 574px)': {
@@ -66,6 +67,8 @@ const Products = () => {
   ];
   const [displayAmount, setDisplayAmount] = useState([]);
   const [products, setProducts] = useState([]);
+  const [specs, setSpecs] = useState([]);
+  const [units, setUnits] = useState([]);
   const data = [{'商品編號': '123456789','商品名稱': 'ABC', '單價': '100', '規格': '規格A'}]
   const history = useHistory();
 
@@ -107,9 +110,12 @@ const Products = () => {
   async function getProducts() {
     try {
       const result = await request.get(`/product`);
-      const product_arr = result.data;
-      console.log(product_arr);
+      const product_arr = result.data.products;
+      const specs_arr = result.data.specs;
+      const units_arr = result.data.units;
       setProducts(product_arr);
+      setSpecs(specs_arr);
+      setUnits(units_arr);
     } catch (err) {
       console.log(err);
     }
@@ -145,8 +151,17 @@ const Products = () => {
               </ContentBox>
             </SearchProductBox>
             <ButtonBox>
-                <Button margin='5px' width='80px' height='45px' background_color='#FF902B' color={'#FFFFFF'} onClick={() => history.push(ADDPRODUCT)}>新增</Button>
-                <Button margin='5px' width='80px' height='45px' background_color='#FF902B' color={'#FFFFFF'} onClick={searchPurchase}>查詢</Button>
+              <Button margin='5px' width='80px' height='45px' background_color='#FF902B' color={'#FFFFFF'} 
+                      onClick={() => history.push({
+                        pathname: ADDPRODUCT,
+                        state: {
+                          specs: specs,
+                          units: units
+                        }
+                      })}>
+                新增
+              </Button>
+              <Button margin='5px' width='80px' height='45px' background_color='#FF902B' color={'#FFFFFF'} onClick={searchPurchase}>查詢</Button>
             </ButtonBox>
           </Wrapper>
         </Col>

@@ -7,12 +7,13 @@ import Input from '../../components/Input/Input';
 import { Heading, SubHeadingLeft, SubHeadingRight, Title, Text } from '../../components/DisplayTable/DisplayTable';
 import Select from '../../components/Select/Select';
 import { PURCHASING } from '../../settings/constants';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Datepicker } from 'baseui/datepicker';
-import { useEffect } from 'react';
 import tw from 'date-fns/locale/zh-TW';
+import moment from 'moment';
 import dayjs from 'dayjs';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
+import { request } from "../../utils/request";
 
 const Col = withStyle(Column, () => ({
     '@media only screen and (max-width: 574px)': {
@@ -72,29 +73,29 @@ const InputBox = styled('div', () => ({
   marginTop: '10px',
 }));
 
-const vendorList = [
-  { value: 'A', label: '廠商A' },
-  { value: 'B', label: '廠商B' },
-];
-
 const unitList = [
   { value: 'g', label: 'g' },
   { value: 'kg', label: 'kg' },
   { value: 'ml', label: 'ml' },
 ];
 
-
+interface LocationState {
+  params: string[]
+};
 
 const AddPurchasing = () => {
     
     const itemsInfoTemp = {"name": "", "batchNumber":"", "origin": "", "brand": "", "amount": "", "unit": "g", "PD": "", "Exp": "", "unitPrice": "", "totalPrice": "", "remark": ""}
     const [vendor, setVendor] = useState([]);
+    const [vendorList, setVendorList] = useState([]);
     const [unit, setUnit] = useState([]);
     const [itemsInfo, setItemsInfo] = useState([]);
     const [date, setDate] = useState([]);
     const history = useHistory();
+    const location = useLocation<LocationState>();
 
     const handleVendor = ({ value }) => {
+      console.log(vendor);
       setVendor(value);
     }
 
@@ -111,12 +112,53 @@ const AddPurchasing = () => {
       setItemsInfo([...itemsInfo]);
     }
 
-    const handleSubmit = () => {
-
+    const handleSubmit = async () => {
+      itemsInfo.forEach(async function (element) {
+        try {
+          console.log("vendor: ", vendor[0].value);
+          console.log("element: ", element);
+          const response = await request.post(`/commodity/create`, {
+            vendor_id: vendor[0].value,
+            name: element.name,
+            batch_no: element.batchNumber,
+            origin: element.origin,
+            brand: element.brand,
+            amount: element.amount,
+            unit:  element.unit,
+            MFG: moment(element.PD).format("YYYY-MM-DD"),
+            EXP: moment(element.Exp).format("YYYY-MM-DD"),
+            unit_price: element.unitPrice,
+            gross_price: element.totalPrice,
+            note: element.remark
+          });
+          history.push(PURCHASING);
+          if (response) {
+            console.log("Add commodity success");
+          } else {
+            console.log("Add commodity failed");
+          }
+        } catch (err) {
+          console.log(err);
+        }
+      });
     }
 
-    useEffect(()=>{
-      console.log(itemsInfo)
+    async function getVendors() {
+      const vendors = location.state.params;
+      console.log("vendor in addpurchasing", vendors);
+      const vendor_list = vendors.map(element => {
+        return {
+          value: element["id"],
+          label: element["name"]
+        }
+      });
+      console.log(vendor_list);
+      setVendorList(vendor_list);
+    }
+
+    useEffect(() => {
+      getVendors();
+      console.log(itemsInfo);
     }, [itemsInfo])
   
 
@@ -148,7 +190,7 @@ const AddPurchasing = () => {
                     </VendorBox>
                     <RowBox>
                       <div>
-                        {itemsInfo.length == 0? (
+                        {itemsInfo.length == 0 ? (
                           <Button
                             background_color={'#FF902B'}
                             color={'#FFFFFF'}
@@ -211,7 +253,7 @@ const AddPurchasing = () => {
                             onChange={({ value }) => {setUnit(value); itemsInfo[index]["unit"]=value[0]['value']; setItemsInfo([...itemsInfo])}}/></InputBox>
                         </RowBox>
                         <RowBox>
-                          <InputBox><Text>製造日期</Text><Datepicker locale={tw} onChange={({date})=>{itemsInfo[index]["PD"]=date; setItemsInfo([...itemsInfo])}}/></InputBox>
+                          <InputBox><Text>製造日期</Text><Datepicker locale={tw}  onChange={({date})=>{itemsInfo[index]["PD"]=date; setItemsInfo([...itemsInfo])}}/></InputBox>
                           <InputBox><Text>有效日期</Text><Datepicker locale={tw} onChange={({date})=>{itemsInfo[index]["Exp"]=date; setItemsInfo([...itemsInfo])}} /></InputBox>
                         </RowBox>
                         <RowBox>

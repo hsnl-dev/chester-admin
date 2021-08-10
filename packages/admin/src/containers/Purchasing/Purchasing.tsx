@@ -40,7 +40,7 @@ const Purchasing = () => {
   ];
   const [displayAmount, setDisplayAmount] = useState([]);
   const [commodities, setCommodities] = useState([]);
-  const data = [{'廠商編號': '123456789','廠商名稱': 'ABC', '進貨日期': '2020/12/02'}]
+  const [vendors, setVendors] = useState([]);
   const [css] = useStyletron();
   const history = useHistory();
   const mb30 = css({
@@ -88,9 +88,10 @@ const Purchasing = () => {
   async function getCommodities() {
     try {
       const result = await request.get(`/commodity`);
-      const commodity_arr = result.data;
-      console.log(commodity_arr);
-      setCommodities(commodity_arr);
+      const vendors_arr = result.data.vendors;
+      const commodities_arr = result.data.commodities;
+      setVendors(vendors_arr);
+      setCommodities(commodities_arr);
     } catch (err) {
       console.log(err);
     }
@@ -110,7 +111,10 @@ const Purchasing = () => {
           <SearchCard
             title = '進貨查詢'
             handleChange = {handleDate}
-            Button1_function = {()=> history.push(ADDPURCHASING)}
+            Button1_function = {() => history.push({
+              pathname: ADDPURCHASING, 
+              state: {params: vendors}
+            })}
             Button2_function = {searchPurchase}
             Button1_text = '新增'
             Button2_text = '查詢'
