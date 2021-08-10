@@ -132,7 +132,7 @@ const AddPurchasing = () => {
         });
         history.push(PURCHASING);
         if (response) {
-          console.log("Add commodity success");
+          console.log("Add commodity successful");
         } else {
           console.log("Add commodity failed");
         }
@@ -142,7 +142,23 @@ const AddPurchasing = () => {
     });
   }
 
-  async function getVendors() {
+  const createVendor = async () => {
+    try {
+      const response = await request.post(`/commodity/create-vendor`, {
+        vendor_name: "",
+        note: "",
+      });
+      if (response){
+        console.log("Create vendor successful");
+      } else {
+        console.log("Create vendor failed");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  } 
+
+  const getVendors = async () => {
     const vendors = location.state.params;
     console.log("vendor in addpurchasing", vendors);
     const vendor_list = vendors.map(element => {

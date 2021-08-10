@@ -164,7 +164,7 @@ const AddProduct = () => {
     }
   }
 
-  async function getProductSpecs() {
+  const getProductSpecs = async () => {
     const product_specs = location.state.specs;
     const spec_list = product_specs.map(element => {
       return {
@@ -176,7 +176,7 @@ const AddProduct = () => {
     setProductSpecs(spec_list);
   }
 
-  async function getProductUnits() {
+  const getProductUnits = async () => {
     const product_units = location.state.units;
     const unit_list = product_units.map(element => {
       return {
@@ -187,6 +187,36 @@ const AddProduct = () => {
     console.log(unit_list);
     setProductUnits(unit_list);
   }
+
+  const createProductSpec = async () => {
+    try {
+      const response = await request.post(`/product/create-spec`, {
+        spec: "",
+      });
+      if (response){
+        console.log("Create spec successful");
+      } else {
+        console.log("Create spec failed");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const createProductUnit = async () => {
+    try {
+      const response = await request.post(`/product/create-unit`, {
+        unit: "",
+      });
+      if (response){
+        console.log("Create unit successful");
+      } else {
+        console.log("Create unit failed");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
 
   const uploadImage = async () => {
