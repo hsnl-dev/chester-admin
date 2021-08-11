@@ -12,7 +12,7 @@ import { Datepicker } from 'baseui/datepicker';
 import { useEffect } from 'react';
 import tw from 'date-fns/locale/zh-TW';
 import dayjs from 'dayjs';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { request } from "../../utils/request";
 
 const Col = withStyle(Column, () => ({
@@ -74,25 +74,19 @@ const InputBox = styled('div', () => ({
   marginTop: '10px',
 }));
 
-const vendorList = [
-  { value: 'A', label: '廠商A' },
-  { value: 'B', label: '廠商B' },
-];
-
 const authorityList = [
-  { value: '系統維護', label: '系統維護' },
-  { value: '店家管理者', label: '店家管理者' },
   { value: '店家使用者', label: '店家使用者' },
+  { value: '店家管理者', label: '店家管理者' },
 ];
-
-
 
 const AddUser = () => {
-    const [vendor, setVendor] = useState([]);
     const [authority, setAuthority] = useState([]);
     const [userInfo, setUserInfo] = useState({"account": "", "authority":"", "name": "", "phone": "", "email": "", "storeName": "", "storePhone": "", "regNumber": "", "address": "", "remark": ""});
-    const [date, setDate] = useState([]);
+    const [currentRole, setCurentRole] = useState();
     const history = useHistory();
+    const location = useLocation();
+    const [isEdit, setIsNew] = useState(location.state[2]);
+    const [selfRole, setSelfRole] = useState();
 
     const handleInfoChange = (e) => {
       console.log(e.target.id);
@@ -106,6 +100,39 @@ const AddUser = () => {
       userInfo["authority"]=value[0]['value'];
       setUserInfo({...userInfo});
       console.log(value);
+    }
+
+    const setCurrentUserInfo = ( info ) => {
+      userInfo['account'] = info[0]['username'];
+      userInfo['name'] = info[0]['name'];
+      userInfo['phone'] = info[0]['phone'];
+      userInfo['email'] = info[0]['email'];
+      userInfo['storeName'] = info[1]['name'];
+      userInfo['storePhone'] = info[1]['phone'];
+      userInfo['regNumber'] = info[1]['food_industry_id'];
+      userInfo['address'] = info[1]['address'];
+      userInfo['remark'] = info[1]['note'];
+      
+      setCurentRole(info[0]['role']);
+      if (info[0]['role'] === 1) {
+        userInfo['authority'] = "店家管理者";
+        setAuthority([{ value: '店家管理者', label: '店家管理者' }]);
+      }
+      else {
+        userInfo['authority'] = "店家使用者";
+        setAuthority([{ value: '店家使用者', label: '店家使用者' }]);
+      }
+      
+    }
+
+    const getRole = async () => {
+      try {
+        const result = await request.get(`/users/roles`)
+        let role = result.data;
+        setSelfRole(role);
+      } catch (err) {
+        console.log(err);
+      }
     }
 
     const handleSubmit = async () => {
@@ -139,71 +166,72 @@ const AddUser = () => {
     }
 
     useEffect(()=>{
-      console.log(userInfo)
-    }, [userInfo])
+      getRole();
+      setCurrentUserInfo(location.state);
+    }, [])
   
 
     return (
         <Grid fluid={true}>
           <Row>
             <Col md={12}>
-                <Title>新增</Title>
+                <Title>{isEdit? '編輯': '新增'}</Title>
             </Col>
           </Row>
           <Row>
             <Col md={12}>
               <Wrapper onChange={handleInfoChange}>
-                <Heading>新增使用者</Heading>
+                <Heading>{isEdit? '編輯使用者': '新增使用者'}</Heading>
                 <RowBox>
                   <InputBox>
                     <Text>帳號</Text>
-                    <Input id={"account"} placeholder="輸入帳號"/></InputBox>
+                    <Input id={"account"} placeholder="輸入帳號" value={userInfo['account']} disabled={isEdit? true: false}/></InputBox>
                   <InputBox>
                     <Text>權限角色</Text>
-                    <Select id={"role"} placeholder="選擇" labelKey="label" valueKey="value" searchable={false} options={authorityList} value={authority}
-                    onChange={handleAuthority}/>
+                    {<Select id={"role"} placeholder="選擇" labelKey="label" valueKey="value" searchable={false} disabled={isEdit? true: false} options={authorityList} value={authority}
+                    onChange={handleAuthority}/>}
                   </InputBox>
                 </RowBox>
                 <RowBox>
                   <InputBox>
                     <Text>姓名</Text>
-                    <Input id={"name"} placeholder="輸入姓名"/>
+                    <Input id={"name"} placeholder="輸入姓名" value={userInfo['name']}/>
                   </InputBox>
                   <InputBox>
                     <Text>電話</Text>
-                    <Input id={"phone"} placeholder="輸入電話"/>
+                    <Input id={"phone"} placeholder="輸入電話" value={userInfo['phone']}/>
                   </InputBox>
                 </RowBox>
                 <RowBox>
                   <InputBox>
                     <Text>E-MAIL</Text>
-                    <Input id={"email"} placeholder="輸入E-mail"/>
+                    <Input id={"email"} placeholder="輸入E-mail" value={userInfo['email']}/>
                   </InputBox>
                   <InputBox>
                     <Text>店家名稱</Text>
-                    <Input id={"storeName"} placeholder="輸入店家名稱"/>
+                    <Input id={"storeName"} placeholder="輸入店家名稱" value={userInfo['storeName']} disabled={currentRole===1? false: true}/>
                   </InputBox>
                 </RowBox>
                 <RowBox>
                   <InputBox>
                     <Text>店家電話</Text>
-                    <Input id={"storePhone"} placeholder="輸入店家電話"/>
+                    <Input id={"storePhone"} placeholder="輸入店家電話" value={userInfo['storePhone']} disabled={currentRole===1? false: true}/>
                   </InputBox>
                   <InputBox>
                     <Text>食品業者登錄字號</Text>
-                    <Input id={"regNumber"} placeholder="輸入食品業者登錄字號"/>
+                    <Input id={"regNumber"} placeholder="輸入食品業者登錄字號" value={userInfo['regNumber']} disabled={currentRole===1? false: true}/>
                   </InputBox>
                 </RowBox>
                 <RowBox>
                   <InputBox>
                     <Text>地址</Text>
-                    <Input id={"address"} placeholder="輸入地址"/>
+                    <Input id={"address"} placeholder="輸入地址" value={userInfo['address']} disabled={currentRole===1? false: true}/>
                   </InputBox>
                 </RowBox>
                 <RowBox>
                   <InputBox>
                   <Text>備註</Text>
-                  <Input id={"remark"} placeholder="" height="100px"/>
+                  <Input id={"remark"} placeholder="" value={userInfo['remark']} disabled={currentRole===1? false: true} height="100px"/>
                 </InputBox>
                 </RowBox>
                 <ButtonBox>
@@ -226,7 +254,7 @@ const AddUser = () => {
             </Col>
           </Row>
         </Grid>
-      );
+    );
   };
   
   export default AddUser;

@@ -9,7 +9,7 @@ import Input from '../../components/Input/Input';
 import Select from '../../components/Select/Select';
 import { SelectBox } from '../../components/Select/Select';
 import { Heading, SubHeadingLeft, SubHeadingRight, Title } from '../../components/DisplayTable/DisplayTable';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { ADDPRODUCT } from '../../settings/constants';
 import { request } from '../../utils/request';
 import { SSL_OP_NETSCAPE_REUSE_CIPHER_CHANGE_BUG } from 'constants';
@@ -67,6 +67,7 @@ const Products = () => {
   ];
   const [displayAmount, setDisplayAmount] = useState([]);
   const [products, setProducts] = useState([]);
+  const [displayProducts, setDisplayProducts] = useState([]);
   const [specs, setSpecs] = useState([]);
   const [units, setUnits] = useState([]);
   const data = [{'商品編號': '123456789','商品名稱': 'ABC', '單價': '100', '規格': '規格A'}]
@@ -81,21 +82,49 @@ const Products = () => {
 
   }
 
-  const checkPurchase = () => {
-
+  const checkPurchase = (e) => {
+    let chooseInfo = products[e.target.id];
+    history.push({
+      pathname: ADDPRODUCT,
+      state: {
+        specs: specs,
+        units: units,
+        info: chooseInfo,
+        type: 'view'
+      }});
   }
 
-  const editPurchase = () => {
-
+  const editPurchase = (e) => {
+    let chooseInfo = products[e.target.id];
+    history.push({
+      pathname: ADDPRODUCT,
+      state: {
+        specs: specs,
+        units: units,
+        info: chooseInfo,
+        type: 'edit'
+      }});
   }
 
-  const deactivatePurchase = async ({ product_id }) => {   // 需要 product_id
-    try {
-      const result = await request.post(`/product/${product_id}/deactivate`);
-      console.log(result);
-      getProducts();
-    } catch (err) {
-      console.log(err);
+  const handleactivate = async (e) => {   // 需要 product_id
+    let product_id = products[e.target.id]['id'];
+    if (products[e.target.id]['activate'] === 1) {
+      try {
+        const result = await request.post(`/product/${product_id}/deactivate`);
+        console.log(result);
+        getProducts();
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    else {
+      try {
+        const result = await request.post(`/product/${product_id}/activate`);
+        console.log(result);
+        getProducts();
+      } catch (err) {
+        console.log(err);
+      }
     }
   }
 
@@ -111,8 +140,14 @@ const Products = () => {
     try {
       const result = await request.get(`/product`);
       const product_arr = result.data.products;
+      console.log(product_arr);
       const specs_arr = result.data.specs;
       const units_arr = result.data.units;
+      let displayTemp = [];
+      for (let i = 0; i < product_arr.length; i++) {
+        displayTemp.push({'product_no': product_arr[i]['product_no'], 'name': product_arr[i]['name'], 'price': product_arr[i]['price'], 'spec': product_arr[i]['spec'], "activate": product_arr[i]['activate']});
+      }
+      setDisplayProducts(displayTemp);
       setProducts(product_arr);
       setSpecs(specs_arr);
       setUnits(units_arr);
@@ -156,7 +191,8 @@ const Products = () => {
                         pathname: ADDPRODUCT,
                         state: {
                           specs: specs,
-                          units: units
+                          units: units,
+                          type: "add",
                         }
                       })}>
                 新增
@@ -188,13 +224,14 @@ const Products = () => {
             </Heading>
             <DisplayTable
               columnNames = {column_names}
-              columnData = {products}
+              columnData = {displayProducts}
               Button1_function = {checkPurchase}
               Button1_text = '查看'
               Button2_function = {editPurchase}
               Button2_text = '編輯'
-              Button3_function = {deactivatePurchase}
+              Button3_function = {handleactivate}
               Button3_text = '停用'
+              
             />
           </Wrapper>
         </Col>

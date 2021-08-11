@@ -10,7 +10,7 @@ import { SelectBox } from '../../components/Select/Select';
 import { ADDPURCHASING } from '../../settings/constants';
 import { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-
+import dayjs from 'dayjs';
 import { request } from '../../utils/request';
 
 const Col = withStyle(Column, () => ({
@@ -40,6 +40,7 @@ const Purchasing = () => {
   ];
   const [displayAmount, setDisplayAmount] = useState([]);
   const [commodities, setCommodities] = useState([]);
+  const [displayInfo, setDisplayInfo] = useState([]);
   const [vendors, setVendors] = useState([]);
   const [css] = useStyletron();
   const history = useHistory();
@@ -90,6 +91,16 @@ const Purchasing = () => {
       const result = await request.get(`/commodity`);
       const vendors_arr = result.data.vendors;
       const commodities_arr = result.data.commodities;
+      for (let i = 0; i < commodities_arr.length; i++) {
+        let vendor;
+        for (let j = 0; j < vendors_arr.length; j++){
+          if(vendors_arr[j]['id'] === commodities_arr[i]['vendor_id']){
+            vendor = vendors_arr[i];
+            break;
+          }
+        }
+        displayInfo.push({'vendor_id': vendor['id'], 'vendor_name': vendor['name'], 'create_at': dayjs(vendor['create_at']).format('YYYY-MM-DD')})       
+      }
       setVendors(vendors_arr);
       setCommodities(commodities_arr);
     } catch (err) {
@@ -144,7 +155,7 @@ const Purchasing = () => {
             </Heading>
             <DisplayTable
               columnNames = {column_names}
-              columnData = {commodities}
+              columnData = {displayInfo}
               Button1_function = {checkPurchase}
               Button1_text = '查看'
               Button2_function = {editPurchase}

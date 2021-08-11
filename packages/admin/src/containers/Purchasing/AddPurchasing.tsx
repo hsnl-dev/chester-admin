@@ -6,7 +6,7 @@ import Button from '../../components/Button/Button';
 import Input from '../../components/Input/Input';
 import { Heading, SubHeadingLeft, SubHeadingRight, Title, Text } from '../../components/DisplayTable/DisplayTable';
 import Select from '../../components/Select/Select';
-import { PURCHASING } from '../../settings/constants';
+import { PURCHASING, ADDPURCHASING } from '../../settings/constants';
 import { useState, useEffect } from 'react';
 import { Datepicker } from 'baseui/datepicker';
 import tw from 'date-fns/locale/zh-TW';
@@ -14,6 +14,7 @@ import moment from 'moment';
 import dayjs from 'dayjs';
 import { useHistory, useLocation } from 'react-router-dom';
 import { request } from "../../utils/request";
+import {Modal, ModalHeader, ModalBody, ModalFooter,ModalButton} from 'baseui/modal';
 
 const Col = withStyle(Column, () => ({
     '@media only screen and (max-width: 574px)': {
@@ -83,15 +84,23 @@ interface LocationState {
   params: string[]
 };
 
+
+
 const AddPurchasing = () => {
   const itemsInfoTemp = {"name": "", "batchNumber":"", "origin": "", "brand": "", "amount": "", "unit": "g", "PD": "", "Exp": "", "unitPrice": "", "totalPrice": "", "remark": ""}
   const [vendor, setVendor] = useState([]);
+  const [newVendor, setNewVendor] = useState({"vendor_name": "", "note": ""});
   const [vendorList, setVendorList] = useState([]);
   const [unit, setUnit] = useState([]);
   const [itemsInfo, setItemsInfo] = useState([]);
   const [date, setDate] = useState([]);
   const history = useHistory();
+  const [isOpen, setIsOpen] = useState(false);
   const location = useLocation<LocationState>();
+
+  const close = () => {
+    setIsOpen(false);
+  }
 
   const handleVendor = ({ value }) => {
     console.log(vendor);
@@ -143,20 +152,24 @@ const AddPurchasing = () => {
   }
 
   const createVendor = async () => {
+    console.log(newVendor);
     try {
       const response = await request.post(`/commodity/create-vendor`, {
-        vendor_name: "",
-        note: "",
+        vendor_name: newVendor["vendor_name"],
+        note: newVendor["note"],
       });
       if (response){
         console.log("Create vendor successful");
+        vendorList.push({value: vendorList.length, label: newVendor["vendor_name"]});
+        setVendorList(vendorList);
       } else {
         console.log("Create vendor failed");
       }
     } catch (err) {
       console.log(err);
     }
-  } 
+    close();
+  }
 
   const getVendors = async () => {
     const vendors = location.state.params;
@@ -173,12 +186,21 @@ const AddPurchasing = () => {
 
   useEffect(() => {
     getVendors();
-    console.log(itemsInfo);
-  }, [itemsInfo])
-  
+  }, [])
 
   return (
     <Grid fluid={true}>
+      <Modal onClose={close} isOpen={isOpen}>
+        <ModalHeader>新增廠商</ModalHeader>
+        <ModalBody>
+          <RowBox><InputBox><Text>廠商名稱</Text><Input  placeholder="輸入名稱" onChange={(e)=>{newVendor["vendor_name"]=e.target.value; setNewVendor({...newVendor})}}/></InputBox></RowBox>
+          <RowBox><InputBox><Text>備註</Text><Input height="100px" placeholder="備註" onChange={(e)=>{newVendor["note"]=e.target.value; setNewVendor({...newVendor})}}/></InputBox></RowBox>
+        </ModalBody>
+        <ModalFooter>
+          <Button background_color={'#616D89'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={close}>取消</Button>
+          <Button background_color={'#FF902B'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={createVendor}>新增</Button>
+        </ModalFooter>
+      </Modal>
       <Row>
         <Col md={12}>
             <Title>
@@ -201,6 +223,7 @@ const AddPurchasing = () => {
                         height={'48px'}
                         background_color={'#FFD2AB'}
                         color={'#FF902B'}
+                        onClick={()=>{setIsOpen(true);}}
                     >+</Button>
                 </VendorBox>
                 <RowBox>
