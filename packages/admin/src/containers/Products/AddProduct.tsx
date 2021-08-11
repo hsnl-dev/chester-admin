@@ -260,11 +260,14 @@ const AddProduct = () => {
       const response = await request.post(`/product/create-spec`, {
         spec: newSpec,
       });
-      if (response){
-        console.log("Create spec successful");
+      const data = response.data;
+      if (data.status === 1) {
+        console.log(data.message);
         setProductSpecs([...productSpecs, {value: newSpec, label: newSpec}]);
+      } else if (data.status === 0) {
+        console.log(data.message);
       } else {
-        console.log("Create spec failed");
+        console.log(data.message);
       }
     } catch (err) {
       console.log(err);
@@ -277,12 +280,15 @@ const AddProduct = () => {
       const response = await request.post(`/product/create-unit`, {
         unit: newFinalUnit,
       });
-      if (response){
-        console.log("Create unit successful");
+      const data = response.data;
+      console.log(data);
+      if (data.status === 1) {
+        console.log(data.message);
         setProductUnits([...productUnits, {value: newFinalUnit, label: newFinalUnit}]);
-        
+      } else if (data.status === 0) {
+        console.log(data.message);
       } else {
-        console.log("Create unit failed");
+        console.log(data.message);
       }
     } catch (err) {
       console.log(err);

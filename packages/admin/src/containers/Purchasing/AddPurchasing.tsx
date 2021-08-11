@@ -158,12 +158,14 @@ const AddPurchasing = () => {
         vendor_name: newVendor["vendor_name"],
         note: newVendor["note"],
       });
-      if (response){
-        console.log("Create vendor successful");
+      const data = response.data;
+      if (data.status === 1) {
         vendorList.push({value: vendorList.length, label: newVendor["vendor_name"]});
         setVendorList(vendorList);
+      } else if (data.status === 0) {
+        console.log(data.message);
       } else {
-        console.log("Create vendor failed");
+        console.log(data.message);
       }
     } catch (err) {
       console.log(err);
