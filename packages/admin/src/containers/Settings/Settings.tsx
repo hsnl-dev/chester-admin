@@ -61,6 +61,8 @@ export default function Settings() {
   const [displayMembers, setDisplayMembers] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const [role, setRole] = useState();
+  const [partnerData, setPartnerData] = useState([]);
+  const data = [{'account': '123456789','name': 'ABC', 'authority': '店家管理者'}]
   const history = useHistory();
 
   const close = () => {
@@ -134,6 +136,11 @@ export default function Settings() {
       setDisplayMembers([...displayTemp]);
       setMembers(member_arr);
       setPartner(result.data['partner']);
+      const partner_data = result.data.partner;
+      console.log(member_arr);
+      console.log(partner_data);
+      setMembers(member_arr);
+      setPartnerData(partner_data);
     } catch (err) {
       console.log(err);
     }
