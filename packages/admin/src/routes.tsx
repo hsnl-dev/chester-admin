@@ -7,6 +7,7 @@ import {
   CATEGORY,
   PURCHASING,
   ADDPURCHASING,
+  IMPORTPURCHASING,
   ORDERS,
   SETTINGS,
   ADDUSER,
@@ -24,16 +25,13 @@ const AddProduct = lazy(() => import('./containers/Products/AddProduct'))
 const AdminLayout = lazy(() => import('./containers/Layout/Layout'));
 const Purchasing = lazy(() => import('./containers/Purchasing/Purchasing'));
 const AddPurchasing = lazy(() => import('./containers/Purchasing/AddPurchasing'));
+const ImportPurchasing = lazy(() => import('./containers/Purchasing/ImportPurchasing'));
 const AddUser = lazy(() => import('./containers/Settings/AddUser'));
 const Category = lazy(() => import('./containers/Category/Category'));
 const Orders = lazy(() => import('./containers/Orders/Orders'));
 const Settings = lazy(() => import('./containers/Settings/Settings'));
-const SiteSettingForm = lazy(() =>
-  import('./containers/SiteSettingForm/SiteSettingForm')
-);
-const StaffMembers = lazy(() =>
-  import('./containers/StaffMembers/StaffMembers')
-);
+const SiteSettingForm = lazy(() => import('./containers/SiteSettingForm/SiteSettingForm'));
+const StaffMembers = lazy(() => import('./containers/StaffMembers/StaffMembers'));
 const Customers = lazy(() => import('./containers/Customers/Customers'));
 const Coupons = lazy(() => import('./containers/Coupons/Coupons'));
 const Login = lazy(() => import('./containers/Login/Login'));
@@ -86,6 +84,13 @@ const Routes = () => {
             <AdminLayout>
               <Suspense fallback={<InLineLoader />}>
                 <AddPurchasing />
+              </Suspense>
+            </AdminLayout>
+          </PrivateRoute>
+          <PrivateRoute path={IMPORTPURCHASING}>
+            <AdminLayout>
+              <Suspense fallback={<InLineLoader />}>
+                <ImportPurchasing />
               </Suspense>
             </AdminLayout>
           </PrivateRoute>

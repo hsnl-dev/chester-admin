@@ -2,6 +2,7 @@
 // General Page Section
 export const PURCHASING = '/';
 export const ADDPURCHASING = '/addPurchasing';
+export const IMPORTPURCHASING = '/importPurchasing';
 export const PRODUCTS = '/products';
 export const ADDPRODUCT = '/addProduct';
 export const CATEGORY = '/category';

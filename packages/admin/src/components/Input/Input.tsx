@@ -24,8 +24,6 @@ const Input = ({ ...props }) => {
               lineHeight: '1.5',
               color: '#75787d',
               backgroundColor: '#FFFFFF',
-              
-              
             };
           },
         },

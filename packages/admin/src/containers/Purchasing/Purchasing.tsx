@@ -110,7 +110,7 @@ const Purchasing = () => {
 
   useEffect(() => {
     getCommodities();
-  }, []);
+  });
 
   return (
     <Grid fluid={true}>

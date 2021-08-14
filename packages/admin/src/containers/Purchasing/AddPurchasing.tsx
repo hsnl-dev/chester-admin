@@ -1,20 +1,20 @@
 import React from 'react';
+import { useState, useEffect } from 'react';
+import { useHistory, useLocation } from 'react-router-dom';
 import { styled, withStyle, useStyletron } from 'baseui';
+import {Modal, ModalHeader, ModalBody, ModalFooter, ModalButton} from 'baseui/modal';
+import { Datepicker } from 'baseui/datepicker';
+import tw from 'date-fns/locale/zh-TW';
+import moment from 'moment';
+
 import { Grid, Row, Col as Column } from '../../components/FlexBox/FlexBox';
 import DisplayTable from '../../components/DisplayTable/DisplayTable';
 import Button from '../../components/Button/Button';
 import Input from '../../components/Input/Input';
 import { Heading, SubHeadingLeft, SubHeadingRight, Title, Text } from '../../components/DisplayTable/DisplayTable';
 import Select from '../../components/Select/Select';
-import { PURCHASING, ADDPURCHASING } from '../../settings/constants';
-import { useState, useEffect } from 'react';
-import { Datepicker } from 'baseui/datepicker';
-import tw from 'date-fns/locale/zh-TW';
-import moment from 'moment';
-import dayjs from 'dayjs';
-import { useHistory, useLocation } from 'react-router-dom';
+import { PURCHASING, IMPORTPURCHASING } from '../../settings/constants';
 import { request } from "../../utils/request";
-import {Modal, ModalHeader, ModalBody, ModalFooter,ModalButton} from 'baseui/modal';
 
 const Col = withStyle(Column, () => ({
     '@media only screen and (max-width: 574px)': {
@@ -84,8 +84,6 @@ interface LocationState {
   params: string[]
 };
 
-
-
 const AddPurchasing = () => {
   const itemsInfoTemp = {"name": "", "batchNumber":"", "origin": "", "brand": "", "amount": "", "unit": "g", "PD": "", "Exp": "", "unitPrice": "", "totalPrice": "", "remark": ""}
   const [vendor, setVendor] = useState([]);
@@ -96,15 +94,33 @@ const AddPurchasing = () => {
   const [date, setDate] = useState([]);
   const history = useHistory();
   const [isOpen, setIsOpen] = useState(false);
+  const [isOpenError, setIsOpenError] = useState(false);
   const location = useLocation<LocationState>();
 
   const close = () => {
     setIsOpen(false);
   }
 
+  const closeError = () => {
+    setIsOpenError(false);
+  }
+
   const handleVendor = ({ value }) => {
-    console.log(vendor);
+    console.log(value);
     setVendor(value);
+  }
+
+  const handleImport = () => {
+    console.log(vendor);
+    if (vendor.length !== 0) {
+      console.log(vendor);
+      history.push({
+        pathname: IMPORTPURCHASING,
+        state: {vendor_id: vendor[0].value}
+      });
+    } else {
+      setIsOpenError(true);
+    }
   }
 
   const addOneItems = () => {
@@ -203,6 +219,15 @@ const AddPurchasing = () => {
           <Button background_color={'#FF902B'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={createVendor}>新增</Button>
         </ModalFooter>
       </Modal>
+      <Modal onClose={closeError} isOpen={isOpenError}>
+        <ModalHeader>匯入進貨</ModalHeader>
+        <ModalBody>
+          <Text>請先選擇進貨廠商</Text>
+        </ModalBody>
+        <ModalFooter>
+          <Button background_color={'#FF902B'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={closeError}>確認</Button>
+        </ModalFooter>
+      </Modal>
       <Row>
         <Col md={12}>
             <Title>
@@ -250,6 +275,7 @@ const AddPurchasing = () => {
                         color={'#FFFFFF'}
                         margin={'5px'}
                         height={'60%'}
+                        onClick={handleImport}
                     >匯入進貨</Button>
                   </div>
                   <div>

@@ -4145,6 +4145,13 @@
   resolved "https://registry.npmjs.org/@types/object-assign/-/object-assign-4.0.30.tgz"
   integrity sha1-iUk3HVqZ9Dge4PHfCpt6GH4H5lI=
 
+"@types/papaparse@^5.0.4":
+  version "5.2.6"
+  resolved "https://registry.yarnpkg.com/@types/papaparse/-/papaparse-5.2.6.tgz#0bba18de4d15eff65883bc7c0794e0134de9e7c7"
+  integrity sha512-xGKSd0UTn58N1h0+zf8mW863Rv8BvXcGibEgKFtBIXZlcDXAmX/T4RdDO2mwmrmOypUDt5vRgo2v32a78JdqUA==
+  dependencies:
+    "@types/node" "*"
+
 "@types/parse-json@^4.0.0":
   version "4.0.0"
   resolved "https://registry.npmjs.org/@types/parse-json/-/parse-json-4.0.0.tgz"
@@ -14015,6 +14022,11 @@ pako@~1.0.5:
   resolved "https://registry.npmjs.org/pako/-/pako-1.0.11.tgz"
   integrity sha512-4hLB8Py4zZce5s4yd9XzopqwVv/yGNhV1Bl8NTmCq1763HeK2+EwVTv+leGeL13Dnh2wfbqowVPXCIO0z4taYw==
 
+papaparse@^5.2.0:
+  version "5.3.1"
+  resolved "https://registry.yarnpkg.com/papaparse/-/papaparse-5.3.1.tgz#770b7a9124d821d4b2132132b7bd7dce7194b5b1"
+  integrity sha512-Dbt2yjLJrCwH2sRqKFFJaN5XgIASO9YOFeFP8rIBRG2Ain8mqk5r1M6DkfvqEVozVcz3r3HaUGw253hA1nLIcA==
+
 parallel-transform@^1.1.0:
   version "1.2.0"
   resolved "https://registry.npmjs.org/parallel-transform/-/parallel-transform-1.2.0.tgz"
@@ -15708,6 +15720,14 @@ react-multi-ref@^1.0.0:
   integrity sha512-LJuQXEabnv8JLcvcWeJcTogxG4eXVFiPfQ9CECuwWUbfJdrVpPf13m9RxmImyJS0J99BWokGn7dlR1dR06XPDw==
   dependencies:
     "@babel/runtime" "^7.1.2"
+
+react-papaparse@^3.17.1:
+  version "3.17.1"
+  resolved "https://registry.yarnpkg.com/react-papaparse/-/react-papaparse-3.17.1.tgz#f9cc8b0f383e1555acd61cc3bfc793139c15d433"
+  integrity sha512-Pe/eheSNMDJzJJWVtryp4A3GjzMzkop1G+a3xNPsBCkPN3YzgX3ed4Vfb4kbMjbYNqS3k2gevXjszHtyFZIWtg==
+  dependencies:
+    "@types/papaparse" "^5.0.4"
+    papaparse "^5.2.0"
 
 react-range@^1.8.0:
   version "1.8.9"
