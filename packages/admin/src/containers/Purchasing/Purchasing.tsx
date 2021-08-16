@@ -3,7 +3,9 @@ import { styled, withStyle, useStyletron } from 'baseui';
 import { Grid, Row, Col as Column } from '../../components/FlexBox/FlexBox';
 import  SearchCard  from '../../components/SearchCard/SearchCard';
 import DisplayTable from '../../components/DisplayTable/DisplayTable';
-import { Wrapper, Heading, SubHeadingLeft, SubHeadingRight, Title } from '../../components/DisplayTable/DisplayTable';
+import { Wrapper, Heading, StyledTable, StyledTd, StyledTh, StyledButtonBox, SubHeadingLeft, SubHeadingRight, Title } from '../../components/DisplayTable/DisplayTable';
+import Button from '../../components/Button/Button';
+import NoResult from '../../components/NoResult/NoResult';
 import Select from '../../components/Select/Select';
 import Input from '../../components/Input/Input';
 import { SelectBox } from '../../components/Select/Select';
@@ -64,22 +66,26 @@ const Purchasing = () => {
 
   }
 
-  const checkPurchase = () => {
+  const checkPurchase = (e) => {
 
   }
 
-  const editPurchase = () => {
+  const editPurchase = (e) => {
 
   }
 
-  const deletePurchase = async ({ commodity_id }) => {   // 需要 commodity_id
-    try {
-      const result = await request.post(`/commodity/${commodity_id}/delete`);
-      console.log(result);
-      getCommodities();
-    } catch (err) {
-      console.log(err);
-    }
+  const returnPurchase = async ({ e }) => {   // 需要 commodity_id
+    // try {
+    //   const result = await request.post(`/commodity/${commodity_id}/delete`);
+    //   console.log(result);
+    //   getCommodities();
+    // } catch (err) {
+    //   console.log(err);
+    // }
+  }
+
+  const reimbursePurchase = (e) => {
+
   }
 
   const handleSearch =() => {
@@ -91,11 +97,13 @@ const Purchasing = () => {
       const result = await request.get(`/commodity`);
       const vendors_arr = result.data.vendors;
       const commodities_arr = result.data.commodities;
+      console.log(vendors_arr)
+      console.log(commodities_arr)
       for (let i = 0; i < commodities_arr.length; i++) {
         let vendor;
         for (let j = 0; j < vendors_arr.length; j++){
           if(vendors_arr[j]['id'] === commodities_arr[i]['vendor_id']){
-            vendor = vendors_arr[i];
+            vendor = vendors_arr[j];
             break;
           }
         }
@@ -110,7 +118,7 @@ const Purchasing = () => {
 
   useEffect(() => {
     getCommodities();
-  });
+  }, []);
 
   return (
     <Grid fluid={true}>
@@ -153,16 +161,50 @@ const Purchasing = () => {
               <SubHeadingRight><SearchBox>Search:<Input onChange={handleSearch}/></SearchBox></SubHeadingRight>
               
             </Heading>
-            <DisplayTable
-              columnNames = {column_names}
-              columnData = {displayInfo}
-              Button1_function = {checkPurchase}
-              Button1_text = '查看'
-              Button2_function = {editPurchase}
-              Button2_text = '編輯'
-              Button3_function = {deletePurchase}
-              Button3_text = '退貨'
-            />
+            <div>
+              {displayInfo.length !== 0 ? (
+                <StyledTable>
+                  <tr>
+                      {column_names.map((column_name) => (
+                          <StyledTh>{column_name}</StyledTh>
+                      ))}
+                  </tr>
+                    {displayInfo.map((item) => Object.values(item))
+                    .map((row: Array<string>, index) => (
+                        <tr>
+                          <React.Fragment key={index}>
+                            <StyledTd>{row[0]}</StyledTd>
+                            <StyledTd>{row[1]}</StyledTd>
+                            <StyledTd>{row[2]}</StyledTd>
+                            {row.length >= 4 && row[3] !== '' ? <StyledTd>{row[3]}</StyledTd>: null}
+                            <StyledTd>
+                              <StyledButtonBox>
+                                <Button id={index} margin='5px' width='80px' height='45px' background_color='#40C057' color={'#FFFFFF'} onClick={checkPurchase}>查看</Button>
+                                <Button id={index} margin='5px' width='80px' height='45px' background_color='#2F8BE6' color={'#FFFFFF'} onClick={editPurchase}>編輯</Button>
+                                <Button id={index} margin='5px' width='80px' height='45px' background_color='#F55252' color={'#FFFFFF'} onClick={returnPurchase}>退貨</Button>
+                                <Button id={index} margin='5px' width='80px' height='45px' background_color='#616D98' color={'#FFFFFF'} onClick={reimbursePurchase}>退貨</Button>
+                              </StyledButtonBox>
+                            </StyledTd>
+                          </React.Fragment>
+                        </tr>
+                      ))
+                    }
+                    <tr>
+                      {column_names.map((column_name) => (
+                          <StyledTh>{column_name}</StyledTh>
+                      ))}
+                  </tr>
+                </StyledTable>
+                ) : (
+                  <NoResult
+                    hideButton={false}
+                      style={{
+                        gridColumnStart: '1',
+                        gridColumnEnd: 'one',
+                      }}
+                  />
+                )}
+            </div>
           </Wrapper>
         </Col>
       </Row>
