@@ -6,6 +6,8 @@ import {
   ADDPRODUCT,
   CATEGORY,
   PURCHASING,
+  REPURCHASING,
+  VIEWPURCHASING,
   ADDPURCHASING,
   IMPORTPURCHASING,
   ORDERS,
@@ -25,6 +27,8 @@ const Products = lazy(() => import('./containers/Products/Products'));
 const AddProduct = lazy(() => import('./containers/Products/AddProduct'))
 const AdminLayout = lazy(() => import('./containers/Layout/Layout'));
 const Purchasing = lazy(() => import('./containers/Purchasing/Purchasing'));
+const RePurchasing = lazy(() => import('./containers/Purchasing/RePurchasing'))
+const ViewPruchasing = lazy(() => import('./containers/Purchasing/ViewPurchasing'));
 const AddPurchasing = lazy(() => import('./containers/Purchasing/AddPurchasing'));
 const ImportPurchasing = lazy(() => import('./containers/Purchasing/ImportPurchasing'));
 const AddUser = lazy(() => import('./containers/Settings/AddUser'));
@@ -79,6 +83,20 @@ const Routes = () => {
             <AdminLayout>
               <Suspense fallback={<InLineLoader />}>
                 <Purchasing />
+              </Suspense>
+            </AdminLayout>
+          </PrivateRoute>
+          <PrivateRoute exact={true} path={REPURCHASING}>
+            <AdminLayout>
+              <Suspense fallback={<InLineLoader />}>
+                <RePurchasing />
+              </Suspense>
+            </AdminLayout>
+          </PrivateRoute>
+          <PrivateRoute exact={true} path={VIEWPURCHASING}>
+            <AdminLayout>
+              <Suspense fallback={<InLineLoader />}>
+                <ViewPruchasing />
               </Suspense>
             </AdminLayout>
           </PrivateRoute>

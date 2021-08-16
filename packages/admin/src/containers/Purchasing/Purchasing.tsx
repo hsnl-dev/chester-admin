@@ -9,7 +9,7 @@ import NoResult from '../../components/NoResult/NoResult';
 import Select from '../../components/Select/Select';
 import Input from '../../components/Input/Input';
 import { SelectBox } from '../../components/Select/Select';
-import { ADDPURCHASING } from '../../settings/constants';
+import { ADDPURCHASING, VIEWPURCHASING, REPURCHASING } from '../../settings/constants';
 import { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import dayjs from 'dayjs';
@@ -44,6 +44,7 @@ const Purchasing = () => {
   const [commodities, setCommodities] = useState([]);
   const [displayInfo, setDisplayInfo] = useState([]);
   const [vendors, setVendors] = useState([]);
+  const [mergeData, setMergeData] = useState([]);
   const [css] = useStyletron();
   const history = useHistory();
   const mb30 = css({
@@ -67,47 +68,46 @@ const Purchasing = () => {
   }
 
   const checkPurchase = (e) => {
-
+    let selectData = mergeData[e.target.id];
+    console.log(vendors)
+    let vendor;
+    for (let i = 0; i < vendors.length; i++){
+      if (vendors[i].id === selectData[0].vendor_id){
+        vendor = vendors[i];
+        break;
+      }
+    }
+    history.push(VIEWPURCHASING, [selectData, vendor]);
   }
 
   const editPurchase = (e) => {
-
+    
   }
 
-  const returnPurchase = async (e) => { 
-    const amount = 10;
-    const unit = 'kg';  // 直接綁定原進貨資料的單位，不能隨意填
-    const reason = 'reason';
-    const  commodity_id = commodities[e.target.id]['id'];
-    try {
-      const result = await request.post(`/commodity/${commodity_id}/return`, {
-        amount: amount,
-        unit: unit,
-        reason: reason
-      });
-      console.log(result);
-      history.push(PURCHASING);
-    } catch (err) {
-      console.log(err);
+  const returnPurchase = async (e) => {
+    let selectData = mergeData[e.target.id];
+    console.log(vendors)
+    let vendor;
+    for (let i = 0; i < vendors.length; i++){
+      if (vendors[i].id === selectData[0].vendor_id){
+        vendor = vendors[i];
+        break;
+      }
     }
+    history.push(REPURCHASING, [selectData, vendor, 'return'])
   }
 
   const reimbursePurchase = async (e) => {
-    const amount = 10;
-    const unit = 'kg';  // 直接綁定原進貨資料的單位，不能隨意填
-    const reason = 'reason';
-    const  commodity_id = commodities[e.target.id]['id'];
-    try {
-      const result = await request.post(`/commodity/${commodity_id}/discard`, {
-        amount: amount,
-        unit: unit,
-        reason: reason
-      });
-      console.log(result);
-      history.push(PURCHASING);
-    } catch (err) {
-      console.log(err);
+    let selectData = mergeData[e.target.id];
+    console.log(vendors)
+    let vendor;
+    for (let i = 0; i < vendors.length; i++){
+      if (vendors[i].id === selectData[0].vendor_id){
+        vendor = vendors[i];
+        break;
+      }
     }
+    history.push(REPURCHASING, [selectData, vendor, 'reimburse'])
   }
 
   const handleSearch =() => {
@@ -139,7 +139,7 @@ const Purchasing = () => {
           merge_data[vendor['id'] + '_' + dayjs(commodities_arr[i]['create_at']).format('YYYY-MM-DD')].push(commodities_arr[i]);
         }
       }
-      console.log(merge_data);
+      setMergeData(Object.values(merge_data));
       setVendors(vendors_arr);
       setCommodities(commodities_arr);
     } catch (err) {

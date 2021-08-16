@@ -9,6 +9,7 @@ import Input from '../../components/Input/Input';
 import Select from '../../components/Select/Select';
 import { SelectBox } from '../../components/Select/Select';
 import { Heading, SubHeadingLeft, SubHeadingRight, Title } from '../../components/DisplayTable/DisplayTable';
+import {Modal, ModalHeader, ModalBody, ModalFooter,ModalButton} from 'baseui/modal';
 import { useHistory, useLocation } from 'react-router-dom';
 import { ADDPRODUCT } from '../../settings/constants';
 import { request } from '../../utils/request';
@@ -70,8 +71,15 @@ const Products = () => {
   const [displayProducts, setDisplayProducts] = useState([]);
   const [specs, setSpecs] = useState([]);
   const [units, setUnits] = useState([]);
+  const [selectId, setSelectId] = useState();
+  const [selectActivate, setSelectActivate] = useState();
+  const [isOpen, setIsOpen] = useState(false);
   const data = [{'商品編號': '123456789','商品名稱': 'ABC', '單價': '100', '規格': '規格A'}]
   const history = useHistory();
+
+  const close = () => {
+    setIsOpen(false);
+  }
 
   function amountChange({ value }) {
     setDisplayAmount(value);
@@ -106,11 +114,10 @@ const Products = () => {
       }});
   }
 
-  const handleactivate = async (e) => {   // 需要 product_id
-    let product_id = products[e.target.id]['id'];
-    if (products[e.target.id]['activate'] === 1) {
+  const handleactivate = async () => {   // 需要 product_id
+    if (selectActivate === 1) {
       try {
-        const result = await request.post(`/product/${product_id}/deactivate`);
+        const result = await request.post(`/product/${selectId}/deactivate`);
         console.log(result);
         getProducts();
       } catch (err) {
@@ -119,13 +126,22 @@ const Products = () => {
     }
     else {
       try {
-        const result = await request.post(`/product/${product_id}/activate`);
+        const result = await request.post(`/product/${selectId}/activate`);
         console.log(result);
         getProducts();
       } catch (err) {
         console.log(err);
       }
     }
+  }
+
+  const handleactivateTemp = (e) => {
+    console.log(products)
+    let product_id = products[e.target.id]['id'];
+    let activate = products[e.target.id]['activate'];
+    setSelectActivate(activate);
+    setSelectId(product_id);
+    setIsOpen(true);
   }
 
   const handleSearch =() => {
@@ -162,6 +178,16 @@ const Products = () => {
 
   return (
     <Grid fluid={true}>
+      <Modal onClose={close} isOpen={isOpen}>
+        <ModalHeader>{selectActivate === 1? '停用商品': '啟用商品'}</ModalHeader>
+        <ModalBody>
+          {selectActivate === 1? '是否確定停用?': '是否確定啟用?'}
+        </ModalBody>
+        <ModalFooter>
+          <Button background_color={'#616D89'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={close}>取消</Button>
+          <Button background_color={'#FF902B'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={() => {close(); handleactivate();}}>確定</Button>
+        </ModalFooter>
+      </Modal>
       <Row>
         <Col md={12}>
           <Title>
@@ -229,7 +255,7 @@ const Products = () => {
               Button1_text = '查看'
               Button2_function = {editPurchase}
               Button2_text = '編輯'
-              Button3_function = {handleactivate}
+              Button3_function = {handleactivateTemp}
               Button3_text = '停用'
               
             />

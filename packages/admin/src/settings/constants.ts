@@ -1,6 +1,8 @@
 // **************** ROUTE CONSTANT START **************************
 // General Page Section
 export const PURCHASING = '/';
+export const VIEWPURCHASING = '/viewPurchasing';
+export const REPURCHASING = '/rePurchasing';
 export const ADDPURCHASING = '/addPurchasing';
 export const IMPORTPURCHASING = '/importPurchasing';
 export const PRODUCTS = '/products';
