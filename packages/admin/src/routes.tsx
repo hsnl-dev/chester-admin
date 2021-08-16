@@ -16,7 +16,8 @@ import {
   STAFF_MEMBERS,
   SITE_SETTINGS,
   PASSWORD_RESET,
-  FORGET_PASSWORD
+  FORGET_PASSWORD,
+  VIEWUSER
 } from './settings/constants';
 import AuthProvider, { AuthContext } from './context/auth';
 import { InLineLoader } from './components/InlineLoader/InlineLoader';
@@ -27,6 +28,7 @@ const Purchasing = lazy(() => import('./containers/Purchasing/Purchasing'));
 const AddPurchasing = lazy(() => import('./containers/Purchasing/AddPurchasing'));
 const ImportPurchasing = lazy(() => import('./containers/Purchasing/ImportPurchasing'));
 const AddUser = lazy(() => import('./containers/Settings/AddUser'));
+const ViewUser = lazy(() => import('./containers/Settings/ViewUser'));
 const Category = lazy(() => import('./containers/Category/Category'));
 const Orders = lazy(() => import('./containers/Orders/Orders'));
 const Settings = lazy(() => import('./containers/Settings/Settings'));
@@ -147,6 +149,13 @@ const Routes = () => {
             <AdminLayout>
               <Suspense fallback={<InLineLoader />}>
                 <AddUser />
+              </Suspense>
+            </AdminLayout>
+          </PrivateRoute>
+          <PrivateRoute path={VIEWUSER}>
+            <AdminLayout>
+              <Suspense fallback={<InLineLoader />}>
+                <ViewUser />
               </Suspense>
             </AdminLayout>
           </PrivateRoute>

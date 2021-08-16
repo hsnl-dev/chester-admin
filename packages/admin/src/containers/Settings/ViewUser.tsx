@@ -1,17 +1,13 @@
 import React from 'react';
-import { styled, withStyle, useStyletron } from 'baseui';
+import { styled, withStyle } from 'baseui';
 import { Grid, Row, Col as Column } from '../../components/FlexBox/FlexBox';
-import DisplayTable from '../../components/DisplayTable/DisplayTable';
 import Button from '../../components/Button/Button';
 import Input from '../../components/Input/Input';
-import { Heading, SubHeadingLeft, SubHeadingRight, Title, Text } from '../../components/DisplayTable/DisplayTable';
+import { Heading, Title, Text } from '../../components/DisplayTable/DisplayTable';
 import Select from '../../components/Select/Select';
-import { PURCHASING, SETTINGS } from '../../settings/constants';
+import { SETTINGS } from '../../settings/constants';
 import { useState } from 'react';
-import { Datepicker } from 'baseui/datepicker';
 import { useEffect } from 'react';
-import tw from 'date-fns/locale/zh-TW';
-import dayjs from 'dayjs';
 import { useHistory, useLocation } from 'react-router-dom';
 import { request } from "../../utils/request";
 
@@ -79,7 +75,7 @@ const authorityList = [
   { value: '店家管理者', label: '店家管理者' },
 ];
 
-const AddUser = () => {
+const ViewUser = () => {
     const [authority, setAuthority] = useState([]);
     const [userInfo, setUserInfo] = useState({"account": "", "authority":"", "name": "", "phone": "", "email": "", "storeName": "", "storePhone": "", "regNumber": "", "address": "", "remark": ""});
     const [currentRole, setCurentRole] = useState();
@@ -103,7 +99,6 @@ const AddUser = () => {
     }
 
     const setCurrentUserInfo = ( info ) => {
-      userInfo['user_id'] = info[0]['user_id'];
       userInfo['account'] = info[0]['username'];
       userInfo['name'] = info[0]['name'];
       userInfo['phone'] = info[0]['phone'];
@@ -136,58 +131,9 @@ const AddUser = () => {
       }
     }
 
-    const handleSubmit = async () => {
-      let role = 2;
-      if (userInfo.authority === "店家管理者") {
-        role = 1;
-      } 
-      console.log(role);
-      let response;
-      try {
-        if (isEdit) {
-          response = await request.post(`/users/${userInfo['user_id']}/edit`, {
-            username: userInfo.account,
-            role: role,
-            name: userInfo.name,
-            phone: userInfo.phone,
-            email: userInfo.email,
-            partner_name: userInfo.storeName,
-            partner_phone:  userInfo.storePhone,
-            food_industry_id: userInfo.regNumber,
-            address: userInfo.address,
-            note: userInfo.remark
-          });
-        }
-        else {
-          response = await request.post(`/users/create`, {
-            username: userInfo.account,
-            role: role,
-            name: userInfo.name,
-            phone: userInfo.phone,
-            email: userInfo.email,
-            partner_name: userInfo.storeName,
-            partner_phone:  userInfo.storePhone,
-            food_industry_id: userInfo.regNumber,
-            address: userInfo.address,
-            note: userInfo.remark
-          });
-        }
-        
-        history.push(SETTINGS);
-        if (response) {
-          console.log("Add user success");
-        } else {
-          console.log("Add user failed");
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    }
-
     useEffect(()=>{
       getRole();
       setCurrentUserInfo(location.state);
-      // console.log(location.state)
     }, [])
   
 
@@ -195,80 +141,73 @@ const AddUser = () => {
         <Grid fluid={true}>
           <Row>
             <Col md={12}>
-                <Title>{isEdit? '編輯': '新增'}</Title>
+                <Title>查看</Title>
             </Col>
           </Row>
           <Row>
             <Col md={12}>
-              <Wrapper onChange={handleInfoChange}>
-                <Heading>{isEdit? '編輯使用者': '新增使用者'}</Heading>
+              <Wrapper>
+                <Heading>查看使用者</Heading>
                 <RowBox>
                   <InputBox>
                     <Text>帳號</Text>
-                    <Input id={"account"} placeholder="輸入帳號" value={userInfo['account']} disabled={isEdit? true: false}/></InputBox>
+                    <Input id={"account"} placeholder="輸入帳號" value={userInfo['account']} disabled={true}/></InputBox>
                   <InputBox>
                     <Text>權限角色</Text>
-                    {<Select id={"role"} placeholder="選擇" labelKey="label" valueKey="value" searchable={false} disabled={isEdit? true: false} options={authorityList} value={authority}
+                    {<Select id={"role"} placeholder="選擇" labelKey="label" valueKey="value" searchable={false} disabled={true} options={authorityList} value={authority}
                     onChange={handleAuthority}/>}
                   </InputBox>
                 </RowBox>
                 <RowBox>
                   <InputBox>
                     <Text>姓名</Text>
-                    <Input id={"name"} placeholder="輸入姓名" value={userInfo['name']}/>
+                    <Input id={"name"} placeholder="輸入姓名" value={userInfo['name']} disabled={true}/>
                   </InputBox>
                   <InputBox>
                     <Text>電話</Text>
-                    <Input id={"phone"} placeholder="輸入電話" value={userInfo['phone']}/>
+                    <Input id={"phone"} placeholder="輸入電話" value={userInfo['phone']} disabled={true}/>
                   </InputBox>
                 </RowBox>
                 <RowBox>
                   <InputBox>
                     <Text>E-MAIL</Text>
-                    <Input id={"email"} placeholder="輸入E-mail" value={userInfo['email']}/>
+                    <Input id={"email"} placeholder="輸入E-mail" value={userInfo['email']} disabled={true}/>
                   </InputBox>
                   <InputBox>
                     <Text>店家名稱</Text>
-                    <Input id={"storeName"} placeholder="輸入店家名稱" value={userInfo['storeName']} disabled={currentRole===1? false: true}/>
+                    <Input id={"storeName"} placeholder="輸入店家名稱" value={userInfo['storeName']} disabled={true}/>
                   </InputBox>
                 </RowBox>
                 <RowBox>
                   <InputBox>
                     <Text>店家電話</Text>
-                    <Input id={"storePhone"} placeholder="輸入店家電話" value={userInfo['storePhone']} disabled={currentRole===1? false: true}/>
+                    <Input id={"storePhone"} placeholder="輸入店家電話" value={userInfo['storePhone']} disabled={true}/>
                   </InputBox>
                   <InputBox>
                     <Text>食品業者登錄字號</Text>
-                    <Input id={"regNumber"} placeholder="輸入食品業者登錄字號" value={userInfo['regNumber']} disabled={currentRole===1? false: true}/>
+                    <Input id={"regNumber"} placeholder="輸入食品業者登錄字號" value={userInfo['regNumber']} disabled={true}/>
                   </InputBox>
                 </RowBox>
                 <RowBox>
                   <InputBox>
                     <Text>地址</Text>
-                    <Input id={"address"} placeholder="輸入地址" value={userInfo['address']} disabled={currentRole===1? false: true}/>
+                    <Input id={"address"} placeholder="輸入地址" value={userInfo['address']} disabled={true}/>
                   </InputBox>
                 </RowBox>
                 <RowBox>
                   <InputBox>
                   <Text>備註</Text>
-                  <Input id={"remark"} placeholder="" value={userInfo['remark']} disabled={currentRole===1? false: true} height="100px"/>
+                  <Input id={"remark"} placeholder="" value={userInfo['remark']} disabled={true} height="100px"/>
                 </InputBox>
                 </RowBox>
                 <ButtonBox>
-                  <Button
-                    background_color={'#616D89'}
-                    color={'#FFFFFF'}
-                    margin={'5px'}
-                    height={'60%'}
-                    onClick={()=> history.push(SETTINGS)}
-                  >取消</Button>
                   <Button
                     background_color={'#FF902B'}
                     color={'#FFFFFF'}
                     margin={'5px'}
                     height={'60%'}
-                    onClick={handleSubmit}
-                  >確認送出</Button>
+                    onClick={()=> history.push(SETTINGS)}
+                  >完成查看</Button>
                 </ButtonBox>
               </Wrapper>
             </Col>
@@ -277,4 +216,4 @@ const AddUser = () => {
     );
   };
   
-  export default AddUser;
+  export default ViewUser;

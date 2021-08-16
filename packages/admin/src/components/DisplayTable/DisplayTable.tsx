@@ -132,7 +132,7 @@ export default function DisplayTable({
                       <StyledTd>{row[0]}</StyledTd>
                       <StyledTd>{row[1]}</StyledTd>
                       <StyledTd>{row[2]}</StyledTd>
-                      {row.length >= 4 ? <StyledTd>{row[3]}</StyledTd>: null}
+                      {row.length >= 4 && row[3] !== '' ? <StyledTd>{row[3]}</StyledTd>: null}
                       <StyledTd>
                         <StyledButtonBox>
                           {Button1_text.length !== 0 ? (

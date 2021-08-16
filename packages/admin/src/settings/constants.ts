@@ -13,6 +13,7 @@ export const CUSTOMERS = '/customers';
 export const COUPONS = '/coupons';
 export const SETTINGS = '/settings';
 export const ADDUSER = '/addUser'
+export const VIEWUSER = '/viewUser'
 export const STAFF_MEMBERS = '/staff-members';
 export const SITE_SETTINGS = '/site-settings';
 export const FORGET_PASSWORD = '/password-reset';

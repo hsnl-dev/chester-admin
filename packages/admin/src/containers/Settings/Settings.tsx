@@ -5,13 +5,14 @@ import Input from '../../components/Input/Input';
 import Button from '../../components/Button/Button';
 import { SelectBox } from '../../components/Select/Select';
 import DisplayTable from '../../components/DisplayTable/DisplayTable';
-import { Wrapper, Heading, SubHeadingLeft, SubHeadingRight, Title } from '../../components/DisplayTable/DisplayTable';
+import { Wrapper, Heading, StyledTable, StyledTd, StyledTh, StyledButtonBox, SubHeadingLeft, SubHeadingRight, Title } from '../../components/DisplayTable/DisplayTable';
+import NoResult from '../../components/NoResult/NoResult';
 import { useState, useEffect } from 'react';
 import { styled, withStyle } from 'baseui';
 import {Modal, ModalHeader, ModalBody, ModalFooter,ModalButton} from 'baseui/modal';
 import { Grid, Row, Col as Column } from '../../components/FlexBox/FlexBox';
 import { useHistory } from 'react-router-dom';
-import { ADDUSER } from '../../settings/constants';
+import { ADDUSER, VIEWUSER } from '../../settings/constants';
 import { request } from '../../utils/request';
 import { userInfo } from 'os';
 
@@ -60,6 +61,7 @@ export default function Settings() {
   const [selectUserId, setSelectUserId] = useState();
   const [displayMembers, setDisplayMembers] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [userActivate, setUserActivate] = useState();
   const [role, setRole] = useState();
   const [partnerData, setPartnerData] = useState([]);
   const data = [{'account': '123456789','name': 'ABC', 'authority': '店家管理者'}]
@@ -87,21 +89,34 @@ export default function Settings() {
       history.push(ADDUSER, [{}, partner, false])
   }
 
-  const deleteUserTemp = (e) => {
+  const activateUserTemp = (e) => {
     let user_id = members[e.target.id]['user_id'];
+    let activate = members[e.target.id]['activate'];
+    setUserActivate(activate);
     setSelectUserId(user_id);
     setIsOpen(true);
   }
 
-  const deleteUser = async () => {   // 需要 user_id
+  const de_activateUser = async () => {   // 需要 user_id
     let user_id = selectUserId;
     try {
-      const result = await request.post(`/users/${user_id}/delete`);
-      console.log(result);
+      if (userActivate === 1) {
+        const result = await request.post(`/users/${user_id}/deactivate`);
+        console.log(result);
+      }
+      else {
+        const result = await request.post(`/users/${user_id}/activate`);
+        console.log(result);
+      }
       getMembers();
     } catch (err) {
       console.log(err);
     }
+  }
+
+  const viewUser = (e) => {
+    let chooseInfo = members[e.target.id];
+    history.push(VIEWUSER, [chooseInfo, partner]);
   }
 
   const handleSearch = () => {  // 資料全部都在members裡面，前端根據條件filter就可以
@@ -131,15 +146,13 @@ export default function Settings() {
           role = '店家管理者';
         else if (member_arr[i]['role'] === 2)
           role = '店家使用者';
-        displayTemp.push({'username': member_arr[i]['username'], 'name': member_arr[i]['name'], 'role': role})
+        displayTemp.push({'username': member_arr[i]['username'], 'name': member_arr[i]['name'], 'role': role, 'activate': member_arr[i]['activate']})
       }
+      console.log(displayTemp);
       setDisplayMembers([...displayTemp]);
       setMembers(member_arr);
       setPartner(result.data['partner']);
       const partner_data = result.data.partner;
-      console.log(member_arr);
-      console.log(partner_data);
-      setMembers(member_arr);
       setPartnerData(partner_data);
     } catch (err) {
       console.log(err);
@@ -149,20 +162,18 @@ export default function Settings() {
   useEffect(() => {
     getRole();
     getMembers();
-    console.log("123456789");
-    console.log(displayMembers);
   }, []);
 
   return (
     <Grid fluid={true}>
       <Modal onClose={close} isOpen={isOpen}>
-        <ModalHeader>刪除帳號</ModalHeader>
+        <ModalHeader>{userActivate === 1? '停用帳號': '啟用帳號'}</ModalHeader>
         <ModalBody>
-          確定刪除帳號?
+          {userActivate === 1? '是否確定停用?': '是否確定啟用?'}
         </ModalBody>
         <ModalFooter>
           <Button background_color={'#616D89'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={close}>取消</Button>
-          <Button background_color={'#FF902B'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={() => {close(); deleteUser();}}>確定</Button>
+          <Button background_color={'#FF902B'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={() => {close(); de_activateUser();}}>確定</Button>
         </ModalFooter>
       </Modal>
       <Row>
@@ -210,16 +221,48 @@ export default function Settings() {
                 </SearchBox>
               </SubHeadingRight>
             </Heading>
-            <DisplayTable
-              columnNames = {column_names}
-              columnData = {displayMembers}
-              Button1_function = {null}
-              Button1_text = ''
-              Button2_function = {editUser}
-              Button2_text = '編輯'
-              Button3_function = {deleteUserTemp}
-              Button3_text = '刪除'
-            />
+            <div>
+              {displayMembers.length !== 0 ? (
+                <StyledTable>
+                  <tr>
+                      {column_names.map((column_name) => (
+                          <StyledTh>{column_name}</StyledTh>
+                      ))}
+                  </tr>
+                    {displayMembers.map((item) => Object.values(item))
+                    .map((row: Array<string>, index) => (
+                        <tr>
+                          <React.Fragment key={index}>
+                            <StyledTd>{row[0]}</StyledTd> 
+                            <StyledTd>{row[1]}</StyledTd>
+                            <StyledTd>{row[2]}</StyledTd>
+                            <StyledTd>
+                              <StyledButtonBox> 
+                                <Button id={index} margin='5px' width='80px' height='45px' background_color='#40C057' color={'#FFFFFF'} onClick={viewUser}>查看</Button>
+                                <Button id={index} margin='5px' width='80px' height='45px' background_color='#2F8BE6' color={'#FFFFFF'} onClick={editUser}>編輯</Button>
+                                <Button id={index} margin='5px' width='80px' height='45px' background_color='#F55252' color={'#FFFFFF'} disabled={row[2] === '店家使用者'? true: false} onClick={activateUserTemp}>{(parseInt(row[3]) === 1? "停用": "啟用")}</Button>
+                              </StyledButtonBox>
+                            </StyledTd>
+                          </React.Fragment>
+                        </tr>
+                      ))
+                    }
+                    <tr>
+                      {column_names.map((column_name) => (
+                          <StyledTh>{column_name}</StyledTh>
+                      ))}
+                    </tr>
+                </StyledTable>
+                ) : (
+                  <NoResult
+                    hideButton={false}
+                      style={{
+                        gridColumnStart: '1',
+                        gridColumnEnd: 'one',
+                      }}
+                  />
+                )}
+            </div>
           </Wrapper>
         </Col>
       </Row>
