@@ -82,7 +82,7 @@ const authorityList = [
 const AddUser = () => {
     const [authority, setAuthority] = useState([]);
     const [userInfo, setUserInfo] = useState({"account": "", "authority":"", "name": "", "phone": "", "email": "", "storeName": "", "storePhone": "", "regNumber": "", "address": "", "remark": ""});
-    const [currentRole, setCurentRole] = useState();
+    const [currentRole, setCurrentRole] = useState();
     const history = useHistory();
     const location = useLocation();
     const [isEdit, setIsNew] = useState(location.state[2]);
@@ -114,7 +114,7 @@ const AddUser = () => {
       userInfo['address'] = info[1]['address'];
       userInfo['remark'] = info[1]['note'];
       
-      setCurentRole(info[0]['role']);
+      setCurrentRole(info[0]['role']);
       if (info[0]['role'] === 1) {
         userInfo['authority'] = "店家管理者";
         setAuthority([{ value: '店家管理者', label: '店家管理者' }]);
@@ -229,29 +229,29 @@ const AddUser = () => {
                   </InputBox>
                   <InputBox>
                     <Text>店家名稱</Text>
-                    <Input id={"storeName"} placeholder="輸入店家名稱" value={userInfo['storeName']} disabled={currentRole===1? false: true}/>
+                    <Input id={"storeName"} placeholder="輸入店家名稱" value={userInfo['storeName']} disabled={currentRole!==0? true: false}/>
                   </InputBox>
                 </RowBox>
                 <RowBox>
                   <InputBox>
                     <Text>店家電話</Text>
-                    <Input id={"storePhone"} placeholder="輸入店家電話" value={userInfo['storePhone']} disabled={currentRole===1? false: true}/>
+                    <Input id={"storePhone"} placeholder="輸入店家電話" value={userInfo['storePhone']} disabled={currentRole!==0? true: false}/>
                   </InputBox>
                   <InputBox>
                     <Text>食品業者登錄字號</Text>
-                    <Input id={"regNumber"} placeholder="輸入食品業者登錄字號" value={userInfo['regNumber']} disabled={currentRole===1? false: true}/>
+                    <Input id={"regNumber"} placeholder="輸入食品業者登錄字號" value={userInfo['regNumber']} disabled={currentRole!==0? true: false}/>
                   </InputBox>
                 </RowBox>
                 <RowBox>
                   <InputBox>
                     <Text>地址</Text>
-                    <Input id={"address"} placeholder="輸入地址" value={userInfo['address']} disabled={currentRole===1? false: true}/>
+                    <Input id={"address"} placeholder="輸入地址" value={userInfo['address']} disabled={currentRole!==0? true: false}/>
                   </InputBox>
                 </RowBox>
                 <RowBox>
                   <InputBox>
                   <Text>備註</Text>
-                  <Input id={"remark"} placeholder="" value={userInfo['remark']} disabled={currentRole===1? false: true} height="100px"/>
+                  <Input id={"remark"} placeholder="" value={userInfo['remark']} disabled={currentRole!==0? true: false} height="100px"/>
                 </InputBox>
                 </RowBox>
                 <ButtonBox>

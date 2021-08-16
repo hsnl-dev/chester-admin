@@ -233,6 +233,7 @@ const AddProduct = () => {
     itemsInfo['preservation'] = productInfo['storage'];
     itemsInfo['remark'] = productInfo['note'];
     itemsInfo['image'] = productInfo['picture'];
+    itemsInfo['imageInfo'] = productInfo['picture_description'];
     setSpecification([{value: productInfo['spec'], label: productInfo['spec']}]);
     setFinalUnit([{value: productInfo['product_unit'], label: productInfo['product_unit']}]);
     setUnit([{value: productInfo['weight_unit'], label: productInfo['weight_unit']}]);
@@ -407,7 +408,7 @@ const AddProduct = () => {
                     <Input type="file" height="100%" id={"image"} placeholder="選擇檔案" disabled={type==="view"? true: false}/>
                   </ContentBox>
                 </InputBox>
-                <InputBox><Text>相片說明</Text><Input height="100%" id={"imageInfo"} placeholder="輸入相片說明" disabled={type==="view"? true: false}/></InputBox>
+                <InputBox><Text>相片說明</Text><Input height="100%" id={"imageInfo"} placeholder="輸入相片說明" value={itemsInfo["imageInfo"]} disabled={type==="view"? true: false}/></InputBox>
               </RowBox>
               <RowBox>
                 <InputBox><Text>備註</Text><Input height="100px" id={"remark"} placeholder="" value={itemsInfo["remark"]} disabled={type==="view"? true: false}/></InputBox>
