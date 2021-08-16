@@ -140,7 +140,7 @@ export default function DisplayTable({
                           ):(null)}
                           <Button id={index} margin='5px' width='80px' height='45px' background_color='#2F8BE6' color={'#FFFFFF'} onClick={Button2_function}>{Button2_text}</Button>
                           {Button3_text.length !== 0 ? (
-                            <Button id={index} margin='5px' width='80px' height='45px' background_color='#F55252' color={'#FFFFFF'} onClick={Button3_function}>{row.length >= 5? (parseInt(row[4]) === 1? "停用": "啟用"):Button3_text}</Button>
+                            <Button id={index} margin='5px' width='80px' height='45px' background_color={row.length >= 5? (parseInt(row[4]) === 1? '#F55252': '#FF902B'):'#F55252'} color={'#FFFFFF'} onClick={Button3_function}>{row.length >= 5? (parseInt(row[4]) === 1? "停用": "啟用"):Button3_text}</Button>
                           ):(null)}
                         </StyledButtonBox>
                       </StyledTd>

@@ -133,9 +133,10 @@ const AddProduct = () => {
   const [itemsInfo, setItemsInfo] = useState({"productNumber": "", "productName":"", "specification": "", "unitPrice": "", "finalUnit": "", "weight": "", "unit": "", "PD": "", "PDUnit": "",  "preservation": "", "image": undefined, "imageInfo": "", "remark": ""});
   const [productSpecs, setProductSpecs] = useState([]);
   const [productUnits, setProductUnits] = useState([]);
-  const [image, setImage] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
+  const [image, setImage] = useState();
+  const [imageUrl, setImageUrl] = useState();
   const [isOpen, setIsOpen] = useState(false);
+  const [isOpenImage, setIsOpenImage] = useState(false);
   const [type, setType] = useState("add");
   const history = useHistory();
   const location = useLocation<LocationState>();
@@ -146,23 +147,31 @@ const AddProduct = () => {
     let type = temp[0];
     itemsInfo[type] = e.target.value;
     setItemsInfo({...itemsInfo});
+    if (type === 'image'){
+      setImage(e.target.files[0]);
+      console.log(e.target.files[0]);
+    }
   }
 
   const close = () => {
     setIsOpen(false);
   }
 
+  const closeImage = () => {
+    setIsOpenImage(false);
+  }
+
   const handleSubmit = async () => {
     try {
       // upload image
-      // if (image) {
-      //   uploadImage();
-      //   console.log("imageurl: ", imageUrl);
-      // }
+      if (image) {
+        await uploadImage();
+        console.log("imageurl: ", itemsInfo.image);
+      }
       console.log(itemsInfo);
       let response;
       if (type === "add") {
-        let response = await request.post(`/product/create`, {
+        response = await request.post(`/product/create`, {
           product_no: itemsInfo.productNumber,
           name: itemsInfo.productName,
           spec: itemsInfo.specification,
@@ -173,13 +182,13 @@ const AddProduct = () => {
           shelf_life: itemsInfo.PD,
           shelf_life_unit: itemsInfo.PDUnit,
           storage: itemsInfo.preservation,
-          picture: imageUrl,
+          picture: itemsInfo.image,
           picture_description: itemsInfo.imageInfo,
           note: itemsInfo.remark
         });
       }
       else {
-        let response = await request.post(`/product/${location.state.info['id']}/edit`, {
+        response = await request.post(`/product/${location.state.info['id']}/edit`, {
           product_no: itemsInfo.productNumber,
           name: itemsInfo.productName,
           spec: itemsInfo.specification,
@@ -190,7 +199,7 @@ const AddProduct = () => {
           shelf_life: itemsInfo.PD,
           shelf_life_unit: itemsInfo.PDUnit,
           storage: itemsInfo.preservation,
-          picture: imageUrl,
+          picture: itemsInfo.image,
           picture_description: itemsInfo.imageInfo,
           note: itemsInfo.remark
         });
@@ -223,6 +232,7 @@ const AddProduct = () => {
     itemsInfo['PDUnit'] = productInfo['shelflife_unit'];
     itemsInfo['preservation'] = productInfo['storage'];
     itemsInfo['remark'] = productInfo['note'];
+    itemsInfo['image'] = productInfo['picture'];
     setSpecification([{value: productInfo['spec'], label: productInfo['spec']}]);
     setFinalUnit([{value: productInfo['product_unit'], label: productInfo['product_unit']}]);
     setUnit([{value: productInfo['weight_unit'], label: productInfo['weight_unit']}]);
@@ -318,7 +328,8 @@ const AddProduct = () => {
     if (response) {
       console.log(response);
       console.log(response.data.url);
-      setImageUrl(response.data.url);
+      itemsInfo.image = response.data.url
+      setItemsInfo({...itemsInfo});
     }
   };
 
@@ -340,6 +351,15 @@ const AddProduct = () => {
         <ModalFooter>
           <Button background_color={'#616D89'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={close}>取消</Button>
           <Button background_color={'#FF902B'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={() => {addName === '規格'? createProductSpec(): createProductUnit()}}>新增</Button>
+        </ModalFooter>
+      </Modal>
+      <Modal onClose={closeImage} isOpen={isOpenImage}>
+        <ModalHeader>照片</ModalHeader>
+        <ModalBody>
+          <img src={itemsInfo['image']}/>
+        </ModalBody>
+        <ModalFooter>
+          <Button background_color={'#616D89'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={closeImage}>關閉</Button>
         </ModalFooter>
       </Modal>
       <Row>
@@ -382,7 +402,10 @@ const AddProduct = () => {
               <RowBox>
                 <InputBox>
                   <Text>照片</Text>
-                  <Input height="100%" id={"image"} placeholder="選擇檔案" disabled={type==="view"? true: false}/>
+                  <ContentBox>
+                    {itemsInfo["image"] !== ""? (<Button width="40%" background_color={'#FF902B'} color={'#FFFFFF'} onClick={()=>{setIsOpenImage(true)}}>查看照片</Button>):(null)}
+                    <Input type="file" height="100%" id={"image"} placeholder="選擇檔案" disabled={type==="view"? true: false}/>
+                  </ContentBox>
                 </InputBox>
                 <InputBox><Text>相片說明</Text><Input height="100%" id={"imageInfo"} placeholder="輸入相片說明" disabled={type==="view"? true: false}/></InputBox>
               </RowBox>
