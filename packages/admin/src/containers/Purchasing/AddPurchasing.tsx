@@ -144,6 +144,7 @@ const AddPurchasing = () => {
         const response = await request.post(`/commodity/create`, {
           vendor_id: vendor[0].value,
           name: element.name,
+          trace_no: element.traceNumber,
           batch_no: element.batchNumber,
           origin: element.origin,
           brand: element.brand,

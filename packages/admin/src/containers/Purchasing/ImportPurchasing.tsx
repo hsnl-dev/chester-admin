@@ -105,6 +105,7 @@ const ImportPurchasing = () => {
       importData.forEach(element => {
         commodities_arr.push({
           name: element.data.name,
+          trace_no: element.data.trace_no,
           batch_no: element.data.batch_no,
           origin: element.data.origin,
           brand: element.data.brand,
@@ -117,7 +118,7 @@ const ImportPurchasing = () => {
           note: element.data.note
         });
       });
-      
+
       if (commodities_arr.length !== 0) {
         try {
           const response = await request.post(`/commodity/create-multiple`, {

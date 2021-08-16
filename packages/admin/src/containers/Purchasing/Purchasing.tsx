@@ -74,18 +74,40 @@ const Purchasing = () => {
 
   }
 
-  const returnPurchase = async ({ e }) => {   // 需要 commodity_id
-    // try {
-    //   const result = await request.post(`/commodity/${commodity_id}/delete`);
-    //   console.log(result);
-    //   getCommodities();
-    // } catch (err) {
-    //   console.log(err);
-    // }
+  const returnPurchase = async (e) => { 
+    const amount = 10;
+    const unit = 'kg';  // 直接綁定原進貨資料的單位，不能隨意填
+    const reason = 'reason';
+    const  commodity_id = commodities[e.target.id]['id'];
+    try {
+      const result = await request.post(`/commodity/${commodity_id}/return`, {
+        amount: amount,
+        unit: unit,
+        reason: reason
+      });
+      console.log(result);
+      history.push(PURCHASING);
+    } catch (err) {
+      console.log(err);
+    }
   }
 
-  const reimbursePurchase = (e) => {
-
+  const reimbursePurchase = async (e) => {
+    const amount = 10;
+    const unit = 'kg';  // 直接綁定原進貨資料的單位，不能隨意填
+    const reason = 'reason';
+    const  commodity_id = commodities[e.target.id]['id'];
+    try {
+      const result = await request.post(`/commodity/${commodity_id}/discard`, {
+        amount: amount,
+        unit: unit,
+        reason: reason
+      });
+      console.log(result);
+      history.push(PURCHASING);
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   const handleSearch =() => {
@@ -191,7 +213,7 @@ const Purchasing = () => {
                                 <Button id={index} margin='5px' width='80px' height='45px' background_color='#40C057' color={'#FFFFFF'} onClick={checkPurchase}>查看</Button>
                                 <Button id={index} margin='5px' width='80px' height='45px' background_color='#2F8BE6' color={'#FFFFFF'} onClick={editPurchase}>編輯</Button>
                                 <Button id={index} margin='5px' width='80px' height='45px' background_color='#F55252' color={'#FFFFFF'} onClick={returnPurchase}>退貨</Button>
-                                <Button id={index} margin='5px' width='80px' height='45px' background_color='#616D98' color={'#FFFFFF'} onClick={reimbursePurchase}>退貨</Button>
+                                <Button id={index} margin='5px' width='80px' height='45px' background_color='#616D98' color={'#FFFFFF'} onClick={reimbursePurchase}>報銷</Button>
                               </StyledButtonBox>
                             </StyledTd>
                           </React.Fragment>
