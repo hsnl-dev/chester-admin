@@ -97,6 +97,7 @@ const Purchasing = () => {
       const result = await request.get(`/commodity`);
       const vendors_arr = result.data.vendors;
       const commodities_arr = result.data.commodities;
+      let merge_data = {};
       console.log(vendors_arr)
       console.log(commodities_arr)
       for (let i = 0; i < commodities_arr.length; i++) {
@@ -107,8 +108,16 @@ const Purchasing = () => {
             break;
           }
         }
-        displayInfo.push({'vendor_id': vendor['id'], 'vendor_name': vendor['name'], 'create_at': dayjs(vendor['create_at']).format('YYYY-MM-DD')})       
+        let keys = Object.keys(merge_data);
+        if (keys.indexOf(vendor['id'] + '_' + dayjs(commodities_arr[i]['create_at']).format('YYYY-MM-DD')) === -1) {
+          displayInfo.push({'vendor_id': vendor['id'], 'vendor_name': vendor['name'], 'create_at': dayjs(commodities_arr[i]['create_at']).format('YYYY-MM-DD')});
+          merge_data[vendor['id'] + '_' + dayjs(commodities_arr[i]['create_at']).format('YYYY-MM-DD')] = [commodities_arr[i]];
+        }
+        else {
+          merge_data[vendor['id'] + '_' + dayjs(commodities_arr[i]['create_at']).format('YYYY-MM-DD')].push(commodities_arr[i]);
+        }
       }
+      console.log(merge_data);
       setVendors(vendors_arr);
       setCommodities(commodities_arr);
     } catch (err) {
