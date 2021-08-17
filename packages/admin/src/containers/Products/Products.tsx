@@ -69,8 +69,9 @@ const Products = () => {
   const [displayAmount, setDisplayAmount] = useState([]);
   const [products, setProducts] = useState([]);
   const [displayProducts, setDisplayProducts] = useState([]);
-  const [specs, setSpecs] = useState([]);
-  const [units, setUnits] = useState([]);
+  const [productUnit, setProductUnit] = useState([]);
+  const [weightUnit, setWeightUnit] = useState([]);
+  const [storage, setStorage] = useState([]);
   const [selectId, setSelectId] = useState();
   const [selectActivate, setSelectActivate] = useState();
   const [isOpen, setIsOpen] = useState(false);
@@ -95,8 +96,9 @@ const Products = () => {
     history.push({
       pathname: ADDPRODUCT,
       state: {
-        specs: specs,
-        units: units,
+        product_unit: productUnit,
+        weight_unit: weightUnit,
+        storage: storage,
         info: chooseInfo,
         type: 'view'
       }});
@@ -107,8 +109,9 @@ const Products = () => {
     history.push({
       pathname: ADDPRODUCT,
       state: {
-        specs: specs,
-        units: units,
+        product_unit: productUnit,
+        weight_unit: weightUnit,
+        storage: storage,
         info: chooseInfo,
         type: 'edit'
       }});
@@ -157,16 +160,18 @@ const Products = () => {
       const result = await request.get(`/product`);
       const product_arr = result.data.products;
       console.log(product_arr);
-      const specs_arr = result.data.specs;
-      const units_arr = result.data.units;
+      const product_unit_arr = result.data.options.product_unit;
+      const weight_unit_arr = result.data.options.weight_unit;
+      const storage_arr = result.data.options.storage;
       let displayTemp = [];
       for (let i = 0; i < product_arr.length; i++) {
         displayTemp.push({'product_no': product_arr[i]['product_no'], 'name': product_arr[i]['name'], 'price': product_arr[i]['price'], 'spec': product_arr[i]['spec'], "activate": product_arr[i]['activate']});
       }
       setDisplayProducts(displayTemp);
       setProducts(product_arr);
-      setSpecs(specs_arr);
-      setUnits(units_arr);
+      setProductUnit(product_unit_arr);
+      setWeightUnit(weight_unit_arr);
+      setStorage(storage_arr);
     } catch (err) {
       console.log(err);
     }
@@ -216,8 +221,9 @@ const Products = () => {
                       onClick={() => history.push({
                         pathname: ADDPRODUCT,
                         state: {
-                          specs: specs,
-                          units: units,
+                          product_unit: productUnit,
+                          weight_unit: weightUnit,
+                          storage: storage,
                           type: "add",
                         }
                       })}>

@@ -17,7 +17,7 @@ import { useHistory, useLocation } from 'react-router-dom';
 import { request } from "../../utils/request";
 import { getUnpackedSettings } from 'http2';
 import { getHeapSpaceStatistics } from 'v8';
-import {Modal, ModalHeader, ModalBody, ModalFooter,ModalButton} from 'baseui/modal';
+import {Modal, ModalHeader, ModalBody, ModalFooter} from 'baseui/modal';
 
 const Col = withStyle(Column, () => ({
     '@media only screen and (max-width: 574px)': {
@@ -94,13 +94,6 @@ const ContentBox = styled('div', () => ({
   
 }));
 
-const preservationList = [
-  { value: '常溫', label: '常溫' },
-  { value: '冷藏', label: '冷藏' },
-  { value: '冷凍', label: '冷凍' },
-];
-
-
 const PDUnitList = [
   { value: '天', label: '天' },
   { value: '月', label: '月' },
@@ -108,34 +101,25 @@ const PDUnitList = [
   { value: '小時', label: '小時' },
 ];
 
-const unitList = [
-  { value: 'g', label: 'g' },
-  { value: 'kg', label: 'kg' },
-  { value: 'ml', label: 'ml' },
-];
-
 interface LocationState {
-  specs: string[],
-  units: string[],
+  product_unit: string[],
+  weight_unit: string[],
+  storage: string[],
   info: {},
   type: string,
 };
 
 const AddProduct = () => {
-  const [specification, setSpecification] = useState([]);
   const [finalUnit, setFinalUnit] = useState([]);
   const [preservation, setPreservation] = useState([]);
   const [PDUnit, setPDUnit] = useState([]);
   const [unit, setUnit] = useState([]);
-  const [addName, setAddName] = useState("");
-  const [newSpec, setNewSpec] = useState("");
-  const [newFinalUnit, setNewFinalUnit] = useState("");
   const [itemsInfo, setItemsInfo] = useState({"productNumber": "", "productName":"", "specification": "", "unitPrice": "", "finalUnit": "", "weight": "", "unit": "", "PD": "", "PDUnit": "",  "preservation": "", "image": undefined, "imageInfo": "", "remark": ""});
-  const [productSpecs, setProductSpecs] = useState([]);
   const [productUnits, setProductUnits] = useState([]);
+  const [weightUnits, setWeightUnits] = useState([]);
+  const [storage, setStorage] = useState([]);
   const [image, setImage] = useState();
   const [imageUrl, setImageUrl] = useState();
-  const [isOpen, setIsOpen] = useState(false);
   const [isOpenImage, setIsOpenImage] = useState(false);
   const [type, setType] = useState("add");
   const history = useHistory();
@@ -151,10 +135,6 @@ const AddProduct = () => {
       setImage(e.target.files[0]);
       console.log(e.target.files[0]);
     }
-  }
-
-  const close = () => {
-    setIsOpen(false);
   }
 
   const closeImage = () => {
@@ -234,7 +214,6 @@ const AddProduct = () => {
     itemsInfo['remark'] = productInfo['note'];
     itemsInfo['image'] = productInfo['picture'];
     itemsInfo['imageInfo'] = productInfo['picture_description'];
-    setSpecification([{value: productInfo['spec'], label: productInfo['spec']}]);
     setFinalUnit([{value: productInfo['product_unit'], label: productInfo['product_unit']}]);
     setUnit([{value: productInfo['weight_unit'], label: productInfo['weight_unit']}]);
     setPDUnit([{value: productInfo['shelflife_unit'], label: productInfo['shelflife_unit']}]);
@@ -242,79 +221,41 @@ const AddProduct = () => {
     console.log(productInfo)
   }
 
-  const getProductSpecs = async () => {
-    const product_specs = location.state.specs;
-    const spec_list = product_specs.map(element => {
-      return {
-        value: element["spec"],
-        label: element["spec"]
-      };
-    });
-    console.log(spec_list);
-    setProductSpecs(spec_list);
-  }
-
   const getProductUnits = async () => {
-    const product_units = location.state.units;
+    const product_units = location.state.product_unit;
     const unit_list = product_units.map(element => {
       return {
-        value: element["unit"],
-        label: element["unit"]
+        value: element,
+        label: element
       };
     });
     console.log(unit_list);
     setProductUnits(unit_list);
   }
 
-  const createProductSpec = async () => {
-    try {
-      const response = await request.post(`/product/create-spec`, {
-        spec: newSpec,
-      });
-      const data = response.data;
-      if (data.status === 1) {
-        console.log(data.message);
-        setProductSpecs([...productSpecs, {value: newSpec, label: newSpec}]);
-      } else if (data.status === 0) {
-        console.log(data.message);
-      } else {
-        console.log(data.message);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-    close();
-  };
-
-  const createProductUnit = async () => {
-    try {
-      const response = await request.post(`/product/create-unit`, {
-        unit: newFinalUnit,
-      });
-      const data = response.data;
-      console.log(data);
-      if (data.status === 1) {
-        console.log(data.message);
-        setProductUnits([...productUnits, {value: newFinalUnit, label: newFinalUnit}]);
-      } else if (data.status === 0) {
-        console.log(data.message);
-      } else {
-        console.log(data.message);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-    close();
-  };
-
-  const handleAddSpecUnit = (e) => {
-    if (e.target.id === 'spec')
-      setAddName("規格");
-    else
-      setAddName("成品單位");
-    setIsOpen(true);
+  const getWeightUnits = async () => {
+    const weight_units = location.state.weight_unit;
+    const weight_unit_list = weight_units.map(element => {
+      return {
+        value: element,
+        label: element
+      };
+    });
+    console.log(weight_unit_list);
+    setWeightUnits(weight_unit_list);
   }
 
+  const getStorage = async () => {
+    const storage_arr = location.state.storage;
+    const storage_list = storage_arr.map(element => {
+      return {
+        value: element,
+        label: element
+      };
+    });
+    console.log(storage_list);
+    setStorage(storage_list);
+  }
 
   const uploadImage = async () => {
     let data = new FormData();
@@ -335,29 +276,18 @@ const AddProduct = () => {
   };
 
   useEffect(() => {
-    getProductSpecs();
     getProductUnits();
+    getWeightUnits();
+    getStorage();
     getProductInfo();
   }, [])
 
   return (
     <Grid fluid={true}>
-      <Modal onClose={close} isOpen={isOpen}>
-        <ModalHeader>新增{addName}</ModalHeader>
-        <ModalBody>
-          <RowBox><InputBox><Text>{addName}</Text>
-            <Input  placeholder={"輸入" + addName} onChange={(e)=>{addName === '規格'? setNewSpec(e.target.value): setNewFinalUnit(e.target.value)}}/>
-          </InputBox></RowBox>
-        </ModalBody>
-        <ModalFooter>
-          <Button background_color={'#616D89'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={close}>取消</Button>
-          <Button background_color={'#FF902B'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={() => {addName === '規格'? createProductSpec(): createProductUnit()}}>新增</Button>
-        </ModalFooter>
-      </Modal>
       <Modal onClose={closeImage} isOpen={isOpenImage}>
         <ModalHeader>照片</ModalHeader>
         <ModalBody>
-          <img src={itemsInfo['image']}/>
+          <img src={itemsInfo['image']} alt={"商品照片"}/>
         </ModalBody>
         <ModalFooter>
           <Button background_color={'#616D89'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={closeImage}>關閉</Button>
@@ -375,18 +305,16 @@ const AddProduct = () => {
                 <InputBox><Text>商品名稱</Text><Input height='100%' id={"productName"} placeholder="輸入商品名稱" value={itemsInfo["productName"]} disabled={type==="view"? true: false}/></InputBox>
               </RowBox>
               <RowBox>
-                <InputBox><Text>規格</Text><AddBox><Select placeholder="選擇" labelKey="label" valueKey="value" searchable={false} options={productSpecs} value={specification} disabled={type==="view"? true: false} onChange={({ value }) => {setSpecification(value); itemsInfo["specification"]=value[0]['value']; setItemsInfo({...itemsInfo})}}/>
-                  <Button id="spec" height={'48px'} background_color={'#FFD2AB'} color={'#FF902B'} onClick={handleAddSpecUnit} disabled={type==="view"? true: false}>+</Button></AddBox></InputBox>
+                <InputBox><Text>規格</Text><Input height='100%' id={"specification"} placeholder="輸入規格" value={itemsInfo["specification"]} disabled={type==="view"? true: false}/></InputBox>
                 <InputBox><Text>單價</Text><Input height="100%" id={"unitPrice"} placeholder="輸入單價" value={itemsInfo["unitPrice"]} disabled={type==="view"? true: false}/></InputBox>
               </RowBox>
               <RowBox>
-                <InputBox><Text>成品單位</Text><AddBox><Select placeholder="選擇" labelKey="label" valueKey="value" searchable={false} options={productUnits} value={finalUnit} disabled={type==="view"? true: false} onChange={({ value }) => {setFinalUnit(value); itemsInfo["finalUnit"]=value[0]['value']; setItemsInfo({...itemsInfo})}}/>
-                  <Button id="finalUnit" height={'48px'} background_color={'#FFD2AB'} color={'#FF902B'} onClick={handleAddSpecUnit} disabled={type==="view"? true: false}>+</Button></AddBox></InputBox>
+                <InputBox><Text>成品單位</Text><Select placeholder="選擇" labelKey="label" valueKey="value" searchable={false} options={productUnits} value={finalUnit} disabled={type==="view"? true: false} onChange={({ value }) => {setFinalUnit(value); itemsInfo["finalUnit"] = (value[0] !== undefined ? value[0]['value'] : null); setItemsInfo({...itemsInfo})}}/></InputBox>
                 <InputBox><Text>成品重量</Text>
                   <ContentBox>
                     <Input height="100%" id={"weight"} placeholder="輸入數字" value={itemsInfo["weight"]} disabled={type==="view"? true: false}/>
-                    <Select placeholder="選擇" labelKey="label" valueKey="value" searchable={false} options={unitList} value={unit} disabled={type==="view"? true: false}
-                      onChange={({ value }) => {setUnit(value); itemsInfo["unit"]=value[0]['value']; setItemsInfo({...itemsInfo})}}/>
+                    <Select placeholder="選擇" labelKey="label" valueKey="value" searchable={false} options={weightUnits} value={unit} disabled={type==="view"? true: false}
+                      onChange={({ value }) => {setUnit(value); itemsInfo["unit"] = (value[0] !== undefined ? value[0]['value'] : null); setItemsInfo({...itemsInfo})}}/>
                   </ContentBox>
                 </InputBox>
               </RowBox>
@@ -395,10 +323,10 @@ const AddProduct = () => {
                   <ContentBox>
                     <Input height="100%" id={"PD"} placeholder="輸入數字" value={itemsInfo["PD"]} disabled={type==="view"? true: false}/>
                     <Select placeholder="選擇" labelKey="label" valueKey="value" searchable={false} options={PDUnitList} value={PDUnit} disabled={type==="view"? true: false}
-                      onChange={({ value }) => {setPDUnit(value); itemsInfo["PDUnit"]=value[0]['value']; setItemsInfo({...itemsInfo})}}/>
+                      onChange={({ value }) => {setPDUnit(value); itemsInfo["PDUnit"] = (value[0] !== undefined ? value[0]['value'] : null); setItemsInfo({...itemsInfo})}}/>
                   </ContentBox>
                 </InputBox>
-                <InputBox><Text>保存性質</Text><Select placeholder="選擇" labelKey="label" valueKey="value" searchable={false} options={preservationList} value={preservation} disabled={type==="view"? true: false} onChange={({ value }) => {setPreservation(value); itemsInfo["preservation"]=value[0]['value']; setItemsInfo({...itemsInfo})}}/></InputBox>
+                <InputBox><Text>保存性質</Text><Select placeholder="選擇" labelKey="label" valueKey="value" searchable={false} options={storage} value={preservation} disabled={type==="view"? true: false} onChange={({ value }) => {setPreservation(value); itemsInfo["preservation"] = (value[0] !== undefined ? value[0]['value'] : null); setItemsInfo({...itemsInfo})}}/></InputBox>
               </RowBox>
               <RowBox>
                 <InputBox>
