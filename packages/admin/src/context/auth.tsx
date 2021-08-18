@@ -13,7 +13,7 @@ const isValidToken = async() => {
   const token = localStorage.getItem('access_token');
   request.defaults.headers.common.Authorization = `Bearer ${token}`;
   try {
-    const response = await request.get('/users/roles');
+    const response = await request.get('/users/role');
     const {
       data: {role},
     } = response;
@@ -40,6 +40,7 @@ const AuthProvider = (props: any) => {
       const {data} = response;
       localStorage.setItem('access_token', data.access_token);
       localStorage.setItem('name', username);
+      localStorage.setItem('user_id', data.user_id);
       request.defaults.headers.common.Authorization = `Bearer ${data.access_token}`;
       makeAuthenticated(true);
     } catch (error) {

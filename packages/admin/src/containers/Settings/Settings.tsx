@@ -124,8 +124,8 @@ export default function Settings() {
 
   const getRole = async () => {
     try {
-      const result = await request.get(`/users/roles`)
-      const memberRole = result.data;
+      const result = await request.get(`/users/role`)
+      const memberRole = result.data.role;
       // console.log(memberRole);
       setRole(memberRole);
       console.log(role)
