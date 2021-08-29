@@ -85,7 +85,7 @@ interface LocationState {
 };
 
 const AddPurchasing = () => {
-  const itemsInfoTemp = {"name": "", "batchNumber":"", "origin": "", "brand": "", "amount": "", "unit": "g", "PD": "", "Exp": "", "unitPrice": "", "totalPrice": "", "remark": ""}
+  const itemsInfoTemp = {"name": "", "batchNumber":"", "origin": "", "brand": "", "amount": "", "unit": "g", "PD": "", "Exp": "", "unitPrice": "", "totalPrice": "", "remark": ""};
   const [vendor, setVendor] = useState([]);
   const [newVendor, setNewVendor] = useState({"vendor_name": "", "note": ""});
   const [vendorList, setVendorList] = useState([]);

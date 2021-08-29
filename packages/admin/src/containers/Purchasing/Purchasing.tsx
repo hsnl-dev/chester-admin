@@ -9,7 +9,7 @@ import NoResult from '../../components/NoResult/NoResult';
 import Select from '../../components/Select/Select';
 import Input from '../../components/Input/Input';
 import { SelectBox } from '../../components/Select/Select';
-import { ADDPURCHASING, VIEWPURCHASING, REPURCHASING } from '../../settings/constants';
+import { ADDPURCHASING, VIEWPURCHASING, REPURCHASING, EDITPURCHASING } from '../../settings/constants';
 import { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import dayjs from 'dayjs';
@@ -81,7 +81,16 @@ const Purchasing = () => {
   }
 
   const editPurchase = (e) => {
-    
+    let selectData = mergeData[e.target.id];
+    console.log(vendors)
+    let vendor;
+    for (let i = 0; i < vendors.length; i++){
+      if (vendors[i].id === selectData[0].vendor_id){
+        vendor = vendors[i];
+        break;
+      }
+    }
+    history.push(EDITPURCHASING, [selectData, vendor, vendors]);
   }
 
   const returnPurchase = async (e) => {

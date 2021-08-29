@@ -74,7 +74,6 @@ const RowBox = styled('div', () => ({
   justifyContent: 'space-between',
   width: '100%',
   marginTop: '10px',
-  padding: '0px'
 }));
 
 const InputBox = styled('div', () => ({
@@ -90,8 +89,6 @@ const ContentBox = styled('div', () => ({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'space-between',
-  
-  
 }));
 
 const PDUnitList = [

@@ -10,7 +10,7 @@ import {
 import {
   PURCHASING,
   PRODUCTS,
-  CATEGORY,
+  RESUME,
   ORDERS,
   CUSTOMERS,
   COUPONS,
@@ -44,7 +44,7 @@ const sidebarMenus = [
   },
   {
     name: '履歷管理',
-    path: CATEGORY,
+    path: RESUME,
     exact: false,
     icon: <SidebarCategoryIcon />,
   },

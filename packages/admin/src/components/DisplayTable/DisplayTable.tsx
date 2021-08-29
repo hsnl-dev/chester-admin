@@ -47,7 +47,6 @@ export const StyledTd = styled('td', () => ({
 export const StyledButtonBox = styled('div', () => ({
   display: 'flex',
   flexDirection: 'column',
-  alignItems: 'center'
 }))
 
 export const Heading = styled('span', ({ $theme }) => ({
@@ -152,7 +151,7 @@ export default function DisplayTable({
                 {columnNames.map((columnName: Array<string>) => (
                     <StyledTh>{columnName}</StyledTh>
                 ))}
-            </tr>
+              </tr>
           </StyledTable>
           ) : (
             <NoResult

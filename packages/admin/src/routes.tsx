@@ -4,10 +4,12 @@ import {
   LOGIN,
   PRODUCTS,
   ADDPRODUCT,
-  CATEGORY,
+  RESUME,
+  ADDRESUME,
   PURCHASING,
   REPURCHASING,
   VIEWPURCHASING,
+  EDITPURCHASING,
   ADDPURCHASING,
   IMPORTPURCHASING,
   ORDERS,
@@ -31,9 +33,11 @@ const RePurchasing = lazy(() => import('./containers/Purchasing/RePurchasing'))
 const ViewPruchasing = lazy(() => import('./containers/Purchasing/ViewPurchasing'));
 const AddPurchasing = lazy(() => import('./containers/Purchasing/AddPurchasing'));
 const ImportPurchasing = lazy(() => import('./containers/Purchasing/ImportPurchasing'));
+const EditPurchasing = lazy(() => import('./containers/Purchasing/EditPurchasing'));
 const AddUser = lazy(() => import('./containers/Settings/AddUser'));
 const ViewUser = lazy(() => import('./containers/Settings/ViewUser'));
-const Category = lazy(() => import('./containers/Category/Category'));
+const Resume = lazy(() => import('./containers/Resume/Resume'));
+const AddResume = lazy(() => import('./containers/Resume/AddResume'));
 const Orders = lazy(() => import('./containers/Orders/Orders'));
 const Settings = lazy(() => import('./containers/Settings/Settings'));
 const SiteSettingForm = lazy(() => import('./containers/SiteSettingForm/SiteSettingForm'));
@@ -114,6 +118,13 @@ const Routes = () => {
               </Suspense>
             </AdminLayout>
           </PrivateRoute>
+          <PrivateRoute path={EDITPURCHASING}>
+            <AdminLayout>
+              <Suspense fallback={<InLineLoader />}>
+                <EditPurchasing />
+              </Suspense>
+            </AdminLayout>
+          </PrivateRoute>
           <PrivateRoute path={PRODUCTS}>
             <AdminLayout>
               <Suspense fallback={<InLineLoader />}>
@@ -128,10 +139,17 @@ const Routes = () => {
               </Suspense>
             </AdminLayout>
           </PrivateRoute>
-          <PrivateRoute path={CATEGORY}>
+          <PrivateRoute path={RESUME}>
             <AdminLayout>
               <Suspense fallback={<InLineLoader />}>
-                <Category />
+                <Resume />
+              </Suspense>
+            </AdminLayout>
+          </PrivateRoute>
+          <PrivateRoute path={ADDRESUME}>
+            <AdminLayout>
+              <Suspense fallback={<InLineLoader />}>
+                <AddResume />
               </Suspense>
             </AdminLayout>
           </PrivateRoute>
