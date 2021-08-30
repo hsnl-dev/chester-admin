@@ -62,6 +62,7 @@ export default function Settings() {
   const [userActivate, setUserActivate] = useState();
   const [role, setRole] = useState(-1);
   const [partnerData, setPartnerData] = useState([]);
+  const [machines, setMachines] = useState([]);
   const data = [{'account': '123456789','name': 'ABC', 'authority': '店家管理者'}]
   const history = useHistory();
 
@@ -78,12 +79,12 @@ export default function Settings() {
     console.log(e.target.id);
     console.log(members[e.target.id]);
     let chooseInfo = members[e.target.id];
-    history.push(ADDUSER, [chooseInfo, partner, true]);
+    history.push(ADDUSER, [chooseInfo, partner, true, machines]);
     
   }
 
   const addUser = () => {
-    history.push(ADDUSER, [{}, partner, false])
+    history.push(ADDUSER, [{}, partner, false, machines]);
   }
 
   const activateUserTemp = (e) => {
@@ -113,7 +114,7 @@ export default function Settings() {
 
   const viewUser = (e) => {
     let chooseInfo = members[e.target.id];
-    history.push(VIEWUSER, [chooseInfo, partner]);
+    history.push(VIEWUSER, [chooseInfo, partner, machines]);
   }
 
   const handleSearch = () => {  // 資料全部都在members裡面，前端根據條件filter就可以
@@ -152,6 +153,9 @@ export default function Settings() {
       setPartner(result.data['partner']);
       const partner_data = result.data.partner;
       setPartnerData(partner_data);
+      const result2 = await request.get(`/users/partner-machines`);
+      console.log(result2.data);
+      setMachines(result2.data);
     } catch (err) {
       console.log(err);
     }

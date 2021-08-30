@@ -83,6 +83,7 @@ const ViewUser = () => {
     const location = useLocation();
     const [isEdit, setIsNew] = useState(location.state[2]);
     const [selfRole, setSelfRole] = useState();
+    const [machines, setMachines] = useState([]);
 
     const handleInfoChange = (e) => {
       console.log(e.target.id);
@@ -99,6 +100,11 @@ const ViewUser = () => {
     }
 
     const setCurrentUserInfo = ( info ) => {
+      /* 
+       * info[0]: user
+       * info[1]: partner
+       * info[2]: machines 
+      */
       userInfo['account'] = info[0]['username'];
       userInfo['name'] = info[0]['name'];
       userInfo['phone'] = info[0]['phone'];
@@ -119,11 +125,20 @@ const ViewUser = () => {
         setAuthority([{ value: '店家使用者', label: '店家使用者' }]);
       }
       
+      let tmpMachines = [];
+      info[2].forEach(element => {
+        tmpMachines.push({
+          "name": element.machine_name,
+          "number": element.machine_id
+        });
+      })
+      setMachines(tmpMachines);
+      console.log(tmpMachines);
     }
 
     const getRole = async () => {
       try {
-        const result = await request.get(`/users/roles`)
+        const result = await request.get(`/users/role`)
         let role = result.data;
         setSelfRole(role);
       } catch (err) {

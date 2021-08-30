@@ -10,6 +10,7 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { request } from "../../utils/request";
+import { forEachLeadingCommentRange } from 'typescript';
 
 const Col = withStyle(Column, () => ({
     '@media only screen and (max-width: 574px)': {
@@ -70,6 +71,7 @@ const AddUser = () => {
     const location = useLocation();
     const [isEdit, setIsNew] = useState(location.state[2]);
     const [machines, setMachines] = useState([]);
+    const [existMachines, setExistMachines] = useState([]);
     const [selfRole, setSelfRole] = useState();
 
     const handleInfoChange = (e) => {
@@ -107,7 +109,15 @@ const AddUser = () => {
         userInfo['authority'] = "店家使用者";
         setAuthority([{ value: '店家使用者', label: '店家使用者' }]);
       }
-      
+      let tmpMachines = [];
+      info[3].forEach(element => {
+        tmpMachines.push({
+          "name": element.machine_name,
+          "number": element.machine_id
+        });
+      })
+      setExistMachines(tmpMachines);
+      console.log(tmpMachines);
     }
 
     const getRole = async () => {
@@ -141,6 +151,11 @@ const AddUser = () => {
             address: userInfo.address,
             note: userInfo.remark
           });
+          if (response.status === 200) {
+            const response2 = await request.post(`/users/add-machines`, {
+              machines: machines
+            });
+          }
         }
         else {
           response = await request.post(`/users/create`, {
@@ -155,14 +170,13 @@ const AddUser = () => {
             address: userInfo.address,
             note: userInfo.remark
           });
+          if (response.status === 200) {
+            const response2 = await request.post(`/users/add-machines`, {
+              machines: machines
+            });
+          }
         }
-        
         history.push(SETTINGS);
-        if (response) {
-          console.log("Add user success");
-        } else {
-          console.log("Add user failed");
-        }
       } catch (err) {
         console.log(err);
       }
@@ -179,39 +193,40 @@ const AddUser = () => {
       let index = split[1];
       machines[index][key] = e.target.value;
       setMachines([...machines]);
+      console.log(machines);
     }
 
     const machinesRow = () => {
       return (
         <Row>
-            <Col md={12}>
-              <Wrapper>
-                <Heading>綁定智販機</Heading>
-                {machines.length === 0? (null):(
-                  Object(machines).map((item, index) => {
-                    return (
-                    <RowBox onChange={handleMachine}>
-                      <InputBox>
-                        <Text>智販機名稱</Text>
-                        <Input id={"name_" + index} placeholder="輸入智販機名稱" value={item.name}/>
-                      </InputBox>
-                      <InputBox>
-                        <Text>智販機編號</Text>
-                        <Input id={"number_" + index} placeholder="輸入智販機編號" value={item.number}/>
-                      </InputBox>
-                    </RowBox>
-                  )})
-                )}
-                <Button
-                    background_color={'#FF902B'}
-                    color={'#FFFFFF'}
-                    margin={'5px'}
-                    height={'60%'}
-                    width={'10%'}
-                    onClick={addMachine}
-                  >新增機器</Button>
-              </Wrapper>
-            </Col>
+          <Col md={12}>
+            <Wrapper>
+              <Heading>綁定智販機</Heading>
+              {machines.length === 0? (null):(
+                Object(machines).map((item, index) => {
+                  return (
+                  <RowBox onChange={handleMachine}>
+                    <InputBox>
+                      <Text>智販機名稱</Text>
+                      <Input id={"name_" + index} placeholder="輸入智販機名稱" value={item.name}/>
+                    </InputBox>
+                    <InputBox>
+                      <Text>智販機編號</Text>
+                      <Input id={"number_" + index} placeholder="輸入智販機編號" value={item.number}/>
+                    </InputBox>
+                  </RowBox>
+                )})
+              )}
+              <Button
+                background_color={'#FF902B'}
+                color={'#FFFFFF'}
+                margin={'5px'}
+                height={'60%'}
+                width={'10%'}
+                onClick={addMachine}
+              >新增機器</Button>
+            </Wrapper>
+          </Col>
         </Row>
       )
     }

@@ -69,8 +69,8 @@ const ContentBox = styled('div', () => ({
 
 const AddResume = () => {
 	const methodSelectOptions = [
-			{ value: '選擇進貨', label: '選擇進貨'},
-			{ value: '填寫進貨', label: '填寫進貨'},
+		{ value: '選擇進貨', label: '選擇進貨'},
+		{ value: '填寫進貨', label: '填寫進貨'},
 	];
 	const [productList, setProductList] = useState([]);
 	const [method, setMethod] = useState([]);
@@ -86,8 +86,9 @@ const AddResume = () => {
 	const [commodities, setCommodities] = useState([]);
 	const [selectCommodities, setSelectCommodities] = useState([]);
 	const [chooseFood, setChooseFood] = useState({'主食': {}, '主菜': {}, '配菜': {}, '其他': {} });
-    const [foodTemp, setFoodTemp] = useState({})
+	const [foodTemp, setFoodTemp] = useState({})
 	const [selectFood, setSelectFood] = useState(foodOptions[0]);
+	const [traceId, setTraceId] = useState(-1);
 	const history = useHistory();
 
 	const close = () => {
@@ -105,31 +106,31 @@ const AddResume = () => {
         amount: amount,
 				create_date: MFG
       });
-			console.log(response);
+			console.log(response.data);
+			setTraceId(response.data.trace_id);
     } catch (err) {
       console.log(err);
     }
 	}
 
 	const handleFoodChange = (e) => {
-        console.log(e.target.id)
-        console.log(selectFood)
+		console.log(e.target.id)
+		console.log(selectFood)
 		let keys = Object.keys(foodTemp);
 		let split = e.target.id.split('_');
 		let key = split[0];
 		let index = String(split[1]);
-        let id = String(commodities[parseInt(index)].id);
+		let id = String(commodities[parseInt(index)].id);
 		
 		if (keys.indexOf(id) !== -1) {
-            console.log('no')
+			console.log('no')
 			foodTemp[id][key] = e.target.value;
 		}	else {
 			let temp = {'id': commodities[parseInt(index)].id,'foodName': selectFood[0].value, 'checked': '', 'date': commodities[parseInt(index)].date, 'amount': '', 'unit': commodities[parseInt(index)].unit};
 			temp[key] = e.target.value;
 			foodTemp[id] = temp;
 		}
-        setFoodTemp({...foodTemp});
-        
+		setFoodTemp({...foodTemp});
 	}
     
     const handleAdd = () => {
@@ -137,9 +138,9 @@ const AddResume = () => {
 		for (let i = 0; i < keys.length; i++) {
 			chooseFood[addFoodName][keys[i]] = foodTemp[keys[i]];
 		}
-        setChooseFood({...chooseFood});
-        close();
-    }
+		setChooseFood({...chooseFood});
+		close();
+	}
 
 	const deleteDisplay = (e) => {
 		let split = e.target.id.split('_');
@@ -163,13 +164,50 @@ const AddResume = () => {
 		setIsOpen(true);
 	}
 
-	const handleSubmit = () => {
-
+	const handleSubmit = async () => {
+		try {
+			let commodity_arr = [];
+			for (const [key, value] of Object.entries(chooseFood["主菜"])) {
+				commodity_arr.push({
+					"commodity_id": parseInt(key),
+					"amount": parseFloat(value["amount"]),
+					"type": "main_dish"
+				})
+			}
+			for (const [key, value] of Object.entries(chooseFood["主食"])) {
+				commodity_arr.push({
+					"commodity_id": parseInt(key),
+					"amount": parseFloat(value["amount"]),
+					"type": "staple_food"
+				})
+			}
+			for (const [key, value] of Object.entries(chooseFood["配菜"])) {
+				commodity_arr.push({
+					"commodity_id": parseInt(key),
+					"amount": parseFloat(value["amount"]),
+					"type": "side_dish"
+				})
+			}
+			for (const [key, value] of Object.entries(chooseFood["其他"])) {
+				commodity_arr.push({
+					"commodity_id": parseInt(key),
+					"amount": parseFloat(value["amount"]),
+					"type": "others"
+				})
+			}
+			console.log(commodity_arr);
+			const result = await request.post(`/trace/${traceId}/add-commodity`, {
+				commodities_arr: commodity_arr
+			});
+			console.log(result);
+		} catch (err) {
+			console.log(err);
+		}
 	}
 
 	const addRow = (head) => {
 		let displayInfo = [];
-        let keys = Object.keys(chooseFood[head]);
+		let keys = Object.keys(chooseFood[head]);
 		for (let i = 0; i < keys.length; i++) {
 			if (chooseFood[head][keys[i]].checked === 'on') {
 				displayInfo.push(chooseFood[head][keys[i]]);
@@ -237,13 +275,13 @@ const AddResume = () => {
 
 	async function getCommodityList() {
 		try {
-            const result = await request.get(`/trace/commodity`);
-            const commodity_arr = result.data.commodities;
+			const result = await request.get(`/trace/commodity`);
+			const commodity_arr = result.data.commodities;
 			const commodity_name = result.data.commodity_name;
-            console.log("commodity_arr: ", commodity_arr);
+			console.log("commodity_arr: ", commodity_arr);
 			console.log("commodity_name: ", commodity_name);
 			let name_list = [];
-            commodity_name.forEach(element => {
+			commodity_name.forEach(element => {
 				name_list.push({
 					value: element,
 					label: element
@@ -264,11 +302,11 @@ const AddResume = () => {
 			
 			console.log(name_list);
 			console.log(commodity_list);
-            setFoodOptions(name_list);
+			setFoodOptions(name_list);
 			setCommodities(commodity_list);
-        } catch (err) {
-            console.log(err);
-        }
+		} catch (err) {
+			console.log(err);
+		}
 	}
 
 	const handleSelectFood = ({value}) => {
