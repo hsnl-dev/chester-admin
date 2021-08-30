@@ -308,10 +308,15 @@ const AddPurchasing = () => {
                     <Heading>新增品項</Heading>
                     <RowBox>
                       <InputBox><Text>進貨品名</Text><Input id={"name_" + index} placeholder="輸入品名"/></InputBox>
-                      <InputBox><Text>批號</Text><Input id={"batchNumber_" + index} placeholder="輸入批號"/></InputBox>
+                      
+                      <InputBox><Text>溯源履歷號碼</Text><Input id={"traceNumber_" + index}   placeholder="輸入溯源履歷號碼"/></InputBox>
                     </RowBox>
                     <RowBox>
                       <InputBox><Text>原產地</Text><Input id={"origin_" + index} placeholder="輸入原產地"/></InputBox>
+                      <InputBox></InputBox>
+                    </RowBox>
+                    <RowBox>
+                      <InputBox><Text>批號</Text><Input id={"batchNumber_" + index} placeholder="輸入批號"/></InputBox>
                       <InputBox><Text>品牌</Text><Input id={"brand_" + index} placeholder="輸入品牌"/></InputBox>
                     </RowBox>
                     <RowBox>

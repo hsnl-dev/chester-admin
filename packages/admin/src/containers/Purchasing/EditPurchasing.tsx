@@ -87,8 +87,7 @@ interface LocationState {
   };
 
 const EditPurchasing = () => {
-    const itemsInfoTemp = {"name": "", "traceNumber": "", "batchNumber":"", "origin": "", "brand": "", "amount": "", "unit": "g", "PD": "", "Exp": "", "unitPrice": "", "totalPrice": "", "remark": ""};
-    const [commodities, setCommodities] = useState([]);
+    const itemsInfoTemp = {"id": "", "name": "", "traceNumber": "", "batchNumber":"", "origin": "", "brand": "", "amount": "", "unit": "g", "PD": "", "Exp": "", "unitPrice": "", "totalPrice": "", "remark": ""};
     const [vendor, setVendor] = useState({});
     const [isOpen, setIsOpen] = useState(false);
     const [isOpenError, setIsOpenError] = useState(false);
@@ -109,15 +108,32 @@ const EditPurchasing = () => {
 
     const getInfo = async (info) => {
         console.log(info);
-        commodities.push(...info[0]);
+        let commodities = info[0];
         let keys = Object.keys(info[1]);
         vendor['value'] = info[1].id;
         vendor['label'] = info[1].name;
         for (let i = 0; i < info[2].length; i++) {
             vendorList.push({value: info[2][i].id, label: info[2][i].name});
         }
-        setCommodities([...commodities]);
-        setItemsInfo([...commodities]);
+        for (let i = 0; i < commodities.length; i++) {
+            let temp = itemsInfoTemp;
+            temp.id = commodities[i].id;
+            temp.name = commodities[i].name;
+            temp.traceNumber = commodities[i].trace_no;
+            temp.origin = commodities[i].origin;
+            temp.batchNumber = commodities[i].batch_no;
+            temp.brand = commodities[i].brand;
+            temp.amount = commodities[i].amount;
+            temp.unit = commodities[i].unit;
+            temp.PD = commodities[i].MFG;
+            temp.Exp = commodities[i].EXP;
+            temp.unitPrice = commodities[i].unit_price;
+            temp.totalPrice = commodities[i].gross_price;
+            temp.remark= commodities[i].note;
+            itemsInfo.push(temp);
+        }
+        
+        setItemsInfo([...itemsInfo]);
         setVendor({...vendor});
         console.log(vendor)
         setVendorList([...vendorList]);
@@ -170,7 +186,7 @@ const EditPurchasing = () => {
           console.log(vendor);
           history.push({
             pathname: IMPORTPURCHASING,
-            state: {vendor_id: vendor[0].value}
+            state: {vendor_id: vendor['value']}
           });
         } else {
           setIsOpenError(true);
@@ -178,35 +194,35 @@ const EditPurchasing = () => {
     }
 
     const handleSubmit = async () => {
-        // itemsInfo.forEach(async function (element) {
-        //   try {
-        //     console.log("vendor: ", vendor[0].value);
-        //     console.log("element: ", element);
-        //     const response = await request.post(`/commodity/create`, {
-        //       vendor_id: vendor[0].value,
-        //       name: element.name,
-        //       trace_no: element.traceNumber,
-        //       batch_no: element.batchNumber,
-        //       origin: element.origin,
-        //       brand: element.brand,
-        //       amount: element.amount,
-        //       unit:  element.unit,
-        //       MFG: moment(element.PD).format("YYYY-MM-DD"),
-        //       EXP: moment(element.Exp).format("YYYY-MM-DD"),
-        //       unit_price: element.unitPrice,
-        //       gross_price: element.totalPrice,
-        //       note: element.remark
-        //     });
-        //     history.push(PURCHASING);
-        //     if (response) {
-        //       console.log("Add commodity successful");
-        //     } else {
-        //       console.log("Add commodity failed");
-        //     }
-        //   } catch (err) {
-        //     console.log(err);
-        //   }
-        // });
+        itemsInfo.forEach(async function (element) {
+          try {
+            console.log("vendor: ", vendor['value']);
+            console.log("element: ", element);
+            const response = await request.post(`/commodity/${element.id}/edit`, {
+              vendor_id: vendor['value'],
+              name: element.name,
+              trace_no: element.traceNumber,
+              batch_no: element.batchNumber,
+              origin: element.origin,
+              brand: element.brand,
+              amount: element.amount,
+              unit:  element.unit,
+              MFG: moment(element.PD).format("YYYY-MM-DD"),
+              EXP: moment(element.Exp).format("YYYY-MM-DD"),
+              unit_price: element.unitPrice,
+              gross_price: element.totalPrice,
+              note: element.remark
+            });
+            history.push(PURCHASING);
+            if (response) {
+              console.log("Add commodity successful");
+            } else {
+              console.log("Add commodity failed");
+            }
+          } catch (err) {
+            console.log(err);
+          }
+        });
     }
 
     useEffect(() => {
@@ -262,7 +278,7 @@ const EditPurchasing = () => {
                         >+</Button>
                     </VendorBox>
                     <RowBox>
-                      <div>
+                      {/* <div>
                         {itemsInfo.length == 0 ? (
                           <Button
                             background_color={'#FF902B'}
@@ -301,7 +317,7 @@ const EditPurchasing = () => {
                             height={'60%'}
                             onClick={handleSubmit}
                         >確認送出</Button>
-                      </div>
+                      </div> */}
                     </RowBox>
                 </Wrapper>
             </Col>
@@ -315,14 +331,14 @@ const EditPurchasing = () => {
                         <Heading>新增品項</Heading>
                         <RowBox>
                           <InputBox><Text>進貨品名</Text><Input id={"name_" + index} value={item.name} placeholder="輸入品名"/></InputBox>
-                          <InputBox><Text>溯源履歷號碼</Text><Input id={"traceNumber_" + index} value={item.trace_no} placeholder="輸入溯源履歷號碼"/></InputBox>
+                          <InputBox><Text>溯源履歷號碼</Text><Input id={"traceNumber_" + index} value={item.traceNumber} placeholder="輸入溯源履歷號碼"/></InputBox>
                         </RowBox>
                         <RowBox>
                           <InputBox><Text>原產地</Text><Input id={"origin_" + index} value={item.origin} placeholder="輸入原產地"/></InputBox>
                           <InputBox></InputBox>
                         </RowBox>
                         <RowBox>
-                            <InputBox><Text>批號</Text><Input id={"batchNumber_" + index} value={item.batch_no} placeholder="輸入批號"/></InputBox>
+                            <InputBox><Text>批號</Text><Input id={"batchNumber_" + index} value={item.batchNumber} placeholder="輸入批號"/></InputBox>
                             <InputBox><Text>品牌</Text><Input id={"brand_" + index} value={item.brand} placeholder="輸入品牌"/></InputBox>
                         </RowBox>
                         <RowBox>
@@ -331,15 +347,15 @@ const EditPurchasing = () => {
                                 onChange={({ value }) => {setUnit(value); itemsInfo[index]["unit"]=value[0]['value']; setItemsInfo([...itemsInfo])}}/></InputBox>
                         </RowBox>
                         <RowBox>
-                          <InputBox><Text>製造日期</Text><Datepicker value={new Date(item.MFG)}  locale={tw} onChange={({date})=>{itemsInfo[index]["PD"]=date; setItemsInfo([...itemsInfo])}}/></InputBox>
-                          <InputBox><Text>有效日期</Text><Datepicker value={new Date(item.EXP)}  locale={tw} onChange={({date})=>{itemsInfo[index]["Exp"]=date; setItemsInfo([...itemsInfo])}} /></InputBox>
+                          <InputBox><Text>製造日期</Text><Datepicker value={new Date(item.PD)}  locale={tw} onChange={({date})=>{itemsInfo[index]["PD"]=date; setItemsInfo([...itemsInfo])}}/></InputBox>
+                          <InputBox><Text>有效日期</Text><Datepicker value={new Date(item.Exp)}  locale={tw} onChange={({date})=>{itemsInfo[index]["Exp"]=date; setItemsInfo([...itemsInfo])}} /></InputBox>
                         </RowBox>
                         <RowBox>
-                          <InputBox><Text>單價</Text><Input value={item.unit_price} id={"unitPrice_" + index} placeholder="輸入單價"/></InputBox>
-                          <InputBox><Text>總價</Text><Input value={item.gross_price} id={"totalPrice_" + index} placeholder="輸入總價"/></InputBox>
+                          <InputBox><Text>單價</Text><Input value={item.unitPrice} id={"unitPrice_" + index} placeholder="輸入單價"/></InputBox>
+                          <InputBox><Text>總價</Text><Input value={item.totalPrice} id={"totalPrice_" + index} placeholder="輸入總價"/></InputBox>
                         </RowBox>
                         <RowBox>
-                          <InputBox><Text>備註</Text><Input value={item.note} id={"remark_" + index} placeholder="" height="100px"/></InputBox>
+                          <InputBox><Text>備註</Text><Input value={item.remark} id={"remark_" + index} placeholder="" height="100px"/></InputBox>
                         </RowBox>
                     </Wrapper>
                 </Col>
@@ -352,7 +368,7 @@ const EditPurchasing = () => {
               <Col md={12}>
                 <BottomWrapper>
                   <RowBox>
-                    <div>
+                    {/* <div>
                       <Button
                         background_color={'#FF902B'}
                         color={'#FFFFFF'}
@@ -360,7 +376,7 @@ const EditPurchasing = () => {
                         height={'60%'}
                         onClick={addOneItems}
                       >新增品項</Button>
-                    </div>
+                    </div> */}
                     <div>
                       <Button
                         background_color={'#616D89'}
