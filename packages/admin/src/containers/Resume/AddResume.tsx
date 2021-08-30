@@ -84,6 +84,7 @@ const AddResume = () => {
 	const [addFoodName, setAddFoodName] = useState("");
 	const [foodOptions, setFoodOptions] = useState([]);
 	const [commodities, setCommodities] = useState([]);
+	const [selectCommodities, setSelectCommodities] = useState([]);
 	const [chooseFood, setChooseFood] = useState({'主食': {}, '主菜': {}, '配菜': {}, '其他': {} });
     const [foodTemp, setFoodTemp] = useState({})
 	const [selectFood, setSelectFood] = useState(foodOptions[0]);
@@ -152,6 +153,13 @@ const AddResume = () => {
 		setAddFoodName(head);
         setSelectFood([foodOptions[0]]);
         setFoodTemp({});
+		let select_list = [];
+		for (let i = 0; i < commodities.length; i++) {
+			if (commodities[i].name === foodOptions[0].value) {
+				select_list.push(commodities[i]);
+			}
+		}
+		setSelectCommodities([...select_list]);
 		setIsOpen(true);
 	}
 
@@ -245,6 +253,7 @@ const AddResume = () => {
 			commodity_arr.forEach(element => {
 				if (element.remain_amount > 0) {
 					commodity_list.push({
+						name: element.name,
                         id: element.commodity_id,
 						date: element.create_at,
 						amount: element.remain_amount,
@@ -252,6 +261,7 @@ const AddResume = () => {
 					});
 				}
 			})
+			
 			console.log(name_list);
 			console.log(commodity_list);
             setFoodOptions(name_list);
@@ -259,6 +269,18 @@ const AddResume = () => {
         } catch (err) {
             console.log(err);
         }
+	}
+
+	const handleSelectFood = ({value}) => {
+		let name = value[0].value;
+		let temp = [];
+		for (let i = 0; i < commodities.length; i++) {
+			if (commodities[i].name === name) {
+				temp.push(commodities[i]);
+			}
+		}
+		setSelectCommodities([...temp]);
+		setSelectFood(value);
 	}
 
 	useEffect(() => {
@@ -283,7 +305,7 @@ const AddResume = () => {
 						placeholder="選擇"
 						value={selectFood}
 						searchable={false}
-						onChange={({value}) => setSelectFood(value)}
+						onChange={handleSelectFood}
 					/>
 					<StyledRoot>
 						<StyledTable>
@@ -292,14 +314,14 @@ const AddResume = () => {
 								<StyledTableHeadCell>{column_name}</StyledTableHeadCell>
 							))}
 							</StyledTableHeadRow>
-							{commodities.map((item) => Object.values(item))
+							{selectCommodities.map((item) => Object.values(item))
 								.map((row: Array<string>, index) => (
 								<StyledTableBodyRow onChange={handleFoodChange}>
 									<StyledTableBodyCell><input id={'checked_' + index} type='checkbox'></input></StyledTableBodyCell>
-									<StyledTableBodyCell>{commodities[index].date}</StyledTableBodyCell>
-									<StyledTableBodyCell>{commodities[index].amount}</StyledTableBodyCell>
+									<StyledTableBodyCell>{selectCommodities[index].date}</StyledTableBodyCell>
+									<StyledTableBodyCell>{selectCommodities[index].amount}</StyledTableBodyCell>
 									<StyledTableBodyCell><input id={'amount_' + index} style={{width: "30px"}}></input></StyledTableBodyCell>
-									<StyledTableBodyCell>{commodities[index].unit}</StyledTableBodyCell>
+									<StyledTableBodyCell>{selectCommodities[index].unit}</StyledTableBodyCell>
 								</StyledTableBodyRow>
 								))
 							}
