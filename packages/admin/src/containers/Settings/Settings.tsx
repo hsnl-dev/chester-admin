@@ -1,15 +1,13 @@
-import React, { useCallback } from 'react';
-import  SearchCard  from '../../components/SearchCard/SearchCard';
+import React from 'react';
 import Select from '../../components/Select/Select';
 import Input from '../../components/Input/Input';
 import Button from '../../components/Button/Button';
 import { SelectBox } from '../../components/Select/Select';
-import DisplayTable from '../../components/DisplayTable/DisplayTable';
 import { Wrapper, Heading, StyledTable, StyledTd, StyledTh, StyledButtonBox, SubHeadingLeft, SubHeadingRight, Title } from '../../components/DisplayTable/DisplayTable';
 import NoResult from '../../components/NoResult/NoResult';
 import { useState, useEffect } from 'react';
 import { styled, withStyle } from 'baseui';
-import {Modal, ModalHeader, ModalBody, ModalFooter,ModalButton} from 'baseui/modal';
+import { Modal, ModalHeader, ModalBody, ModalFooter } from 'baseui/modal';
 import { Grid, Row, Col as Column } from '../../components/FlexBox/FlexBox';
 import { useHistory } from 'react-router-dom';
 import { ADDUSER, VIEWUSER } from '../../settings/constants';

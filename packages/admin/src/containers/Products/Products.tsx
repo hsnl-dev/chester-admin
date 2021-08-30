@@ -9,7 +9,7 @@ import Input from '../../components/Input/Input';
 import Select from '../../components/Select/Select';
 import { SelectBox } from '../../components/Select/Select';
 import { Heading, SubHeadingLeft, SubHeadingRight, Title } from '../../components/DisplayTable/DisplayTable';
-import {Modal, ModalHeader, ModalBody, ModalFooter,ModalButton} from 'baseui/modal';
+import { Modal, ModalHeader, ModalBody, ModalFooter } from 'baseui/modal';
 import { useHistory, useLocation } from 'react-router-dom';
 import { ADDPRODUCT } from '../../settings/constants';
 import { request } from '../../utils/request';

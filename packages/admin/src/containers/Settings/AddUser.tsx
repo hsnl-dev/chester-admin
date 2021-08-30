@@ -1,17 +1,13 @@
 import React from 'react';
-import { styled, withStyle, useStyletron } from 'baseui';
+import { styled, withStyle } from 'baseui';
 import { Grid, Row, Col as Column } from '../../components/FlexBox/FlexBox';
-import DisplayTable from '../../components/DisplayTable/DisplayTable';
 import Button from '../../components/Button/Button';
 import Input from '../../components/Input/Input';
-import { Heading, SubHeadingLeft, SubHeadingRight, Title, Text } from '../../components/DisplayTable/DisplayTable';
+import { Heading, Title, Text } from '../../components/DisplayTable/DisplayTable';
 import Select from '../../components/Select/Select';
-import { PURCHASING, SETTINGS } from '../../settings/constants';
+import { SETTINGS } from '../../settings/constants';
 import { useState } from 'react';
-import { Datepicker } from 'baseui/datepicker';
 import { useEffect } from 'react';
-import tw from 'date-fns/locale/zh-TW';
-import dayjs from 'dayjs';
 import { useHistory, useLocation } from 'react-router-dom';
 import { request } from "../../utils/request";
 
@@ -128,7 +124,7 @@ const AddUser = () => {
 
     const getRole = async () => {
       try {
-        const result = await request.get(`/users/roles`)
+        const result = await request.get(`/users/role`)
         let role = result.data;
         setSelfRole(role);
       } catch (err) {
