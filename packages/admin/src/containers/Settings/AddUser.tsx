@@ -1,17 +1,13 @@
 import React from 'react';
 import { styled, withStyle, useStyletron } from 'baseui';
 import { Grid, Row, Col as Column } from '../../components/FlexBox/FlexBox';
-import DisplayTable from '../../components/DisplayTable/DisplayTable';
 import Button from '../../components/Button/Button';
 import Input from '../../components/Input/Input';
 import { Heading, SubHeadingLeft, SubHeadingRight, Title, Text } from '../../components/DisplayTable/DisplayTable';
 import Select from '../../components/Select/Select';
-import { PURCHASING, SETTINGS } from '../../settings/constants';
+import { SETTINGS } from '../../settings/constants';
 import { useState } from 'react';
-import { Datepicker } from 'baseui/datepicker';
 import { useEffect } from 'react';
-import tw from 'date-fns/locale/zh-TW';
-import dayjs from 'dayjs';
 import { useHistory, useLocation } from 'react-router-dom';
 import { request } from "../../utils/request";
 
@@ -34,19 +30,6 @@ const Wrapper = styled('div', () => ({
     backgroundColor: "#ffffff",
     boxShadow: "-3px 3px 5px 1px #E0E0E0",
   }));
-
-const BottomWrapper = styled('div', () => ({
-    width: '100%',
-    display: "flex",
-    flexDirection: "column",
-    paddingTop: "5px",
-    paddingBottom: "5px",
-    paddingRight: "30px",
-    paddingLeft: "30px",
-    borderRadius: "6px",
-    backgroundColor: "#ffffff",
-    boxShadow: "-3px 3px 5px 1px #E0E0E0",
-}));
 
 const ButtonBox = styled('div', () => ({
   display: 'flex',

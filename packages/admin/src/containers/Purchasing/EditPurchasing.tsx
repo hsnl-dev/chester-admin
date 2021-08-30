@@ -55,7 +55,7 @@ const VendorBox = styled('div', () => ({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'flex-start',
-    width: '40%'
+    width: '100%'
 }));
 
 const RowBox = styled('div', () => ({
@@ -270,7 +270,7 @@ const EditPurchasing = () => {
                         <VendorBox>
                             <Select
                                 options={vendorList}
-                                placeholder={'選擇'}
+                                placeholder={''}
                                 searchable={false}
                                 value={vendor}
                                 labelKey="label"
