@@ -65,7 +65,35 @@ const InputBox = styled('div', () => ({
 	flexDirection: 'column',
 	width: '100%',
 	marginTop: '10px',
-  }));
+	
+}));
+
+const MBox = styled('div', () => ({
+	display: 'flex',
+	flexDirection: 'row',
+	width: '100%',
+	marginTop: '10px',
+	alignItems: 'center',
+	justifyContent: 'center',
+}));
+
+const Mtext = styled('div', () => ({
+	fontSize: '20px',
+	display: 'flex',
+	flexDirection: 'row',
+	
+	
+	
+}));
+
+const RowBox = styled('div', () => ({
+	display: 'flex',
+	flexDirection: 'row',
+	justifyContent: 'space-between',
+	width: '100%',
+	marginTop: '10px',
+	padding: '0px'
+}));
 
 const Resume = () => {
 	const amountSelectOptions = [
@@ -88,6 +116,7 @@ const Resume = () => {
 	const [isOpenLabel, setIsOpenLabel] = useState(false);
 	const [labelAction, setLabelAction] = useState([labelOptions[0]]);
 	const [labelAmount, setLabelAmount] = useState();
+	const [machines, setMachines] = useState([]);
 	const history = useHistory();
 
 	const close = () => {
@@ -107,6 +136,7 @@ const Resume = () => {
 		// } catch (err) {
 		// 	console.log(err);
 		// }
+		console.log(machines);
 		closeLabel();
 	}
 
@@ -170,8 +200,14 @@ const Resume = () => {
 		}
 	}
 
+	async function getMachines() {
+		const result = await request.get(`/users/partner-machines`);
+      	setMachines([...result.data]);
+	}
+
 	useEffect(() => {
 		getResumes();
+		getMachines();
 	}, []);
 
 
@@ -200,10 +236,21 @@ const Resume = () => {
 							onChange={({value}) => {setLabelAction(value)}}
 						/>
 					</SelectBox>
-					<InputBox>
-						<Text>數量</Text>
-						<Input placeholder = '輸入數量' onChange = {(e) => {setLabelAmount(e.target.value)}}/>
-					</InputBox>
+					
+						{Object(machines).map((item, index) => {
+							return (
+								<RowBox>
+									<MBox>
+										<Mtext>{item.machine_name}</Mtext>
+									</MBox>
+									<InputBox>
+										<Text>數量</Text>
+										<Input placeholder = '輸入數量' onChange = {(e) => {machines[index]['labelAmount'] = e.target.value; setMachines([...machines])}}/>
+									</InputBox>
+								</RowBox>
+							);
+						})}
+					
 				</ModalBody>
 				<ModalFooter>
 					<Button background_color={'#616D89'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={closeLabel}>取消</Button>
