@@ -60,6 +60,13 @@ const ContentBox = styled('div', () => ({
 	marginRight: '10px',
 }));
 
+const InputBox = styled('div', () => ({
+	display: 'flex',
+	flexDirection: 'column',
+	width: '100%',
+	marginTop: '10px',
+  }));
+
 const Resume = () => {
 	const amountSelectOptions = [
 			{ value: 10, label: '10' },
@@ -67,21 +74,38 @@ const Resume = () => {
 			{ value: 50, label: '50' },
 			{ value: 100, label: '100' },
 	];
+	const labelOptions = [
+		{value: 'add', label: '加印'},
+		{value: 're', label: '補印'},
+		{value: 'invalid', label: '作廢'},
+	];
 	const column_names = ['建立日期', '溯源履歷號碼', '商品名稱', '操作'];
 	const [displayInfo, setDisplayInfo] = useState([{'date': '2020/12/02', 'number': '12345', 'name': 'ABC'}]);
 	const [displayAmount, setDisplayAmount] = useState([]);
 	const [resumes, setResumes] = useState([]);
 	const [selectId, setSelectId] = useState();
 	const [isOpen, setIsOpen] = useState(false);
+	const [isOpenLabel, setIsOpenLabel] = useState(false);
+	const [labelAction, setLabelAction] = useState([labelOptions[0]]);
+	const [labelAmount, setLabelAmount] = useState();
 	const history = useHistory();
 
 	const close = () => {
-    setIsOpen(false);
-  }
+		setIsOpen(false);
+	}
+
+	const closeLabel = () => {
+		setIsOpenLabel(false);
+	}
+
+	const submitLabel = () => {
+
+		closeLabel();
+	}
 
 	const amountChange = ({ value }) => {
-			setDisplayAmount(value);
-			console.log(displayAmount)
+		setDisplayAmount(value);
+		console.log(displayAmount)
 	}
 
 	const handleChange = () => {
@@ -101,14 +125,14 @@ const Resume = () => {
 	}
 
 	const manageLabel = () => {
-
+		setIsOpenLabel(true);
 	}
 
 	const deleteResumeTemp = (e) => {
 		console.log(resumes)
-    let resume_id = resumes[e.target.id]['id'];
-    setSelectId(resume_id);
-    setIsOpen(true);
+		let resume_id = resumes[e.target.id]['id'];
+		setSelectId(resume_id);
+		setIsOpen(true);
 	}
 
 	const deleteResume = async () => {
@@ -123,18 +147,18 @@ const Resume = () => {
 
 	async function getResumes() {
 		try {
-      const result = await request.get(`/trace`);
-      const resume_arr = result.data;
-      console.log(resume_arr);
-      let displayTemp = [];
-      for (let i = 0; i < resume_arr.length; i++) {
-        displayTemp.push({'date': resume_arr[i]['create_date'], 'number': resume_arr[i]['id'], 'name': resume_arr[i]['product_name']});
-      }
-      setDisplayInfo(displayTemp);
-      setResumes(resume_arr);
-    } catch (err) {
-      console.log(err);
-    }
+			const result = await request.get(`/trace`);
+			const resume_arr = result.data;
+			console.log(resume_arr);
+			let displayTemp = [];
+			for (let i = 0; i < resume_arr.length; i++) {
+				displayTemp.push({'date': resume_arr[i]['create_date'], 'number': resume_arr[i]['id'], 'name': resume_arr[i]['product_name']});
+			}
+			setDisplayInfo(displayTemp);
+			setResumes(resume_arr);
+		} catch (err) {
+			console.log(err);
+		}
 	}
 
 	useEffect(() => {
@@ -145,13 +169,38 @@ const Resume = () => {
 	return (
 		<Grid fluid={true}>
 			<Modal onClose={close} isOpen={isOpen}>
-        <ModalHeader>刪除履歷</ModalHeader>
-        <ModalBody>是否確定刪除?</ModalBody>
-        <ModalFooter>
-          <Button background_color={'#616D89'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={close}>取消</Button>
-          <Button background_color={'#FF902B'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={() => {close(); deleteResume();}}>確定</Button>
-        </ModalFooter>
-      </Modal>
+				<ModalHeader>刪除履歷</ModalHeader>
+				<ModalBody>是否確定刪除?</ModalBody>
+				<ModalFooter>
+					<Button background_color={'#616D89'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={close}>取消</Button>
+					<Button background_color={'#FF902B'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={() => {close(); deleteResume();}}>確定</Button>
+				</ModalFooter>
+			</Modal>
+			<Modal onClose={closeLabel} isOpen={isOpenLabel}>
+				<ModalHeader>標籤管理</ModalHeader>
+				<ModalBody>
+					<SelectBox>
+						<Text>選擇列印動作</Text>
+						<Select
+							options = {labelOptions}
+							labelKey="label"
+							valueKey="value"
+							placeholder={''}
+							value={labelAction}
+							searchable={false}
+							onChange={({value}) => {setLabelAction(value)}}
+						/>
+					</SelectBox>
+					<InputBox>
+						<Text>加印/補印數量</Text>
+						<Input placeholder = '輸入數量' onChange = {(e) => {setLabelAmount(e.target.value)}}/>
+					</InputBox>
+				</ModalBody>
+				<ModalFooter>
+					<Button background_color={'#616D89'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={closeLabel}>取消</Button>
+					<Button background_color={'#FF902B'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={submitLabel}>確定</Button>
+				</ModalFooter>
+			</Modal>
 			<Row>
 				<Col md={12}>
 					<Title>履歷管理</Title>
