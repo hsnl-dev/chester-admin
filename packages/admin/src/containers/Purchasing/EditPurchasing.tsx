@@ -95,6 +95,7 @@ const EditPurchasing = () => {
     const [vendorList, setVendorList] = useState([]);
     const [itemsInfo, setItemsInfo] = useState([]);
     const [unit, setUnit] = useState([]);
+    const [purchasingDate, setPurchasingDate] = useState(new Date());
     const location = useLocation<LocationState>();
     const history = useHistory();
 
@@ -104,7 +105,11 @@ const EditPurchasing = () => {
 
     const closeError = () => {
         setIsOpenError(false);
-      }
+    }
+
+    const handleDate = ({date}) => {
+      setPurchasingDate(date);
+    }
 
     const getInfo = async (info) => {
         console.log(info);
@@ -259,24 +264,32 @@ const EditPurchasing = () => {
                 </Title>
                 <Wrapper>
                     <Heading>{'進貨資訊'}</Heading>
-                    <Text>{'廠商名稱'}</Text>
-                    <VendorBox>
-                        <Select
-                            options={vendorList}
-                            placeholder={''}
-                            searchable={false}
-                            value={vendor}
-                            labelKey="label"
-                            valueKey="value"
-                            onChange={handleVendor}
-                        />
-                        <Button
-                            height={'48px'}
-                            background_color={'#FFD2AB'}
-                            color={'#FF902B'}
-                            onClick={()=>{setIsOpen(true);}}
-                        >+</Button>
-                    </VendorBox>
+                    <RowBox>
+                      <InputBox>
+                        <Text>{'廠商名稱'}</Text>
+                        <VendorBox>
+                            <Select
+                                options={vendorList}
+                                placeholder={'選擇'}
+                                searchable={false}
+                                value={vendor}
+                                labelKey="label"
+                                valueKey="value"
+                                onChange={handleVendor}
+                            />
+                            <Button
+                                height={'48px'}
+                                background_color={'#FFD2AB'}
+                                color={'#FF902B'}
+                                onClick={()=>{setIsOpen(true);}}
+                            >+</Button>
+                        </VendorBox>
+                      </InputBox>
+                      <InputBox>
+                        <Text>進貨日期</Text>
+                        <Datepicker locale={tw} value={purchasingDate} onChange={handleDate} />
+                      </InputBox>
+                    </RowBox>
                     <RowBox>
                       {/* <div>
                         {itemsInfo.length == 0 ? (

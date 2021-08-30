@@ -86,6 +86,7 @@ const AddUser = () => {
     const history = useHistory();
     const location = useLocation();
     const [isEdit, setIsNew] = useState(location.state[2]);
+    const [machines, setMachines] = useState([]);
     const [selfRole, setSelfRole] = useState();
 
     const handleInfoChange = (e) => {
@@ -128,7 +129,7 @@ const AddUser = () => {
 
     const getRole = async () => {
       try {
-        const result = await request.get(`/users/roles`)
+        const result = await request.get(`/users/role`)
         let role = result.data;
         setSelfRole(role);
       } catch (err) {
@@ -184,6 +185,54 @@ const AddUser = () => {
       }
     }
 
+    const addMachine = () => {
+      machines.push({'name': '', 'number': ''});
+      setMachines([...machines]);
+    }
+
+    const handleMachine = (e) => {
+      let split = e.target.id.split('_');
+      let key = split[0];
+      let index = split[1];
+      machines[index][key] = e.target.value;
+      setMachines([...machines]);
+    }
+
+    const machinesRow = () => {
+      return (
+        <Row>
+            <Col md={12}>
+              <Wrapper>
+                <Heading>綁定智販機</Heading>
+                {machines.length === 0? (null):(
+                  Object(machines).map((item, index) => {
+                    return (
+                    <RowBox onChange={handleMachine}>
+                      <InputBox>
+                        <Text>智販機名稱</Text>
+                        <Input id={"name_" + index} placeholder="輸入智販機名稱" value={item.name}/>
+                      </InputBox>
+                      <InputBox>
+                        <Text>智販機編號</Text>
+                        <Input id={"number_" + index} placeholder="輸入智販機編號" value={item.number}/>
+                      </InputBox>
+                    </RowBox>
+                  )})
+                )}
+                <Button
+                    background_color={'#FF902B'}
+                    color={'#FFFFFF'}
+                    margin={'5px'}
+                    height={'60%'}
+                    width={'10%'}
+                    onClick={addMachine}
+                  >新增機器</Button>
+              </Wrapper>
+            </Col>
+        </Row>
+      )
+    }
+
     useEffect(()=>{
       getRole();
       setCurrentUserInfo(location.state);
@@ -198,6 +247,7 @@ const AddUser = () => {
                 <Title>{isEdit? '編輯': '新增'}</Title>
             </Col>
           </Row>
+          {machinesRow()}
           <Row>
             <Col md={12}>
               <Wrapper onChange={handleInfoChange}>
@@ -254,7 +304,8 @@ const AddUser = () => {
                   <Input id={"remark"} placeholder="" value={userInfo['remark']} disabled={currentRole!==0? true: false} height="100px"/>
                 </InputBox>
                 </RowBox>
-                <ButtonBox>
+              </Wrapper>
+              <ButtonBox>
                   <Button
                     background_color={'#616D89'}
                     color={'#FFFFFF'}
@@ -270,7 +321,6 @@ const AddUser = () => {
                     onClick={handleSubmit}
                   >確認送出</Button>
                 </ButtonBox>
-              </Wrapper>
             </Col>
           </Row>
         </Grid>
