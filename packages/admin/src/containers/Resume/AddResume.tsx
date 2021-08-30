@@ -85,7 +85,7 @@ const AddResume = () => {
 	const [isCheck, setIsCheck] = useState(false);
 	const [isOpen, setIsOpen] = useState(false);
 	const [addFoodName, setAddFoodName] = useState("");
-	const [foodOptions, setFoodOptions] = useState([{value: '白飯', label: '白飯'}, {value: '糙米', label: '糙米'}, {value: '麵', label: '麵'}]);
+	const [foodOptions, setFoodOptions] = useState([]);
 	const [commodities, setCommodities] = useState([{'date': '2021/06/20', 'amount': 10, 'unit': 'kg'}]);
 	const [chooseFood, setChooseFood] = useState({'主食': {}, '主菜': {}, '配菜': {}, '其他': {} });
 	const [selectFood, setSelectFood] = useState(foodOptions[0]);
@@ -214,8 +214,42 @@ const AddResume = () => {
     }
 	}
 
+	async function getCommodityList() {
+		try {
+      const result = await request.get(`/trace/commodity`);
+      const commodity_arr = result.data.commodities;
+			const commodity_name = result.data.commodity_name;
+      console.log("commodity_arr: ", commodity_arr);
+			console.log("commodity_name: ", commodity_name);
+			let name_list = [];
+      commodity_name.forEach(element => {
+				name_list.push({
+					value: element,
+					label: element
+				});
+			});
+			let commodity_list = [];
+			commodity_arr.forEach(element => {
+				if (element.remain_amount > 0) {
+					commodity_list.push({
+						date: element.create_at,
+						amount: element.remain_amount,
+						unit: element.unit
+					});
+				}
+			})
+			console.log(name_list);
+			console.log(commodity_list);
+      setFoodOptions(name_list);
+			setCommodities(commodity_list);
+    } catch (err) {
+      console.log(err);
+    }
+	}
+
 	useEffect(() => {
 		getProductList();
+		getCommodityList();
 		console.log(method);
 		console.log(MFG);
 		console.log(product);
@@ -232,7 +266,7 @@ const AddResume = () => {
 						options = {foodOptions}
 						labelKey="label"
 						valueKey="value"
-						placeholder={""}
+						placeholder="選擇"
 						value={selectFood}
 						searchable={false}
 						onChange={({value}) => setSelectFood(value)}
@@ -247,11 +281,11 @@ const AddResume = () => {
 							{commodities.map((item) => Object.values(item))
 								.map((row: Array<string>, index) => (
 								<StyledTableBodyRow onChange={handleAdd}>
-										<StyledTableBodyCell><input id={'checked_' + String(index)} type='checkbox'></input></StyledTableBodyCell>
-										<StyledTableBodyCell>{commodities[index].date}</StyledTableBodyCell>
-										<StyledTableBodyCell>{commodities[index].amount}</StyledTableBodyCell>
-										<StyledTableBodyCell><input id={'amount_' + String(index)} style={{width: "30px"}}></input></StyledTableBodyCell>
-										<StyledTableBodyCell>{commodities[index].unit}</StyledTableBodyCell>
+									<StyledTableBodyCell><input id={'checked_' + String(index)} type='checkbox'></input></StyledTableBodyCell>
+									<StyledTableBodyCell>{commodities[index].date}</StyledTableBodyCell>
+									<StyledTableBodyCell>{commodities[index].amount}</StyledTableBodyCell>
+									<StyledTableBodyCell><input id={'amount_' + String(index)} style={{width: "30px"}}></input></StyledTableBodyCell>
+									<StyledTableBodyCell>{commodities[index].unit}</StyledTableBodyCell>
 								</StyledTableBodyRow>
 								))
 							}
@@ -296,7 +330,7 @@ const AddResume = () => {
 									options = {methodSelectOptions}
 									labelKey="label"
 									valueKey="value"
-									placeholder={'選擇'}
+									placeholder='選擇'
 									value={method}
 									searchable={false}
 									onChange={({value}) => setMethod(value)}
