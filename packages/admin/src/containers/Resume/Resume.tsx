@@ -127,8 +127,14 @@ const Resume = () => {
 
 	}
 
-	const checkResume = () => {
-
+	const checkResume = async (e) => {
+		const resume_id = resumes[e.target.id]['id'];
+		try {
+			const result = await request.get(`/trace/${resume_id}/view`);
+			console.log(result.data);
+		} catch (err) {
+			console.log(err);
+		}
 	}
 
 	const manageLabel = (e) => {
