@@ -11,10 +11,7 @@ import {
 	 StyledTableBodyRow, 
 	 StyledTableBodyCell 
 } from 'baseui/table-semantic';
-import dayjs from 'dayjs';
 import tw from 'date-fns/locale/zh-TW';
-import { split } from 'apollo-boost';
-
 import Button from '../../components/Button/Button';
 import { ButtonBox, Text } from '../../components/SearchCard/SearchCard';
 import Select from '../../components/Select/Select';
@@ -128,7 +125,7 @@ const AddResume = () => {
 			console.log('no')
 			foodTemp[id][key] = e.target.value;
 		}	else {
-			let temp = {'foodName': selectFood[0].value, 'checked': '', 'date': commodities[parseInt(index)].date, 'amount': '', 'unit': commodities[parseInt(index)].unit};
+			let temp = {'id': commodities[parseInt(index)].id,'foodName': selectFood[0].value, 'checked': '', 'date': commodities[parseInt(index)].date, 'amount': '', 'unit': commodities[parseInt(index)].unit};
 			temp[key] = e.target.value;
 			foodTemp[id] = temp;
 		}
@@ -136,11 +133,13 @@ const AddResume = () => {
 	}
     
     const handleAdd = () => {
-			chooseFood[addFoodName] = foodTemp;
-			setChooseFood({...chooseFood});
-			console.log(chooseFood)
-			close();
-    }
+		let keys = Object.keys(foodTemp);
+		for (let i = 0; i < keys.length; i++) {
+			chooseFood[addFoodName][keys[i]] = foodTemp[keys[i]];
+		}
+		setChooseFood({...chooseFood});
+		close();
+	}
 
 	const deleteDisplay = (e) => {
 		let split = e.target.id.split('_');
@@ -206,8 +205,7 @@ const AddResume = () => {
 				displayInfo.push(chooseFood[head][keys[i]]);
 			}
 		}
-        
-		if (isCheck) {
+		if (isCheck){
 			return (
 				<Row>
 					<Col md={12}>
@@ -231,7 +229,7 @@ const AddResume = () => {
 														<StyledTableBodyCell>{displayInfo[index].date}</StyledTableBodyCell>
 														<StyledTableBodyCell>{displayInfo[index].amount}</StyledTableBodyCell>
 														<StyledTableBodyCell>{displayInfo[index].unit}</StyledTableBodyCell>
-														<StyledTableBodyCell><Button id={head + '_' + index} margin='5px' width='80px' height='45px' background_color='#F55252' color={'#FFFFFF'} onClick={deleteDisplay}>刪除</Button></StyledTableBodyCell>
+														<StyledTableBodyCell><Button id={head + '_' + displayInfo[index].id} margin='5px' width='80px' height='45px' background_color='#F55252' color={'#FFFFFF'} onClick={deleteDisplay}>刪除</Button></StyledTableBodyCell>
 													</StyledTableBodyRow>
 												))
 											}
@@ -250,21 +248,21 @@ const AddResume = () => {
 
 	async function getProductList() {
 		try {
-      const result = await request.get(`/product`);
-      const product_arr = result.data.products;
-      console.log(product_arr);
+			const result = await request.get(`/product`);
+			const product_arr = result.data.products;
+			console.log(product_arr);
 			let product_list = [];
-      product_arr.forEach(element => {
+      		product_arr.forEach(element => {
 				product_list.push({
 					value: element.id,
 					label: element.name
 				});
 			});
 			console.log(product_list);
-      setProductList(product_list);
-    } catch (err) {
-      console.log(err);
-    }
+      		setProductList(product_list);
+    	} catch (err) {
+      		console.log(err);
+    	}
 	}
 
 	async function getCommodityList() {
