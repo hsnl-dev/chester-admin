@@ -15,6 +15,7 @@ import { Heading, SubHeadingLeft, SubHeadingRight, Title, Text } from '../../com
 import Select from '../../components/Select/Select';
 import { PURCHASING, IMPORTPURCHASING } from '../../settings/constants';
 import { request } from "../../utils/request";
+import dayjs from 'dayjs';
 
 const Col = withStyle(Column, () => ({
     '@media only screen and (max-width: 574px)': {
@@ -53,7 +54,7 @@ const VendorBox = styled('div', () => ({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'flex-start',
-    width: '40%'
+    width: '100%'
 }));
 
 const RowBox = styled('div', () => ({
@@ -91,10 +92,10 @@ const AddPurchasing = () => {
   const [vendorList, setVendorList] = useState([]);
   const [unit, setUnit] = useState([]);
   const [itemsInfo, setItemsInfo] = useState([]);
-  const [date, setDate] = useState([]);
   const history = useHistory();
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenError, setIsOpenError] = useState(false);
+  const [purchasingDate, setPurchasingDate] = useState(new Date());
   const location = useLocation<LocationState>();
 
   const close = () => {
@@ -105,6 +106,10 @@ const AddPurchasing = () => {
     setIsOpenError(false);
   }
 
+  const handleDate = ({date}) => {
+    setPurchasingDate(date);
+  }
+  
   const handleVendor = ({ value }) => {
     console.log(value);
     setVendor(value);
@@ -236,24 +241,32 @@ const AddPurchasing = () => {
             </Title>
             <Wrapper>
                 <Heading>{'進貨資訊'}</Heading>
-                <Text>{'廠商名稱'}</Text>
-                <VendorBox>
-                    <Select
-                        options={vendorList}
-                        placeholder={'選擇'}
-                        searchable={false}
-                        value={vendor}
-                        labelKey="label"
-                        valueKey="value"
-                        onChange={handleVendor}
-                    />
-                    <Button
-                        height={'48px'}
-                        background_color={'#FFD2AB'}
-                        color={'#FF902B'}
-                        onClick={()=>{setIsOpen(true);}}
-                    >+</Button>
-                </VendorBox>
+                <RowBox>
+                  <InputBox>
+                    <Text>{'廠商名稱'}</Text>
+                    <VendorBox>
+                        <Select
+                            options={vendorList}
+                            placeholder={'選擇'}
+                            searchable={false}
+                            value={vendor}
+                            labelKey="label"
+                            valueKey="value"
+                            onChange={handleVendor}
+                        />
+                        <Button
+                            height={'48px'}
+                            background_color={'#FFD2AB'}
+                            color={'#FF902B'}
+                            onClick={()=>{setIsOpen(true);}}
+                        >+</Button>
+                    </VendorBox>
+                  </InputBox>
+                  <InputBox>
+                    <Text>進貨日期</Text>
+                    <Datepicker locale={tw} value={purchasingDate} onChange={handleDate} />
+                  </InputBox>
+                </RowBox>
                 <RowBox>
                   <div>
                     {itemsInfo.length == 0 ? (
@@ -308,10 +321,15 @@ const AddPurchasing = () => {
                     <Heading>新增品項</Heading>
                     <RowBox>
                       <InputBox><Text>進貨品名</Text><Input id={"name_" + index} placeholder="輸入品名"/></InputBox>
-                      <InputBox><Text>批號</Text><Input id={"batchNumber_" + index} placeholder="輸入批號"/></InputBox>
+                      
+                      <InputBox><Text>溯源履歷號碼</Text><Input id={"traceNumber_" + index}   placeholder="輸入溯源履歷號碼"/></InputBox>
                     </RowBox>
                     <RowBox>
                       <InputBox><Text>原產地</Text><Input id={"origin_" + index} placeholder="輸入原產地"/></InputBox>
+                      <InputBox></InputBox>
+                    </RowBox>
+                    <RowBox>
+                      <InputBox><Text>批號</Text><Input id={"batchNumber_" + index} placeholder="輸入批號"/></InputBox>
                       <InputBox><Text>品牌</Text><Input id={"brand_" + index} placeholder="輸入品牌"/></InputBox>
                     </RowBox>
                     <RowBox>
