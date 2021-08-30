@@ -86,8 +86,9 @@ const AddResume = () => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [addFoodName, setAddFoodName] = useState("");
 	const [foodOptions, setFoodOptions] = useState([]);
-	const [commodities, setCommodities] = useState([{'date': '2021/06/20', 'amount': 10, 'unit': 'kg'}]);
+	const [commodities, setCommodities] = useState([]);
 	const [chooseFood, setChooseFood] = useState({'主食': {}, '主菜': {}, '配菜': {}, '其他': {} });
+    const [foodTemp, setFoodTemp] = useState({})
 	const [selectFood, setSelectFood] = useState(foodOptions[0]);
 	const history = useHistory();
 
@@ -112,23 +113,33 @@ const AddResume = () => {
     }
 	}
 
-	const handleAdd = (e) => {
-		let keys = Object.keys(chooseFood[addFoodName]);
+	const handleFoodChange = (e) => {
+        console.log(e.target.id)
+        console.log(selectFood)
+		let keys = Object.keys(foodTemp);
 		let split = e.target.id.split('_');
 		let key = split[0];
 		let index = String(split[1]);
+        let id = String(commodities[parseInt(index)].id);
 		
-		if (keys.indexOf(index) !== -1) {
-			chooseFood[addFoodName][index][key] = e.target.value;
+		if (keys.indexOf(id) !== -1) {
+            console.log('no')
+			foodTemp[id][key] = e.target.value;
 		}	else {
-			let temp = {'foodName': selectFood.value, 'checked': false, 'date': commodities[parseInt(index)].date, 'amount': '', 'unit': commodities[parseInt(index)].unit};
+			let temp = {'foodName': selectFood[0].value, 'checked': '', 'date': commodities[parseInt(index)].date, 'amount': '', 'unit': commodities[parseInt(index)].unit};
 			temp[key] = e.target.value;
-			chooseFood[addFoodName][index] = temp;
+			foodTemp[id] = temp;
 		}
-		if (chooseFood[addFoodName][index].checked === 'on' && chooseFood[addFoodName][index].amount !== '') {
-			setChooseFood({...chooseFood});
-		}	
+        setFoodTemp({...foodTemp});
+        
 	}
+    
+    const handleAdd = () => {
+        chooseFood[addFoodName] = foodTemp;
+        setChooseFood({...chooseFood});
+        console.log(chooseFood)
+        close();
+    }
 
 	const deleteDisplay = (e) => {
 		let split = e.target.id.split('_');
@@ -140,6 +151,8 @@ const AddResume = () => {
 
 	const setDialog = (head) => {
 		setAddFoodName(head);
+        setSelectFood([foodOptions[0]]);
+        setFoodTemp({});
 		setIsOpen(true);
 	}
 
@@ -149,11 +162,13 @@ const AddResume = () => {
 
 	const addRow = (head) => {
 		let displayInfo = [];
-		for (let i = 0; i < Object.keys(chooseFood[head]).length; i++) {
-				if (chooseFood[head][String(i)].checked === 'on') {
-						displayInfo.push(chooseFood[head][String(i)]);
-				}
+        let keys = Object.keys(chooseFood[head]);
+		for (let i = 0; i < keys.length; i++) {
+			if (chooseFood[head][keys[i]].checked === 'on') {
+				displayInfo.push(chooseFood[head][keys[i]]);
+			}
 		}
+        
 		if (isCheck){
 			return (
 				<Row>
@@ -216,13 +231,13 @@ const AddResume = () => {
 
 	async function getCommodityList() {
 		try {
-      const result = await request.get(`/trace/commodity`);
-      const commodity_arr = result.data.commodities;
+            const result = await request.get(`/trace/commodity`);
+            const commodity_arr = result.data.commodities;
 			const commodity_name = result.data.commodity_name;
-      console.log("commodity_arr: ", commodity_arr);
+            console.log("commodity_arr: ", commodity_arr);
 			console.log("commodity_name: ", commodity_name);
 			let name_list = [];
-      commodity_name.forEach(element => {
+            commodity_name.forEach(element => {
 				name_list.push({
 					value: element,
 					label: element
@@ -232,6 +247,7 @@ const AddResume = () => {
 			commodity_arr.forEach(element => {
 				if (element.remain_amount > 0) {
 					commodity_list.push({
+                        id: element.commodity_id,
 						date: element.create_at,
 						amount: element.remain_amount,
 						unit: element.unit
@@ -240,11 +256,11 @@ const AddResume = () => {
 			})
 			console.log(name_list);
 			console.log(commodity_list);
-      setFoodOptions(name_list);
+            setFoodOptions(name_list);
 			setCommodities(commodity_list);
-    } catch (err) {
-      console.log(err);
-    }
+        } catch (err) {
+            console.log(err);
+        }
 	}
 
 	useEffect(() => {
@@ -280,11 +296,11 @@ const AddResume = () => {
 							</StyledTableHeadRow>
 							{commodities.map((item) => Object.values(item))
 								.map((row: Array<string>, index) => (
-								<StyledTableBodyRow onChange={handleAdd}>
-									<StyledTableBodyCell><input id={'checked_' + String(index)} type='checkbox'></input></StyledTableBodyCell>
+								<StyledTableBodyRow onChange={handleFoodChange}>
+									<StyledTableBodyCell><input id={'checked_' + index} type='checkbox'></input></StyledTableBodyCell>
 									<StyledTableBodyCell>{commodities[index].date}</StyledTableBodyCell>
 									<StyledTableBodyCell>{commodities[index].amount}</StyledTableBodyCell>
-									<StyledTableBodyCell><input id={'amount_' + String(index)} style={{width: "30px"}}></input></StyledTableBodyCell>
+									<StyledTableBodyCell><input id={'amount_' + index} style={{width: "30px"}}></input></StyledTableBodyCell>
 									<StyledTableBodyCell>{commodities[index].unit}</StyledTableBodyCell>
 								</StyledTableBodyRow>
 								))
@@ -294,7 +310,7 @@ const AddResume = () => {
 				</ModalBody>
 				<ModalFooter>
 					<Button background_color={'#616D89'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={close}>取消</Button>
-					<Button background_color={'#FF902B'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={close}>新增</Button>
+					<Button background_color={'#FF902B'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={handleAdd}>新增</Button>
 				</ModalFooter>
 			</Modal>
 			<Row>
