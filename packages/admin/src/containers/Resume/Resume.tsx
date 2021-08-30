@@ -128,15 +128,36 @@ const Resume = () => {
 	}
 
 	const submitLabel = async () => {
-		// try {
-		// 	const result = await request.post(`/trace/${selectId}/print`, {
-		// 		operation: labelAction,
-		// 		total_amount: labelAmount
-		// 	})
-		// } catch (err) {
-		// 	console.log(err);
-		// }
-		console.log(machines);
+		try {
+			const total_amount = machines.map(element => parseInt(element.labelAmount))
+																	 .filter(element => Number.isInteger(element))
+																	 .reduce((a, b) => a+b);
+			const print_arr = machines.map(function(element) {
+				return {
+					"machine_id": element.machine_id,
+					"amount": parseInt(element.labelAmount)
+				}
+			}).filter(function(element) {
+				if (Number.isInteger(element.amount)) {
+					if (element.amount !== 0) {
+						return true;
+					}
+				}
+				return false;
+			});
+			const result = await request.post(`/trace/${selectId}/print`, {
+				operation: labelAction[0].value,
+				total_amount: total_amount,
+				print_array: print_arr
+			});
+			let restoreMachine = machines;
+			restoreMachine.forEach(element => {
+				element.labelAmount = 0
+			});
+			setMachines(restoreMachine);
+		} catch (err) {
+			console.log(err);
+		}
 		closeLabel();
 	}
 
@@ -208,7 +229,7 @@ const Resume = () => {
 
 	async function getMachines() {
 		const result = await request.get(`/users/partner-machines`);
-      	setMachines([...result.data]);
+		setMachines([...result.data]);
 	}
 
 	useEffect(() => {
@@ -242,21 +263,19 @@ const Resume = () => {
 							onChange={({value}) => {setLabelAction(value)}}
 						/>
 					</SelectBox>
-					
-						{Object(machines).map((item, index) => {
-							return (
-								<RowBox>
-									<MBox>
-										<Mtext>{item.machine_name}</Mtext>
-									</MBox>
-									<InputBox>
-										<Text>數量</Text>
-										<Input placeholder = '輸入數量' onChange = {(e) => {machines[index]['labelAmount'] = e.target.value; setMachines([...machines])}}/>
-									</InputBox>
-								</RowBox>
-							);
-						})}
-					
+					{Object(machines).map((item, index) => {
+						return (
+							<RowBox>
+								<MBox>
+									<Mtext>{item.machine_name}</Mtext>
+								</MBox>
+								<InputBox>
+									<Text>數量</Text>
+									<Input placeholder = '輸入數量' onChange = {(e) => {machines[index]['labelAmount'] = e.target.value; setMachines([...machines])}}/>
+								</InputBox>
+							</RowBox>
+						);
+					})}
 				</ModalBody>
 				<ModalFooter>
 					<Button background_color={'#616D89'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={closeLabel}>取消</Button>
