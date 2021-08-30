@@ -292,7 +292,7 @@ const AddResume = () => {
 				if (element.remain_amount > 0) {
 					commodity_list.push({
 						name: element.name,
-                        id: element.commodity_id,
+						id: element.commodity_id,
 						date: element.create_at,
 						amount: element.remain_amount,
 						unit: element.unit

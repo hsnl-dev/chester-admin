@@ -75,9 +75,9 @@ const Resume = () => {
 			{ value: 100, label: '100' },
 	];
 	const labelOptions = [
-		{value: 'add', label: '加印'},
-		{value: 're', label: '補印'},
-		{value: 'invalid', label: '作廢'},
+		{value: 1, label: '加印'},
+		{value: 0, label: '補印'},
+		{value: -1, label: '作廢'},
 	];
 	const column_names = ['建立日期', '溯源履歷號碼', '商品名稱', '操作'];
 	const [displayInfo, setDisplayInfo] = useState([{'date': '2020/12/02', 'number': '12345', 'name': 'ABC'}]);
@@ -98,8 +98,15 @@ const Resume = () => {
 		setIsOpenLabel(false);
 	}
 
-	const submitLabel = () => {
-
+	const submitLabel = async () => {
+		// try {
+		// 	const result = await request.post(`/trace/${selectId}/print`, {
+		// 		operation: labelAction,
+		// 		total_amount: labelAmount
+		// 	})
+		// } catch (err) {
+		// 	console.log(err);
+		// }
 		closeLabel();
 	}
 
@@ -124,7 +131,9 @@ const Resume = () => {
 
 	}
 
-	const manageLabel = () => {
+	const manageLabel = (e) => {
+		const resume_id = resumes[e.target.id]['id'];
+		setSelectId(resume_id);
 		setIsOpenLabel(true);
 	}
 
@@ -192,7 +201,7 @@ const Resume = () => {
 						/>
 					</SelectBox>
 					<InputBox>
-						<Text>加印/補印數量</Text>
+						<Text>數量</Text>
 						<Input placeholder = '輸入數量' onChange = {(e) => {setLabelAmount(e.target.value)}}/>
 					</InputBox>
 				</ModalBody>
