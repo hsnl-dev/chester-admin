@@ -21,7 +21,8 @@ import {
   SITE_SETTINGS,
   PASSWORD_RESET,
   FORGET_PASSWORD,
-  VIEWUSER
+  VIEWUSER,
+  VIEWRESUME
 } from './settings/constants';
 import AuthProvider, { AuthContext } from './context/auth';
 import { InLineLoader } from './components/InlineLoader/InlineLoader';
@@ -38,6 +39,7 @@ const AddUser = lazy(() => import('./containers/Settings/AddUser'));
 const ViewUser = lazy(() => import('./containers/Settings/ViewUser'));
 const Resume = lazy(() => import('./containers/Resume/Resume'));
 const AddResume = lazy(() => import('./containers/Resume/AddResume'));
+const ViewResume = lazy(() => import('./containers/Resume/ViewResume'));
 const Orders = lazy(() => import('./containers/Orders/Orders'));
 const Settings = lazy(() => import('./containers/Settings/Settings'));
 const SiteSettingForm = lazy(() => import('./containers/SiteSettingForm/SiteSettingForm'));
@@ -150,6 +152,13 @@ const Routes = () => {
             <AdminLayout>
               <Suspense fallback={<InLineLoader />}>
                 <AddResume />
+              </Suspense>
+            </AdminLayout>
+          </PrivateRoute>
+          <PrivateRoute path={VIEWRESUME}>
+            <AdminLayout>
+              <Suspense fallback={<InLineLoader />}>
+                <ViewResume />
               </Suspense>
             </AdminLayout>
           </PrivateRoute>

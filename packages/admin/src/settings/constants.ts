@@ -10,6 +10,7 @@ export const PRODUCTS = '/products';
 export const ADDPRODUCT = '/addProduct';
 export const RESUME = '/resume';
 export const ADDRESUME = '/addResume';
+export const VIEWRESUME = '/viewResume';
 export const LOGIN = '/login';
 export const LOGOUT = '/logout';
 export const ORDERS = '/orders';
