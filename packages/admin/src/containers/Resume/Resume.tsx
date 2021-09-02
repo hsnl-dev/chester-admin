@@ -8,13 +8,13 @@ import { ButtonBox, Text } from '../../components/SearchCard/SearchCard';
 import Select from '../../components/Select/Select';
 import { SelectBox } from '../../components/Select/Select';
 import { Datepicker } from 'baseui/datepicker';
+import dayjs from 'dayjs';
 import Input from '../../components/Input/Input';
 import { Grid, Row, Col as Column } from '../../components/FlexBox/FlexBox';
 import NoResult from '../../components/NoResult/NoResult';
 import { Heading, StyledTable, StyledTd, StyledTh, StyledButtonBox, SubHeadingLeft, SubHeadingRight, Title } from '../../components/DisplayTable/DisplayTable';
-import { ADDRESUME } from '../../settings/constants';
+import { ADDRESUME, VIEWRESUME } from '../../settings/constants';
 import { request } from '../../utils/request';
-
 
 const Col = withStyle(Column, () => ({
 	'@media only screen and (max-width: 574px)': {
@@ -80,10 +80,7 @@ const MBox = styled('div', () => ({
 const Mtext = styled('div', () => ({
 	fontSize: '20px',
 	display: 'flex',
-	flexDirection: 'row',
-	
-	
-	
+	flexDirection: 'row',	
 }));
 
 const RowBox = styled('div', () => ({
@@ -130,8 +127,8 @@ const Resume = () => {
 	const submitLabel = async () => {
 		try {
 			const total_amount = machines.map(element => parseInt(element.labelAmount))
-																	 .filter(element => Number.isInteger(element))
-																	 .reduce((a, b) => a+b);
+										.filter(element => Number.isInteger(element))
+										.reduce((a, b) => a+b);
 			const print_arr = machines.map(function(element) {
 				return {
 					"machine_id": element.machine_id,
@@ -183,6 +180,7 @@ const Resume = () => {
 		try {
 			const result = await request.get(`/trace/${resume_id}/view`);
 			console.log(result.data);
+			history.push(VIEWRESUME, [result.data]);
 		} catch (err) {
 			console.log(err);
 		}
@@ -349,7 +347,7 @@ const Resume = () => {
 										.map((row: Array<string>, index) => (
 											<tr>
 												<React.Fragment key={index}>
-													<StyledTd>{row[0]}</StyledTd>
+													<StyledTd>{dayjs(row[0]).format('YYYY-MM-DD')}</StyledTd>
 													<StyledTd>{row[1]}</StyledTd>
 													<StyledTd>{row[2]}</StyledTd>
 													{row.length >= 4 && row[3] !== '' ? <StyledTd>{row[3]}</StyledTd>: null}

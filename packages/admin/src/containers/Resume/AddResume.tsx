@@ -382,6 +382,7 @@ const AddResume = () => {
 								<Datepicker 
 									locale={tw}
 									onChange = {({ date }) => {MFG[0] = date; setMFG([...MFG])}}
+									disabled={isCheck? true: false}
 								/>
 							</ContentBox>
 							<ContentBox>
@@ -394,6 +395,7 @@ const AddResume = () => {
 									value={product}
 									searchable={false}
 									onChange={({value}) => setProduct(value)}
+									disabled={isCheck? true: false}
 								/>
 							</ContentBox>
 						</SearchProductBox>
@@ -408,6 +410,7 @@ const AddResume = () => {
 									value={method}
 									searchable={false}
 									onChange={({value}) => setMethod(value)}
+									disabled={isCheck? true: false}
 								/>
 							</ContentBox>
 							<ContentBox>
@@ -416,6 +419,7 @@ const AddResume = () => {
 									placeholder = '輸入製成數量'    
 									onChange = {(e) => {setAmount(e.target.value)}}
 									height = {'45px'}
+									disabled={isCheck? true: false}
 								/>
 							</ContentBox>
 						</SearchProductBox>
