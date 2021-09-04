@@ -105,7 +105,8 @@ const Resume = () => {
 		{value: -1, label: '作廢'},
 	];
 	const column_names = ['建立日期', '溯源履歷號碼', '商品名稱', '操作'];
-	const [displayInfo, setDisplayInfo] = useState([{'date': '2020/12/02', 'number': '12345', 'name': 'ABC'}]);
+	const [displayInfo, setDisplayInfo] = useState([]);
+	const [displayTemp, setDisplayTemp] = useState([]);
 	const [displayAmount, setDisplayAmount] = useState([]);
 	const [resumes, setResumes] = useState([]);
 	const [selectId, setSelectId] = useState();
@@ -114,6 +115,8 @@ const Resume = () => {
 	const [labelAction, setLabelAction] = useState([labelOptions[0]]);
 	const [labelAmount, setLabelAmount] = useState();
 	const [machines, setMachines] = useState([]);
+	const [searchName, setSearchName] = useState("");
+	const [searchDate, setSearchDate] = useState(null)
 	const history = useHistory();
 
 	const close = () => {
@@ -160,20 +163,53 @@ const Resume = () => {
 
 	const amountChange = ({ value }) => {
 		setDisplayAmount(value);
-		console.log(displayAmount)
+		let amount = (value===[])? value[0].value: displayTemp.length;
+		if (displayTemp.length > amount) {
+			setDisplayInfo(displayTemp.slice(amount));
+		}
+		else {
+			setDisplayInfo(displayTemp);
+		}
 	}
 
-	const handleChange = () => {
-			
+	const handleDate = ({ date }) => {
+		setSearchDate(date);
 	}
 
 	const searchResume = () => {
-
+		let date = dayjs(searchDate).format("YYYY-MM-DD");
+		if (searchDate !== null || searchName !== "") {
+			let temp = []
+			for (let i = 0; i < displayTemp.length; i++) {
+				if (displayTemp[i].name.indexOf(searchName) !== -1) {
+					if ((searchDate !== null && dayjs(displayTemp[i].date).format("YYYY-MM-DD") === date) || searchDate === null) {
+						temp.push(displayTemp[i]);
+					}
+				}
+			}
+			setDisplayInfo(temp);
+		}
+		else {
+			setDisplayInfo(displayTemp);
+		}
 	}
 
-	const handleSearch = () => {
-
-	}
+	const handleSearch = (e) => {
+		let temp = [];
+		let value = e.target.value;
+		if (value !== "") {
+			for (let i = 0; i < displayTemp.length; i++) {
+				let info = displayTemp[i];
+				if (String(info.number).indexOf(value) !== -1 || info.name.indexOf(value) !== -1 || dayjs(info.date).format("YYYY-MM-DD").indexOf(value) !== -1) {
+					temp.push(info);
+				}
+			}
+			setDisplayInfo(temp);
+		}
+		else {
+			setDisplayInfo(displayTemp);
+		}
+	}	
 
 	const checkResume = async (e) => {
 		const resume_id = resumes[e.target.id]['id'];
@@ -214,9 +250,8 @@ const Resume = () => {
 			const result = await request.get(`/trace`);
 			const resume_arr = result.data;
 			console.log(resume_arr);
-			let displayTemp = [];
 			for (let i = 0; i < resume_arr.length; i++) {
-				displayTemp.push({'date': resume_arr[i]['create_date'], 'number': resume_arr[i]['id'], 'name': resume_arr[i]['product_name']});
+				displayTemp.push({'index': i, 'date': resume_arr[i]['create_date'], 'number': resume_arr[i]['id'], 'name': resume_arr[i]['product_name']});
 			}
 			setDisplayInfo(displayTemp);
 			setResumes(resume_arr);
@@ -289,14 +324,14 @@ const Resume = () => {
 							<ContentBox>
 								<Text>建立日期</Text>
 								<Datepicker 
-									onChange = {handleChange}
+									onChange = {handleDate}
 								/>
 							</ContentBox>
 							<ContentBox>
 								<Text>商品名稱</Text>
 								<Input 
 									placeholder = '輸入商品名稱'    
-									onChange = {handleChange}
+									onChange = {(e) => {setSearchName(e.target.value)}}
 									height = {'45px'}
 							/>
 							</ContentBox>
@@ -346,16 +381,16 @@ const Resume = () => {
 									{displayInfo.map((item) => Object.values(item))
 										.map((row: Array<string>, index) => (
 											<tr>
-												<React.Fragment key={index}>
-													<StyledTd>{dayjs(row[0]).format('YYYY-MM-DD')}</StyledTd>
-													<StyledTd>{row[1]}</StyledTd>
+												<React.Fragment key={row[0]}>
+													<StyledTd>{dayjs(row[1]).format('YYYY-MM-DD')}</StyledTd>
 													<StyledTd>{row[2]}</StyledTd>
-													{row.length >= 4 && row[3] !== '' ? <StyledTd>{row[3]}</StyledTd>: null}
+													<StyledTd>{row[3]}</StyledTd>
+													{row.length >= 5 && row[4] !== '' ? <StyledTd>{row[4]}</StyledTd>: null}
 													<StyledTd>
 														<StyledButtonBox>
-															<Button id={index} margin='5px' width='80px' height='45px' background_color='#40C057' color={'#FFFFFF'} onClick={checkResume}>查看</Button>
-															<Button id={index} margin='5px' width='110px' height='45px' background_color='#2F8BE6' color={'#FFFFFF'} onClick={manageLabel}>標籤管理</Button>
-															<Button id={index} margin='5px' width='80px' height='45px' background_color='#F55252' color={'#FFFFFF'} onClick={deleteResumeTemp}>刪除</Button>
+															<Button id={row[0]} margin='5px' width='80px' height='45px' background_color='#40C057' color={'#FFFFFF'} onClick={checkResume}>查看</Button>
+															<Button id={row[0]} margin='5px' width='110px' height='45px' background_color='#2F8BE6' color={'#FFFFFF'} onClick={manageLabel}>標籤管理</Button>
+															<Button id={row[0]} margin='5px' width='80px' height='45px' background_color='#F55252' color={'#FFFFFF'} onClick={deleteResumeTemp}>刪除</Button>
 														</StyledButtonBox>
 													</StyledTd>
 												</React.Fragment>

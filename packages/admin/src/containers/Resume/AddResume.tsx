@@ -324,10 +324,10 @@ const AddResume = () => {
 	useEffect(() => {
 		getProductList();
 		getCommodityList();
-		console.log(method);
-		console.log(MFG);
-		console.log(product);
-		console.log(amount)
+		// console.log(method);
+		// console.log(MFG);
+		// console.log(product);
+		// console.log(amount);
 	}, [method, MFG, product, amount])
 
 	return (

@@ -69,6 +69,9 @@ const Products = () => {
   const [displayAmount, setDisplayAmount] = useState([]);
   const [products, setProducts] = useState([]);
   const [displayProducts, setDisplayProducts] = useState([]);
+  const [displayTemp, setDisplayTemp] = useState([]);
+  const [searchName, setSearchName] = useState("");
+  const [searchNumber, setSearchNumber] = useState("");
   const [productUnit, setProductUnit] = useState([]);
   const [weightUnit, setWeightUnit] = useState([]);
   const [storage, setStorage] = useState([]);
@@ -84,11 +87,13 @@ const Products = () => {
 
   function amountChange({ value }) {
     setDisplayAmount(value);
-    console.log(displayAmount)
-  }
-
-  const searchPurchase = () =>{
-
+    let amount = (value===[])? value[0].value: displayTemp.length;
+    if (displayTemp.length > amount) {
+      setDisplayAmount(displayTemp.slice(amount));
+    }
+    else {
+      setDisplayAmount(displayTemp);
+    }
   }
 
   const checkPurchase = (e) => {
@@ -147,12 +152,45 @@ const Products = () => {
     setIsOpen(true);
   }
 
-  const handleSearch =() => {
-
+  const handleSearch =(e) => {
+    let temp = [];
+    let value = e.target.value;
+    if (value !== "") {
+      for (let i = 0; i < displayTemp.length; i++) {
+        let info = displayTemp[i];
+        if (info.product_no.indexOf(value) !== -1 || info.name.indexOf(value) !== -1 || String(info.price).indexOf(value) !== -1 || info.spec.indexOf(value) !== -1) {
+          temp.push(info);
+        }
+      }
+      setDisplayProducts(temp);
+    }
+    else {
+      setDisplayProducts(displayTemp);
+    }
   }
 
   const handleChange = () => {
     
+  }
+
+  const searchProduct = () =>{
+    console.log(searchName)
+    console.log(searchNumber)
+    if (searchNumber !== "" || searchName !== "") {
+      let temp = []
+      for (let i = 0; i < displayTemp.length; i++) {
+        console.log(displayTemp[i].product_no.indexOf(searchNumber))
+        if (displayTemp[i].product_no.indexOf(searchNumber) !== -1) {
+          if (displayTemp[i].name.indexOf(searchName) !== -1){
+            temp.push(displayTemp[i]);
+          }
+        }
+      }
+      setDisplayProducts(temp);
+    }
+    else {
+      setDisplayProducts(displayTemp);
+    }
   }
 
   async function getProducts() {
@@ -163,9 +201,8 @@ const Products = () => {
       const product_unit_arr = result.data.options.product_unit;
       const weight_unit_arr = result.data.options.weight_unit;
       const storage_arr = result.data.options.storage;
-      let displayTemp = [];
       for (let i = 0; i < product_arr.length; i++) {
-        displayTemp.push({'product_no': product_arr[i]['product_no'], 'name': product_arr[i]['name'], 'price': product_arr[i]['price'], 'spec': product_arr[i]['spec'], "activate": product_arr[i]['activate']});
+        displayTemp.push({'index': i, 'product_no': product_arr[i]['product_no'], 'name': product_arr[i]['name'], 'price': product_arr[i]['price'], 'spec': product_arr[i]['spec'], "activate": product_arr[i]['activate']});
       }
       setDisplayProducts(displayTemp);
       setProducts(product_arr);
@@ -205,14 +242,14 @@ const Products = () => {
                   <Text>商品編號</Text>
                   <Input 
                       placeholder = '輸入商品編號'
-                      onChange = {handleChange}
+                      onChange = {(e) => {setSearchNumber(e.target.value)}}
                   />
               </ContentBox>
               <ContentBox>
                   <Text>商品名稱</Text>
                   <Input 
                       placeholder = '輸入商品名稱'
-                      onChange = {handleChange}
+                      onChange = {(e) => {setSearchName(e.target.value)}}
                   />
               </ContentBox>
             </SearchProductBox>
@@ -229,7 +266,7 @@ const Products = () => {
                       })}>
                 新增
               </Button>
-              <Button margin='5px' width='80px' height='45px' background_color='#FF902B' color={'#FFFFFF'} onClick={searchPurchase}>查詢</Button>
+              <Button margin='5px' width='80px' height='45px' background_color='#FF902B' color={'#FFFFFF'} onClick={searchProduct}>查詢</Button>
             </ButtonBox>
           </Wrapper>
         </Col>
@@ -263,7 +300,6 @@ const Products = () => {
               Button2_text = '編輯'
               Button3_function = {handleactivateTemp}
               Button3_text = '停用'
-              
             />
           </Wrapper>
         </Col>

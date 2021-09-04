@@ -65,8 +65,6 @@ const ViewResume = () => {
     const [MFG, setMFG] = useState('1970-01-01');
     const [commodities, setCommodities] = useState({});
 
-    
-
     const getResumes = (resumes) => {
         console.log("resumes data");
         console.log(resumes);

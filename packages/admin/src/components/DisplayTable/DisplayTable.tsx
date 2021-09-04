@@ -127,19 +127,19 @@ export default function DisplayTable({
               {columnData.map((item) => Object.values(item))
               .map((row: Array<string>, index) => (
                   <tr>
-                    <React.Fragment key={index}>
-                      <StyledTd>{row[0]}</StyledTd>
+                    <React.Fragment key={row[0]}>
                       <StyledTd>{row[1]}</StyledTd>
                       <StyledTd>{row[2]}</StyledTd>
-                      {row.length >= 4 && row[3] !== '' ? <StyledTd>{row[3]}</StyledTd>: null}
+                      <StyledTd>{row[3]}</StyledTd>
+                      {row.length >= 5 && row[4] !== '' ? <StyledTd>{row[4]}</StyledTd>: null}
                       <StyledTd>
                         <StyledButtonBox>
                           {Button1_text.length !== 0 ? (
-                            <Button id={index} margin='5px' width='80px' height='45px' background_color='#40C057' color={'#FFFFFF'} onClick={Button1_function}>{Button1_text}</Button>
+                            <Button id={row[0]} margin='5px' width='80px' height='45px' background_color='#40C057' color={'#FFFFFF'} onClick={Button1_function}>{Button1_text}</Button>
                           ):(null)}
-                          <Button id={index} margin='5px' width='80px' height='45px' background_color='#2F8BE6' color={'#FFFFFF'} onClick={Button2_function}>{Button2_text}</Button>
+                          <Button id={row[0]} margin='5px' width='80px' height='45px' background_color='#2F8BE6' color={'#FFFFFF'} onClick={Button2_function}>{Button2_text}</Button>
                           {Button3_text.length !== 0 ? (
-                            <Button id={index} margin='5px' width='80px' height='45px' background_color={row.length >= 5? (parseInt(row[4]) === 1? '#F55252': '#FF902B'):'#F55252'} color={'#FFFFFF'} onClick={Button3_function}>{row.length >= 5? (parseInt(row[4]) === 1? "停用": "啟用"):Button3_text}</Button>
+                            <Button id={row[0]} margin='5px' width='80px' height='45px' background_color={row.length >= 5? (parseInt(row[5]) === 1? '#F55252': '#FF902B'):'#F55252'} color={'#FFFFFF'} onClick={Button3_function}>{row.length >= 6? (parseInt(row[5]) === 1? "停用": "啟用"):Button3_text}</Button>
                           ):(null)}
                         </StyledButtonBox>
                       </StyledTd>

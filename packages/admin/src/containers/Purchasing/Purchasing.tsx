@@ -1,9 +1,11 @@
 import React from 'react';
 import { styled, withStyle, useStyletron } from 'baseui';
 import { Grid, Row, Col as Column } from '../../components/FlexBox/FlexBox';
-import  SearchCard  from '../../components/SearchCard/SearchCard';
+import SearchCard  from '../../components/SearchCard/SearchCard';
+import { ButtonBox,Text } from '../../components/SearchCard/SearchCard';
 import DisplayTable from '../../components/DisplayTable/DisplayTable';
-import { Wrapper, Heading, StyledTable, StyledTd, StyledTh, StyledButtonBox, SubHeadingLeft, SubHeadingRight, Title } from '../../components/DisplayTable/DisplayTable';
+import { DatePicker } from 'baseui/datepicker';
+import { Heading, StyledTable, StyledTd, StyledTh, StyledButtonBox, SubHeadingLeft, SubHeadingRight, Title } from '../../components/DisplayTable/DisplayTable';
 import Button from '../../components/Button/Button';
 import NoResult from '../../components/NoResult/NoResult';
 import Select from '../../components/Select/Select';
@@ -32,6 +34,32 @@ const SearchBox = styled('div', () => ({
   alignItems: 'center',
 }));
 
+const SearchPurchasingBox = styled('div', () => ({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  paddingRight: '10px'
+}));
+
+const ContentBox = styled('div', () => ({
+  display: 'flex',
+  flexDirection: 'column',
+  width: '90%',
+  marginRight: '10px',
+}));
+
+const Wrapper = styled('div', () => ({
+  width: '100%',
+  fontFamily: "Montserrat",
+  display: "flex",
+  flexDirection: "column",
+  padding: "30px",
+  borderRadius: "6px",
+  backgroundColor: "#ffffff",
+  boxShadow: "-3px 3px 5px 1px #E0E0E0",
+  marginBottom: '20px',
+}));
+
 const Purchasing = () => {
   const column_names = ['廠商編號', '廠商名稱', '進貨日期', '操作'];
   const amountSelectOptions = [
@@ -43,10 +71,14 @@ const Purchasing = () => {
   const [displayAmount, setDisplayAmount] = useState([]);
   const [commodities, setCommodities] = useState([]);
   const [displayInfo, setDisplayInfo] = useState([]);
+  const [displayTemp, setDisplayTemp] = useState([]);
   const [vendors, setVendors] = useState([]);
   const [mergeData, setMergeData] = useState([]);
   const [css] = useStyletron();
   const history = useHistory();
+  const [searchName, setSearchName] = useState("");
+  const [searchDate, setSearchDate] = useState(null);
+
   const mb30 = css({
     '@media only screen and (max-width: 990px)': {
       marginBottom: '16px',
@@ -55,16 +87,18 @@ const Purchasing = () => {
 
   function amountChange({ value }) {
     setDisplayAmount(value);
-    console.log(displayAmount)
+    let amount = (value===[])? value[0].value: displayTemp.length;
+    if (displayTemp.length > amount) {
+      setDisplayInfo(displayTemp.slice(amount));
+    }
+    else {
+      setDisplayInfo(displayTemp);
+    }
   }
 
   
-  const handleDate = () => { 
-    console.log("change date")
-  }
-
-  const searchPurchase = () =>{
-
+  const handleDate = ({ date }) => { 
+    setSearchDate(date);
   }
 
   const checkPurchase = (e) => {
@@ -119,8 +153,39 @@ const Purchasing = () => {
     history.push(REPURCHASING, [selectData, vendor, 'reimburse'])
   }
 
-  const handleSearch =() => {
+  const handleSearch =(e) => {
+    let temp = [];
+    let value = e.target.value;
+    if (value !== "") {
+      for (let i = 0; i < displayTemp.length; i++) {
+        let info = displayTemp[i];
+        if (String(info.vendor_id).indexOf(value) !== -1 || info.vendor_name.indexOf(value) !== -1 || info.create_at.indexOf(value) !== -1) {
+          temp.push(info);
+        }
+      }
+      setDisplayInfo(temp);
+    }
+    else {
+      setDisplayInfo(displayTemp);
+    }
+  }
 
+  const searchPurchase = () =>{
+    let date = dayjs(searchDate).format("YYYY-MM-DD");
+    if (searchDate !== null || searchName !== "") {
+      let temp = []
+      for (let i = 0; i < displayTemp.length; i++) {
+        if (displayTemp[i].vendor_name.indexOf(searchName) !== -1) {
+          if ((searchDate !== null && displayTemp[i].create_at === date) || searchDate === null) {
+            temp.push(displayTemp[i]);
+          }
+        }
+      }
+      setDisplayInfo([...temp]);
+    }
+    else {
+      setDisplayInfo(displayTemp);
+    }
   }
 
   async function getCommodities() {
@@ -141,13 +206,14 @@ const Purchasing = () => {
         }
         let keys = Object.keys(merge_data);
         if (keys.indexOf(vendor['id'] + '_' + dayjs(commodities_arr[i]['create_at']).format('YYYY-MM-DD')) === -1) {
-          displayInfo.push({'vendor_id': vendor['id'], 'vendor_name': vendor['name'], 'create_at': dayjs(commodities_arr[i]['create_at']).format('YYYY-MM-DD')});
+          displayTemp.push({'index': Object.keys(merge_data).length, 'vendor_id': vendor['id'], 'vendor_name': vendor['name'], 'create_at': dayjs(commodities_arr[i]['create_at']).format('YYYY-MM-DD')});
           merge_data[vendor['id'] + '_' + dayjs(commodities_arr[i]['create_at']).format('YYYY-MM-DD')] = [commodities_arr[i]];
         }
         else {
           merge_data[vendor['id'] + '_' + dayjs(commodities_arr[i]['create_at']).format('YYYY-MM-DD')].push(commodities_arr[i]);
         }
       }
+      setDisplayInfo([...displayTemp]);
       setMergeData(Object.values(merge_data));
       setVendors(vendors_arr);
       setCommodities(commodities_arr);
@@ -168,17 +234,35 @@ const Purchasing = () => {
           <Title>
             進貨管理
           </Title>
-          <SearchCard
-            title = '進貨查詢'
-            handleChange = {handleDate}
-            Button1_function = {() => history.push({
-              pathname: ADDPURCHASING, 
-              state: {params: vendors}
-            })}
-            Button2_function = {searchPurchase}
-            Button1_text = '新增'
-            Button2_text = '查詢'
-          />
+          <Wrapper>
+            <Heading>進貨查詢</Heading>
+            <SearchPurchasingBox>
+              <ContentBox>
+                  <Text>廠商名稱</Text>
+                  <Input 
+                      placeholder = '輸入名稱'
+                      onChange = {(e) => {setSearchName(e.target.value)}}
+                  />
+              </ContentBox>
+              <ContentBox>
+                  <Text>進貨日期</Text>
+                  <DatePicker 
+                      placeholder = '進貨日期'
+                      onChange = {handleDate}
+                  />
+              </ContentBox>
+            </SearchPurchasingBox>
+            <ButtonBox>
+              <Button margin='5px' width='80px' height='45px' background_color='#FF902B' color={'#FFFFFF'} 
+                      onClick={() => history.push({
+                        pathname: ADDPURCHASING, 
+                        state: {params: vendors}
+                      })}>
+                新增
+              </Button>
+              <Button margin='5px' width='80px' height='45px' background_color='#FF902B' color={'#FFFFFF'} onClick={searchPurchase}>查詢</Button>
+            </ButtonBox>
+          </Wrapper>
         </Col>
       </Row>
       <Row>
@@ -213,17 +297,17 @@ const Purchasing = () => {
                     {displayInfo.map((item) => Object.values(item))
                     .map((row: Array<string>, index) => (
                         <tr>
-                          <React.Fragment key={index}>
-                            <StyledTd>{row[0]}</StyledTd>
+                          <React.Fragment key={row[0]}>
                             <StyledTd>{row[1]}</StyledTd>
                             <StyledTd>{row[2]}</StyledTd>
-                            {row.length >= 4 && row[3] !== '' ? <StyledTd>{row[3]}</StyledTd>: null}
+                            <StyledTd>{row[3]}</StyledTd>
+                            {row.length >= 5 && row[4] !== '' ? <StyledTd>{row[4]}</StyledTd>: null}
                             <StyledTd>
                               <StyledButtonBox>
-                                <Button id={index} margin='5px' width='80px' height='45px' background_color='#40C057' color={'#FFFFFF'} onClick={checkPurchase}>查看</Button>
-                                <Button id={index} margin='5px' width='80px' height='45px' background_color='#2F8BE6' color={'#FFFFFF'} onClick={editPurchase}>編輯</Button>
-                                <Button id={index} margin='5px' width='80px' height='45px' background_color='#F55252' color={'#FFFFFF'} onClick={returnPurchase}>退貨</Button>
-                                <Button id={index} margin='5px' width='80px' height='45px' background_color='#616D98' color={'#FFFFFF'} onClick={reimbursePurchase}>報銷</Button>
+                                <Button id={row[0]} margin='5px' width='80px' height='45px' background_color='#40C057' color={'#FFFFFF'} onClick={checkPurchase}>查看</Button>
+                                <Button id={row[0]} margin='5px' width='80px' height='45px' background_color='#2F8BE6' color={'#FFFFFF'} onClick={editPurchase}>編輯</Button>
+                                <Button id={row[0]} margin='5px' width='80px' height='45px' background_color='#F55252' color={'#FFFFFF'} onClick={returnPurchase}>退貨</Button>
+                                <Button id={row[0]} margin='5px' width='80px' height='45px' background_color='#616D98' color={'#FFFFFF'} onClick={reimbursePurchase}>報銷</Button>
                               </StyledButtonBox>
                             </StyledTd>
                           </React.Fragment>
