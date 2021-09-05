@@ -8,14 +8,12 @@ import tw from 'date-fns/locale/zh-TW';
 import moment from 'moment';
 
 import { Grid, Row, Col as Column } from '../../components/FlexBox/FlexBox';
-import DisplayTable from '../../components/DisplayTable/DisplayTable';
 import Button from '../../components/Button/Button';
 import Input from '../../components/Input/Input';
 import { Heading, SubHeadingLeft, SubHeadingRight, Title, Text } from '../../components/DisplayTable/DisplayTable';
 import Select from '../../components/Select/Select';
 import { PURCHASING, IMPORTPURCHASING } from '../../settings/constants';
 import { request } from "../../utils/request";
-import dayjs from 'dayjs';
 
 const Col = withStyle(Column, () => ({
     '@media only screen and (max-width: 574px)': {
@@ -86,7 +84,7 @@ interface LocationState {
 };
 
 const AddPurchasing = () => {
-  const itemsInfoTemp = {"name": "", "batchNumber":"", "origin": "", "brand": "", "amount": "", "unit": "g", "PD": "", "Exp": "", "unitPrice": "", "totalPrice": "", "remark": ""};
+  const itemsInfoTemp = {"name": "", "batchNumber":"", "origin": "", "brand": "", "amount": "", "unit": "g", "PD": null, "Exp": null, "unitPrice": "", "totalPrice": "", "remark": ""};
   const [vendor, setVendor] = useState([]);
   const [newVendor, setNewVendor] = useState({"vendor_name": "", "note": ""});
   const [vendorList, setVendorList] = useState([]);
@@ -95,6 +93,8 @@ const AddPurchasing = () => {
   const history = useHistory();
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenError, setIsOpenError] = useState(false);
+  const [isOpenCheck, setIsOpenCheck] = useState(false);
+  const [checkMessage, setCheckMessage] = useState("");
   const [purchasingDate, setPurchasingDate] = useState(new Date());
   const location = useLocation<LocationState>();
 
@@ -104,6 +104,10 @@ const AddPurchasing = () => {
 
   const closeError = () => {
     setIsOpenError(false);
+  }
+
+  const closeCheck = () => {
+    setIsOpenCheck(false);
   }
 
   const handleDate = ({date}) => {
@@ -138,6 +142,12 @@ const AddPurchasing = () => {
     let type = temp[0];
     let index = temp[1];
     itemsInfo[index][type] = e.target.value;
+    if (itemsInfo[index].amount !== "" && itemsInfo[index].unitPrice !== "") {
+      let amount = parseInt(itemsInfo[index]['amount']);
+      let unitPrice = parseInt(itemsInfo[index]['unitPrice']);
+      let totalPrice = amount* unitPrice;
+      itemsInfo[index].totalPrice = String(totalPrice);
+    }
     setItemsInfo([...itemsInfo]);
   }
 
@@ -171,6 +181,54 @@ const AddPurchasing = () => {
         console.log(err);
       }
     });
+  }
+
+  const checkItemInfo = () => {
+    let check = true;
+    if (vendor.length === 0) {
+      setCheckMessage("請選擇廠商");
+      setIsOpenCheck(true);
+    } else {
+      if (itemsInfo.length >= 0) {
+        for (let i = 0; i < itemsInfo.length; i++) {
+          let element = itemsInfo[i];
+          if (element.name === "") {
+            setCheckMessage("請填寫品名");
+            setIsOpenCheck(true);
+            check = false;
+            break;
+          } else if (element.origin === "") {
+            setCheckMessage("請填寫原產地");
+            setIsOpenCheck(true);
+            check = false;
+            break;
+          } else if (element.Exp === null ) {
+            setCheckMessage("請選擇有效日期");
+            setIsOpenCheck(true);
+            check = false;
+            break;
+          } else if (element.PD === null ) {
+            setCheckMessage("請選擇製造日期");
+            setIsOpenCheck(true); 
+            check = false;
+            break;
+          } else if (element.amount === "") {
+            setCheckMessage("請填寫數量");
+            setIsOpenCheck(true);
+            check = false;
+            break;
+          }
+          if (check) {
+            
+            handleSubmit();
+          }
+        }
+        console.log(itemsInfo);
+      } else {
+        setCheckMessage("請新增品項");
+        setIsOpenCheck(true);
+      }
+    }
   }
 
   const createVendor = async () => {
@@ -232,6 +290,15 @@ const AddPurchasing = () => {
         </ModalBody>
         <ModalFooter>
           <Button background_color={'#FF902B'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={closeError}>確認</Button>
+        </ModalFooter>
+      </Modal>
+      <Modal onClose={closeCheck} isOpen={isOpenCheck}>
+        <ModalHeader>欄位未填</ModalHeader>
+        <ModalBody>
+          <Text>{checkMessage}</Text>
+        </ModalBody>
+        <ModalFooter>
+          <Button background_color={'#FF902B'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={closeCheck}>確認</Button>
         </ModalFooter>
       </Modal>
       <Row>
@@ -305,7 +372,7 @@ const AddPurchasing = () => {
                         color={'#FFFFFF'}
                         margin={'5px'}
                         height={'60%'}
-                        onClick={handleSubmit}
+                        onClick={checkItemInfo}
                     >確認送出</Button>
                   </div>
                 </RowBox>
@@ -333,7 +400,7 @@ const AddPurchasing = () => {
                       <InputBox><Text>品牌</Text><Input id={"brand_" + index} placeholder="輸入品牌"/></InputBox>
                     </RowBox>
                     <RowBox>
-                      <InputBox><Text>數量</Text><Input id={"amount_" + index} placeholder="輸入數量"/></InputBox>
+                      <InputBox><Text>數量</Text><Input type="Number" id={"amount_" + index} placeholder="輸入數量"/></InputBox>
                       <InputBox><Text>單位</Text><Select placeholder="g" labelKey="label" valueKey="value" searchable={false} options={unitList} value={unit}
                         onChange={({ value }) => {setUnit(value); itemsInfo[index]["unit"]=value[0]['value']; setItemsInfo([...itemsInfo])}}/></InputBox>
                     </RowBox>
@@ -342,8 +409,8 @@ const AddPurchasing = () => {
                       <InputBox><Text>有效日期</Text><Datepicker locale={tw} onChange={({date})=>{itemsInfo[index]["Exp"]=date; setItemsInfo([...itemsInfo])}} /></InputBox>
                     </RowBox>
                     <RowBox>
-                      <InputBox><Text>單價</Text><Input id={"unitPrice_" + index} placeholder="輸入單價"/></InputBox>
-                      <InputBox><Text>總價</Text><Input id={"totalPrice_" + index} placeholder="輸入總價"/></InputBox>
+                      <InputBox><Text>單價</Text><Input type="Number" id={"unitPrice_" + index} placeholder="輸入單價"/></InputBox>
+                      <InputBox><Text>總價</Text><Input type="Number" value={itemsInfo[index]["totalPrice"]} id={"totalPrice_" + index} placeholder="輸入總價"/></InputBox>
                     </RowBox>
                     <RowBox>
                       <InputBox><Text>備註</Text><Input id={"remark_" + index} placeholder="" height="100px"/></InputBox>
@@ -381,7 +448,7 @@ const AddPurchasing = () => {
                     color={'#FFFFFF'}
                     margin={'5px'}
                     height={'60%'}
-                    onClick={handleSubmit}
+                    onClick={checkItemInfo}
                   >確認送出</Button>
                 </div>
               </RowBox>      

@@ -89,10 +89,10 @@ const Products = () => {
     setDisplayAmount(value);
     let amount = (value===[])? value[0].value: displayTemp.length;
     if (displayTemp.length > amount) {
-      setDisplayAmount(displayTemp.slice(amount));
+      setDisplayProducts(displayTemp.slice(amount));
     }
     else {
-      setDisplayAmount(displayTemp);
+      setDisplayProducts(displayTemp);
     }
   }
 

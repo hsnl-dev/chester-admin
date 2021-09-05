@@ -58,12 +58,13 @@ export default function Settings() {
   const [partner, setPartner] = useState({});
   const [selectUserId, setSelectUserId] = useState();
   const [displayMembers, setDisplayMembers] = useState([]);
+  const [displayTemp, setDisplayTemp] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const [userActivate, setUserActivate] = useState();
-  const [role, setRole] = useState(-1);
+  const [role, setRole] = useState([-1]);
   const [partnerData, setPartnerData] = useState([]);
   const [machines, setMachines] = useState([]);
-  const data = [{'account': '123456789','name': 'ABC', 'authority': '店家管理者'}]
+  const data = [{'account': '123456789','name': 'ABC', 'authority': '店家管理者'}];
   const history = useHistory();
 
   const close = () => {
@@ -72,7 +73,13 @@ export default function Settings() {
 
   function amountChange({ value }) {
     setDisplayAmount(value);
-    console.log(displayAmount)
+    let amount = (value===[])? value[0].value: displayTemp.length;
+    if (displayTemp.length > amount) {
+      setDisplayMembers(displayTemp.slice(amount));
+    }
+    else {
+      setDisplayMembers(displayTemp);
+    }
   }
 
   const editUser = (e) => {  // 跳到有form的頁面
@@ -117,17 +124,29 @@ export default function Settings() {
     history.push(VIEWUSER, [chooseInfo, partner, machines]);
   }
 
-  const handleSearch = () => {  // 資料全部都在members裡面，前端根據條件filter就可以
-    
+  const handleSearch = (e) => {  // 資料全部都在members裡面，前端根據條件filter就可以
+    let temp = [];
+    let value = e.target.value;
+    if (value !== "") {
+      for (let i = 0; i < displayTemp.length; i++) {
+        let info = displayTemp[i];
+        if (info.username.indexOf(value) !== -1 || info.name.indexOf(value) !== -1 || info.role.indexOf(value) !== -1) {
+          temp.push(info);
+        }
+      }
+      setDisplayMembers(temp);
+    }
+    else {
+      setDisplayMembers(displayTemp);
+    }
   }
 
   const getRole = async () => {
     try {
       const result = await request.get(`/users/role`)
       const memberRole = result.data.role;
-      // console.log(memberRole);
-      setRole(memberRole);
-      console.log(role)
+      role[0] = memberRole;
+      setRole([memberRole]);
     } catch (err) {
       console.log(err);
     }
@@ -137,24 +156,22 @@ export default function Settings() {
     try {
       const result = await request.get(`/users`);
       const member_arr = result.data['members'];
-      console.log(member_arr);
-      let displayTemp = [];
+      const current_user = localStorage.getItem('name');
       for (let i = 0; i < member_arr.length; i++) {
         let role_ = '系統維護';
         if (member_arr[i]['role'] === 1)
           role_ = '店家管理者';
         else if (member_arr[i]['role'] === 2)
           role_ = '店家使用者';
-        displayTemp.push({'username': member_arr[i]['username'], 'name': member_arr[i]['name'], 'role': role_, 'activate': member_arr[i]['activate']})
+        if ((role[0] === 0) || (role[0] === 1 && role_ !== "系統維護") || (role[0] === 2 && current_user === member_arr[i]['username'])) 
+          displayTemp.push({'index': i, 'username': member_arr[i]['username'], 'name': member_arr[i]['name'], 'role': role_, 'activate': member_arr[i]['activate']})
       }
-      console.log(displayTemp);
-      setDisplayMembers([...displayTemp]);
+      setDisplayMembers(displayTemp);
       setMembers(member_arr);
       setPartner(result.data['partner']);
       const partner_data = result.data.partner;
       setPartnerData(partner_data);
       const result2 = await request.get(`/users/partner-machines`);
-      console.log(result2.data);
       setMachines(result2.data);
     } catch (err) {
       console.log(err);
@@ -189,7 +206,7 @@ export default function Settings() {
         <Col md={12}>
           <Wrapper>
             <Text>帳號管理</Text>
-            {role !== 2? (
+            {role[0] !== 2? (
               <ButtonBox>
                 <Button 
                   background_color={'#FF902B'}
@@ -235,14 +252,14 @@ export default function Settings() {
                     .map((row: Array<string>, index) => (
                         <tr>
                           <React.Fragment key={index}>
-                            <StyledTd>{row[0]}</StyledTd> 
-                            <StyledTd>{row[1]}</StyledTd>
+                            <StyledTd>{row[1]}</StyledTd> 
                             <StyledTd>{row[2]}</StyledTd>
+                            <StyledTd>{row[3]}</StyledTd>
                             <StyledTd>
                               <StyledButtonBox> 
-                                <Button id={index} margin='5px' width='80px' height='45px' background_color='#40C057' color={'#FFFFFF'} onClick={viewUser}>查看</Button>
-                                <Button id={index} margin='5px' width='80px' height='45px' background_color='#2F8BE6' color={'#FFFFFF'} onClick={editUser}>編輯</Button>
-                                <Button id={index} margin='5px' width='80px' height='45px' background_color='#F55252' color={'#FFFFFF'} disabled={role === 2? true: false} onClick={activateUserTemp}>{(parseInt(row[3]) === 1? "停用": "啟用")}</Button>
+                                <Button id={row[0]} margin='5px' width='80px' height='45px' background_color='#40C057' color={'#FFFFFF'} onClick={viewUser}>查看</Button>
+                                <Button id={row[0]} margin='5px' width='80px' height='45px' background_color='#2F8BE6' color={'#FFFFFF'} onClick={editUser}>編輯</Button>
+                                <Button id={row[0]} margin='5px' width='80px' height='45px' background_color='#F55252' color={'#FFFFFF'} disabled={role[0] === 2? true: false} onClick={activateUserTemp}>{(parseInt(row[4]) === 1? "停用": "啟用")}</Button>
                               </StyledButtonBox>
                             </StyledTd>
                           </React.Fragment>

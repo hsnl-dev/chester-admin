@@ -10,6 +10,8 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { request } from "../../utils/request";
+import {Modal, ModalHeader, ModalBody, ModalFooter} from 'baseui/modal';
+
 import { forEachLeadingCommentRange } from 'typescript';
 
 const Col = withStyle(Column, () => ({
@@ -70,9 +72,15 @@ const AddUser = () => {
     const history = useHistory();
     const location = useLocation();
     const [isEdit, setIsNew] = useState(location.state[2]);
+    const [isOpenCheck, setIsOpenCheck] = useState(false);
+    const [checkMessage, setCheckMessage] = useState("");
     const [machines, setMachines] = useState([]);
     const [existMachines, setExistMachines] = useState([]);
     const [selfRole, setSelfRole] = useState();
+
+    const closeCheck = () => {
+      setIsOpenCheck(false);
+    }
 
     const handleInfoChange = (e) => {
       console.log(e.target.id);
@@ -99,8 +107,6 @@ const AddUser = () => {
       userInfo['regNumber'] = info[1]['food_industry_id'];
       userInfo['address'] = info[1]['address'];
       userInfo['remark'] = info[1]['note'];
-      
-      setCurrentRole(info[0]['role']);
       if (info[0]['role'] === 1) {
         userInfo['authority'] = "店家管理者";
         setAuthority([{ value: '店家管理者', label: '店家管理者' }]);
@@ -123,7 +129,8 @@ const AddUser = () => {
     const getRole = async () => {
       try {
         const result = await request.get(`/users/role`)
-        let role = result.data;
+        let role = result.data.role;
+        setCurrentRole(role);
         setSelfRole(role);
       } catch (err) {
         console.log(err);
@@ -180,6 +187,43 @@ const AddUser = () => {
       } catch (err) {
         console.log(err);
       }
+    }
+
+    const checkUserInfo = () => {
+      if (userInfo.account === "") {
+        setCheckMessage("請輸入帳號");
+        setIsOpenCheck(true);
+      } else if (userInfo.authority === "") {
+        setCheckMessage("請選擇權限角色");
+        setIsOpenCheck(true);
+      } else if (userInfo.name === "") {
+        setCheckMessage("請輸入姓名");
+        setIsOpenCheck(true);
+      } else if (userInfo.phone === "") {
+        setCheckMessage("請輸入電話");
+        setIsOpenCheck(true);
+      } else if (userInfo.email === "") {
+        setCheckMessage("請輸入E-amil");
+        setIsOpenCheck(true);
+      } else if (userInfo.storeName === "") {
+        setCheckMessage("請輸入店家名稱");
+        setIsOpenCheck(true);
+      } else if (userInfo.storePhone === "") {
+        setCheckMessage("請輸入店家電話");
+        setIsOpenCheck(true);
+      } else if (userInfo.regNumber === "") {
+        setCheckMessage("請輸入食品業者登錄字號");
+        setIsOpenCheck(true);
+      } else if (userInfo.address === "") {
+        setCheckMessage("請輸入地址");
+        setIsOpenCheck(true);
+      } else if (machines.length === 0) {
+        setCheckMessage("請新增機器");
+        setIsOpenCheck(true);
+      } else {
+        handleSubmit();
+      }
+      
     }
 
     const addMachine = () => {
@@ -240,6 +284,15 @@ const AddUser = () => {
 
     return (
         <Grid fluid={true}>
+          <Modal onClose={closeCheck} isOpen={isOpenCheck}>
+            <ModalHeader>欄位未填</ModalHeader>
+            <ModalBody>
+              <Text>{checkMessage}</Text>
+            </ModalBody>
+            <ModalFooter>
+              <Button background_color={'#FF902B'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={closeCheck}>確認</Button>
+            </ModalFooter>
+          </Modal>
           <Row>
             <Col md={12}>
                 <Title>{isEdit? '編輯': '新增'}</Title>
@@ -283,11 +336,11 @@ const AddUser = () => {
                 <RowBox>
                   <InputBox>
                     <Text>店家電話</Text>
-                    <Input id={"storePhone"} placeholder="輸入店家電話" value={userInfo['storePhone']} disabled={currentRole!==0? true: false}/>
+                    <Input id={"storePhone"} placeholder="輸入店家電話" value={currentRole!==0? userInfo['storePhone']: ""} disabled={currentRole!==0? true: false}/>
                   </InputBox>
                   <InputBox>
                     <Text>食品業者登錄字號</Text>
-                    <Input id={"regNumber"} placeholder="輸入食品業者登錄字號" value={userInfo['regNumber']} disabled={currentRole!==0? true: false}/>
+                    <Input id={"regNumber"} placeholder="輸入食品業者登錄字號" value={currentRole!==0? userInfo['regNumber']: ""} disabled={currentRole!==0? true: false}/>
                   </InputBox>
                 </RowBox>
                 <RowBox>
@@ -316,7 +369,7 @@ const AddUser = () => {
                     color={'#FFFFFF'}
                     margin={'5px'}
                     height={'60%'}
-                    onClick={handleSubmit}
+                    onClick={checkUserInfo}
                   >確認送出</Button>
                 </ButtonBox>
             </Col>

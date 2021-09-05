@@ -111,13 +111,15 @@ const AddProduct = () => {
   const [preservation, setPreservation] = useState([]);
   const [PDUnit, setPDUnit] = useState([]);
   const [unit, setUnit] = useState([]);
-  const [itemsInfo, setItemsInfo] = useState({"productNumber": "", "productName":"", "specification": "", "unitPrice": "", "finalUnit": "", "weight": "", "unit": "", "PD": "", "PDUnit": "",  "preservation": "", "image": undefined, "imageInfo": "", "remark": ""});
+  const [itemsInfo, setItemsInfo] = useState({"productNumber": "", "productName":"", "specification": "", "unitPrice": "", "finalUnit": "", "weight": "", "unit": "", "PD": null, "PDUnit": "",  "preservation": "", "image": undefined, "imageInfo": "", "remark": ""});
   const [productUnits, setProductUnits] = useState([]);
   const [weightUnits, setWeightUnits] = useState([]);
   const [storage, setStorage] = useState([]);
   const [image, setImage] = useState();
   const [imageUrl, setImageUrl] = useState();
   const [isOpenImage, setIsOpenImage] = useState(false);
+  const [isOpenCheck, setIsOpenCheck] = useState(false);
+  const [checkMessage, setCheckMessage] = useState("");
   const [type, setType] = useState("add");
   const history = useHistory();
   const location = useLocation<LocationState>();
@@ -136,6 +138,40 @@ const AddProduct = () => {
 
   const closeImage = () => {
     setIsOpenImage(false);
+  }
+
+  const closeCheck = () => {
+    setIsOpenCheck(false);
+  }
+
+  const checkProductInfo = () => {
+    if (itemsInfo.productNumber === "") {
+      setCheckMessage("請輸入商品編號");
+      setIsOpenCheck(true);
+    } else if (itemsInfo.productName === "") {
+      setCheckMessage("請輸入商品名稱");
+      setIsOpenCheck(true);
+    } else if (itemsInfo.unitPrice === "") {
+      setCheckMessage("請輸入單價");
+      setIsOpenCheck(true);
+    } else if (itemsInfo.finalUnit === "") {
+      setCheckMessage("請輸入成品單位");
+      setIsOpenCheck(true);
+    } else if (itemsInfo.PD === null) {
+      setCheckMessage("請選擇保存期限");
+      setIsOpenCheck(true);
+    } else if (itemsInfo.PDUnit === "") {
+      setCheckMessage("請選擇期限單位");
+      setIsOpenCheck(true);
+    } else if (itemsInfo.preservation === "") {
+      setCheckMessage("請選擇保存性質");
+      setIsOpenCheck(true);
+    } else if (image === undefined) {
+      setCheckMessage("請上傳照片");
+      setIsOpenCheck(true);
+    } else {
+      handleSubmit();
+    }
   }
 
   const handleSubmit = async () => {
@@ -290,6 +326,15 @@ const AddProduct = () => {
           <Button background_color={'#616D89'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={closeImage}>關閉</Button>
         </ModalFooter>
       </Modal>
+      <Modal onClose={closeCheck} isOpen={isOpenCheck}>
+        <ModalHeader>欄位未填</ModalHeader>
+        <ModalBody>
+          <Text>{checkMessage}</Text>
+        </ModalBody>
+        <ModalFooter>
+          <Button background_color={'#FF902B'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={closeCheck}>確認</Button>
+        </ModalFooter>
+      </Modal>
       <Row>
         <Col md={12}>
             <Title>
@@ -354,7 +399,7 @@ const AddProduct = () => {
                       color={'#FFFFFF'}
                       margin={'5px'}
                       height={'60%'}
-                      onClick={handleSubmit}
+                      onClick={checkProductInfo}
                     >確認送出</Button>
                   )}
                   

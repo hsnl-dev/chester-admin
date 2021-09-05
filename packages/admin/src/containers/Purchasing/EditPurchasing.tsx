@@ -91,6 +91,8 @@ const EditPurchasing = () => {
     const [vendor, setVendor] = useState({});
     const [isOpen, setIsOpen] = useState(false);
     const [isOpenError, setIsOpenError] = useState(false);
+    const [isOpenCheck, setIsOpenCheck] = useState(false);
+    const [checkMessage, setCheckMessage] = useState("");
     const [newVendor, setNewVendor] = useState({"vendor_name": "", "note": ""});
     const [vendorList, setVendorList] = useState([]);
     const [itemsInfo, setItemsInfo] = useState([]);
@@ -105,6 +107,10 @@ const EditPurchasing = () => {
 
     const closeError = () => {
         setIsOpenError(false);
+    }
+
+    const closeCheck = () => {
+      setIsOpenCheck(false);
     }
 
     const handleDate = ({date}) => {
@@ -230,6 +236,54 @@ const EditPurchasing = () => {
         });
     }
 
+    const checkItemInfo = () => {
+      let check = true;
+      if (vendor !== null) {
+        setCheckMessage("請選擇廠商");
+        setIsOpenCheck(true);
+      } else {
+        if (itemsInfo.length >= 0) {
+          for (let i = 0; i < itemsInfo.length; i++) {
+            let element = itemsInfo[i];
+            if (element.name === "") {
+              setCheckMessage("請填寫品名");
+              setIsOpenCheck(true);
+              check = false;
+              break;
+            } else if (element.origin === "") {
+              setCheckMessage("請填寫原產地");
+              setIsOpenCheck(true);
+              check = false;
+              break;
+            } else if (element.Exp === null ) {
+              setCheckMessage("請選擇有效日期");
+              setIsOpenCheck(true);
+              check = false;
+              break;
+            } else if (element.PD === null ) {
+              setCheckMessage("請選擇製造日期");
+              setIsOpenCheck(true); 
+              check = false;
+              break;
+            } else if (element.amount === "") {
+              setCheckMessage("請填寫數量");
+              setIsOpenCheck(true);
+              check = false;
+              break;
+            }
+            if (check) {
+              
+              handleSubmit();
+            }
+          }
+          console.log(itemsInfo);
+        } else {
+          setCheckMessage("請新增品項");
+          setIsOpenCheck(true);
+        }
+      }
+    }
+
     useEffect(() => {
         getInfo(location.state);
        
@@ -255,6 +309,15 @@ const EditPurchasing = () => {
             </ModalBody>
             <ModalFooter>
               <Button background_color={'#FF902B'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={closeError}>確認</Button>
+            </ModalFooter>
+          </Modal>
+          <Modal onClose={closeCheck} isOpen={isOpenCheck}>
+            <ModalHeader>欄位未填</ModalHeader>
+            <ModalBody>
+              <Text>{checkMessage}</Text>
+            </ModalBody>
+            <ModalFooter>
+              <Button background_color={'#FF902B'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={closeCheck}>確認</Button>
             </ModalFooter>
           </Modal>
           <Row>
@@ -355,7 +418,7 @@ const EditPurchasing = () => {
                             <InputBox><Text>品牌</Text><Input id={"brand_" + index} value={item.brand} placeholder="輸入品牌"/></InputBox>
                         </RowBox>
                         <RowBox>
-                            <InputBox><Text>數量</Text><Input id={"amount_" + index} value={item.amount} placeholder="輸入數量"/></InputBox>
+                            <InputBox><Text>數量</Text><Input type="Number" id={"amount_" + index} value={item.amount} placeholder="輸入數量"/></InputBox>
                             <InputBox><Text>單位</Text><Select placeholder="" value={{value: item.unit, label: item.unit}} labelKey="label" valueKey="value" searchable={false} options={unitList}
                                 onChange={({ value }) => {setUnit(value); itemsInfo[index]["unit"]=value[0]['value']; setItemsInfo([...itemsInfo])}}/></InputBox>
                         </RowBox>
@@ -364,8 +427,8 @@ const EditPurchasing = () => {
                           <InputBox><Text>有效日期</Text><Datepicker value={new Date(item.Exp)}  locale={tw} onChange={({date})=>{itemsInfo[index]["Exp"]=date; setItemsInfo([...itemsInfo])}} /></InputBox>
                         </RowBox>
                         <RowBox>
-                          <InputBox><Text>單價</Text><Input value={item.unitPrice} id={"unitPrice_" + index} placeholder="輸入單價"/></InputBox>
-                          <InputBox><Text>總價</Text><Input value={item.totalPrice} id={"totalPrice_" + index} placeholder="輸入總價"/></InputBox>
+                          <InputBox><Text>單價</Text><Input type="Number" value={item.unitPrice} id={"unitPrice_" + index} placeholder="輸入單價"/></InputBox>
+                          <InputBox><Text>總價</Text><Input type="Number" value={item.totalPrice} id={"totalPrice_" + index} placeholder="輸入總價"/></InputBox>
                         </RowBox>
                         <RowBox>
                           <InputBox><Text>備註</Text><Input value={item.remark} id={"remark_" + index} placeholder="" height="100px"/></InputBox>
@@ -403,7 +466,7 @@ const EditPurchasing = () => {
                         color={'#FFFFFF'}
                         margin={'5px'}
                         height={'60%'}
-                        onClick={handleSubmit}
+                        onClick={checkItemInfo}
                       >確認送出</Button>
                     </div>
                   </RowBox>      
