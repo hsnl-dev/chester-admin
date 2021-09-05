@@ -306,10 +306,10 @@ const AddUser = () => {
                 <RowBox>
                   <InputBox>
                     <Text>帳號</Text>
-                    <Input id={"account"} placeholder="輸入帳號" value={userInfo['account']} disabled={isEdit? true: false}/></InputBox>
+                    <Input id={"account"} placeholder="輸入帳號" value={userInfo['account']} disabled={isEdit && currentRole !== 0? true: false}/></InputBox>
                   <InputBox>
                     <Text>權限角色</Text>
-                    {<Select id={"role"} placeholder="選擇" labelKey="label" valueKey="value" searchable={false} disabled={isEdit? true: false} options={authorityList} value={authority}
+                    {<Select id={"role"} placeholder="選擇" labelKey="label" valueKey="value" searchable={false} disabled={isEdit && currentRole !== 0? true: false} options={authorityList} value={authority}
                     onChange={handleAuthority}/>}
                   </InputBox>
                 </RowBox>
@@ -320,13 +320,13 @@ const AddUser = () => {
                   </InputBox>
                   <InputBox>
                     <Text>電話</Text>
-                    <Input id={"phone"} placeholder="輸入電話" value={userInfo['phone']}/>
+                    <Input id={"phone"} placeholder="輸入電話" disabled={(isEdit==true && currentRole!== 2)? false: true} value={userInfo['phone']}/>
                   </InputBox>
                 </RowBox>
                 <RowBox>
                   <InputBox>
                     <Text>E-MAIL</Text>
-                    <Input id={"email"} placeholder="輸入E-mail" value={userInfo['email']}/>
+                    <Input id={"email"} placeholder="輸入E-mail" disabled={(isEdit==true && currentRole!== 2)? false: true} value={userInfo['email']}/>
                   </InputBox>
                   <InputBox>
                     <Text>店家名稱</Text>
