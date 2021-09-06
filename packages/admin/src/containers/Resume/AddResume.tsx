@@ -3,14 +3,7 @@ import { useHistory } from 'react-router';
 import { styled, withStyle } from 'baseui';
 import { Datepicker } from 'baseui/datepicker';
 import { Modal, ModalHeader, ModalBody, ModalFooter } from 'baseui/modal';
-import { 
-	StyledRoot, 
-	StyledTable, 
-	StyledTableHeadRow, 
-	StyledTableHeadCell,
-	 StyledTableBodyRow, 
-	 StyledTableBodyCell 
-} from 'baseui/table-semantic';
+import { StyledRoot, StyledTable, StyledTableHeadRow, StyledTableHeadCell,StyledTableBodyRow, StyledTableBodyCell } from 'baseui/table-semantic';
 import tw from 'date-fns/locale/zh-TW';
 import Button from '../../components/Button/Button';
 import { ButtonBox, Text } from '../../components/SearchCard/SearchCard';
@@ -18,6 +11,7 @@ import Select from '../../components/Select/Select';
 import Input from '../../components/Input/Input';
 import { Grid, Row, Col as Column } from '../../components/FlexBox/FlexBox';
 import { Heading, Title } from '../../components/DisplayTable/DisplayTable';
+import dayjs from 'dayjs';
 
 import { RESUME } from '../../settings/constants';
 import { request } from '../../utils/request';
@@ -43,15 +37,8 @@ const Wrapper = styled('div', () => ({
 	boxShadow: "-3px 3px 5px 1px #E0E0E0",
 	marginBottom: '20px',
 }));
-
-const SearchBox = styled('div', () => ({
-	width: '50%',
-	display: 'flex',
-	flexDirection: 'row',
-	alignItems: 'center',
-}));
   
-const SearchProductBox = styled('div', () => ({
+const RowBox = styled('div', () => ({
 	display: 'flex',
 	flexDirection: 'row',
 	justifyContent: 'space-between',
@@ -67,20 +54,48 @@ const ContentBox = styled('div', () => ({
 	marginBottom: '10px',
 }));
 
+const InputBox = styled('div', () => ({
+	display: 'flex',
+	flexDirection: 'column',
+	width: '100%',
+	marginRight: '20px',
+	marginLeft: '20px',
+	marginTop: '10px',
+}));
+
 const AddResume = () => {
 	const methodSelectOptions = [
 		{ value: '選擇進貨', label: '選擇進貨'},
 		{ value: '填寫進貨', label: '填寫進貨'},
 	];
+	const onShelfTimeOptions = [
+		{ value: 1, label: '早餐'},
+		{ value: 2, label: '午餐'},
+		{ value: 3, label: '下午茶'},
+		{ value: 4, label: '晚餐'},
+		{ value: 5, label: '宵夜'}
+	];
+	const unitList = [
+		{ value: 'g', label: 'g' },
+		{ value: 'kg', label: 'kg' },
+		{ value: 'ml', label: 'ml' },
+	];
+	const commodityFormat = {"id": "", "date": dayjs(new Date()).format("YYYY-MM-DD"), "name": "", "traceNumber": "", "origin": "", "batchNumber": "", "brand": "", "amount": "", "unit": null, "remark": ""};
+	const [onShelfTime, setOnSelfTime] = useState([]);
+	const [addTimes, setAddTimes] = useState("");
 	const [productList, setProductList] = useState([]);
 	const [method, setMethod] = useState([]);
 	const [product, setProduct] = useState([]);
-	const [MFG, setMFG] = useState([]);
+	const [MFG, setMFG] = useState(null);
 	const column_names = ['選取', '進料日期', '數量', '選取數量', '單位'];
 	const display_column_name = ['進貨品名', '進貨日期', '數量', '單位', '刪除'];
-	const [amount, setAmount] = useState(0);
+	const [commodityTemp, setCommodityTemp] = useState(commodityFormat);
+	const [amount, setAmount] = useState("");
 	const [isCheck, setIsCheck] = useState(false);
 	const [isOpen, setIsOpen] = useState(false);
+	const [isOpenCheck, setIsOpenCheck] = useState(false);
+	const [isOpenCommodity, setIsOpenCommodity] = useState(false);
+	const [checkMessage, setCheckMessage] = useState("");
 	const [addFoodName, setAddFoodName] = useState("");
 	const [foodOptions, setFoodOptions] = useState([]);
 	const [commodities, setCommodities] = useState([]);
@@ -88,6 +103,7 @@ const AddResume = () => {
 	const [chooseFood, setChooseFood] = useState({'主食': {}, '主菜': {}, '配菜': {}, '其他': {} });
 	const [foodTemp, setFoodTemp] = useState({})
 	const [selectFood, setSelectFood] = useState(foodOptions[0]);
+	const [unit, setUnit] = useState([]);
 	const [traceId, setTraceId] = useState(-1);
 	const history = useHistory();
 
@@ -95,27 +111,60 @@ const AddResume = () => {
 		setIsOpen(false);
 	}
 
+	const closeCheck = () => {
+		setIsOpenCheck(false);
+	}
+
+	const closeCommodity = () => {
+		setIsOpenCommodity(false);
+	}
+
 	const check = async () => {
-		setIsCheck(true);
-		console.log(product);
-		console.log(amount);
-		console.log(MFG);
-		try {
-      const response = await request.post(`/trace/create`, {
-        product_id: product[0].value,
-        amount: amount,
-				create_date: MFG
-      });
-			console.log(response.data);
-			setTraceId(response.data.trace_id);
-    } catch (err) {
-      console.log(err);
-    }
+		console.log(amount)
+		if (MFG === null) {
+			setCheckMessage("請選擇日期");
+			setIsOpenCheck(true);
+		} else if (product.length === 0) {
+			setCheckMessage("請選擇商品");
+			setIsOpenCheck(true);
+		} else if (onShelfTime.length === 0){
+			setCheckMessage("請選擇上架時段");
+			setIsOpenCheck(true);
+		} else if (addTimes === "" || addTimes === "0") {
+			setCheckMessage("請輸入第幾次補貨(大於0)");
+			setIsOpenCheck(true);
+		}else if (method.length === 0) {
+			setCheckMessage("請選擇進貨方式");
+			setIsOpenCheck(true);
+		} else if (amount === "" || amount === "0") {
+			setCheckMessage("請輸入製成數量(大於0)");
+			setIsOpenCheck(true);
+		} else {
+			setIsCheck(true);
+			if (method[0].value === "填寫進貨") {
+				setFoodOptions([]);
+				setCommodities([]);
+			}
+			// try {
+			// 	const response = await request.post(`/trace/create`, {
+			// 		product_id: product[0].value,
+			// 		amount: amount,
+			// 		create_date: MFG
+			// 	});
+			// 	console.log(response.data);
+			// 	setTraceId(response.data.trace_id);
+			// } catch (err) {
+			// 	console.log(err);
+			// }
+		}
+		
+	}
+	
+	const handleDate = ({ date }) => {
+		setMFG(date);
 	}
 
 	const handleFoodChange = (e) => {
-		console.log(e.target.id)
-		console.log(selectFood)
 		let keys = Object.keys(foodTemp);
 		let split = e.target.id.split('_');
 		let key = split[0];
@@ -123,7 +172,6 @@ const AddResume = () => {
 		let id = String(commodities[parseInt(index)].id);
 		
 		if (keys.indexOf(id) !== -1) {
-			console.log('no')
 			foodTemp[id][key] = e.target.value;
 		}	else {
 			let temp = {'id': commodities[parseInt(index)].id,'foodName': selectFood[0].value, 'checked': '', 'date': commodities[parseInt(index)].date, 'amount': '', 'unit': commodities[parseInt(index)].unit};
@@ -140,6 +188,61 @@ const AddResume = () => {
 		}
 		setChooseFood({...chooseFood});
 		close();
+	}
+
+	const handelCommodity = (e) => {
+		if (commodityTemp.id === "") {
+			commodityTemp.id = String(commodities.length);
+		}
+		commodityTemp[e.target.id] = e.target.value;
+		setCommodityTemp(commodityTemp);
+	}	
+
+	const submitCommodity = () => {
+		if (commodityTemp.name === "") {
+			setCheckMessage("請輸入品名");
+			setIsOpenCheck(true);
+		} else if (commodityTemp.traceNumber === "") {
+			setCheckMessage("請輸入溯源履歷號碼");
+			setIsOpenCheck(true);
+		} else if (commodityTemp.origin === "") {
+			setCheckMessage("請輸入原產地");
+			setIsOpenCheck(true);
+		} else if (commodityTemp.batchNumber === "") {
+			setCheckMessage("請輸入批號");
+			setIsOpenCheck(true);
+		} else if (commodityTemp.brand === "") {
+			setCheckMessage("請輸入品牌");
+			setIsOpenCheck(true);
+		} else if (commodityTemp.traceNumber === "") {
+			setCheckMessage("請輸入溯源履歷號碼");
+			setIsOpenCheck(true);
+		} else if (commodityTemp.amount === "" || commodityTemp.amount === "0") {
+			setCheckMessage("請輸入數量");
+			setIsOpenCheck(true);
+		}  else if (commodityTemp.unit === null) {
+			setCheckMessage("請選擇單位");
+			setIsOpenCheck(true);
+		} else {
+			if (foodOptions.length === 0) {
+				foodOptions.push({value: commodityTemp.name, label: commodityTemp.name});
+			} else {
+				let exist = false;
+				for (let i = 0; i < commodities.length; i++) {
+					if (commodities[i].name === commodityTemp.name) {
+						exist = true;
+						break;
+					} 	
+				}
+				if (!exist) {
+					foodOptions.push({value: commodityTemp.name, label: commodityTemp.name});
+				}
+			}
+			commodities.push(commodityTemp);
+			setCommodities(commodities);
+			setFoodOptions(foodOptions);
+			closeCommodity();
+		}
 	}
 
 	const deleteDisplay = (e) => {
@@ -166,43 +269,109 @@ const AddResume = () => {
 
 	const handleSubmit = async () => {
 		try {
+			console.log(chooseFood)
 			let commodity_arr = [];
 			for (const [key, value] of Object.entries(chooseFood["主菜"])) {
-				commodity_arr.push({
-					"commodity_id": parseInt(key),
-					"amount": parseFloat(value["amount"]),
-					"type": "main_dish"
-				})
+				if (method[0].value === "選擇進貨") { 
+					commodity_arr.push({
+						"commodity_id": parseInt(key),
+						"amount": parseFloat(value["amount"]),
+						"type": "main_dish"
+					})
+				} else {
+					commodity_arr.push({
+						"name": commodities[key]["name"],
+						"trace_no": commodities[key]["traceNumber"],
+						"batch_no": commodities[key]["batchNumber"],
+						"origin": commodities[key]["origin"],
+						"brand" : commodities[key]["brand"],
+						"unit" : commodities[key]["unit"],
+						"note": commodities[key]["remark"],
+						"amount": parseFloat(value["amount"]),
+						"type": "main_dish"
+					})
+				}
 			}
 			for (const [key, value] of Object.entries(chooseFood["主食"])) {
-				commodity_arr.push({
-					"commodity_id": parseInt(key),
-					"amount": parseFloat(value["amount"]),
-					"type": "staple_food"
-				})
+				if (method[0].value === "選擇進貨") { 
+					commodity_arr.push({
+						"commodity_id": parseInt(key),
+						"amount": parseFloat(value["amount"]),
+						"type": "staple_food"
+					})
+				} else {
+					commodity_arr.push({
+						"name": commodities[key]["name"],
+						"trace_no": commodities[key]["traceNumber"],
+						"batch_no": commodities[key]["batchNumber"],
+						"origin": commodities[key]["origin"],
+						"brand" : commodities[key]["brand"],
+						"unit" : commodities[key]["unit"],
+						"note": commodities[key]["remark"],
+						"amount": parseFloat(value["amount"]),
+						"type": "staple_food"
+					})
+				}
 			}
 			for (const [key, value] of Object.entries(chooseFood["配菜"])) {
-				commodity_arr.push({
-					"commodity_id": parseInt(key),
-					"amount": parseFloat(value["amount"]),
-					"type": "side_dish"
-				})
+				if (method[0].value === "選擇進貨") { 
+					commodity_arr.push({
+						"commodity_id": parseInt(key),
+						"amount": parseFloat(value["amount"]),
+						"type": "side_dish"
+					})
+				} else {
+					commodity_arr.push({
+						"name": commodities[key]["name"],
+						"trace_no": commodities[key]["traceNumber"],
+						"batch_no": commodities[key]["batchNumber"],
+						"origin": commodities[key]["origin"],
+						"brand" : commodities[key]["brand"],
+						"unit" : commodities[key]["unit"],
+						"note": commodities[key]["remark"],
+						"amount": parseFloat(value["amount"]),
+						"type": "side_dish"
+					})
+				}
 			}
 			for (const [key, value] of Object.entries(chooseFood["其他"])) {
-				commodity_arr.push({
-					"commodity_id": parseInt(key),
-					"amount": parseFloat(value["amount"]),
-					"type": "others"
-				})
+				if (method[0].value === "選擇進貨") { 
+					commodity_arr.push({
+						"commodity_id": parseInt(key),
+						"amount": parseFloat(value["amount"]),
+						"type": "others"
+					})
+				} else {
+					commodity_arr.push({
+						"name": commodities[key]["name"],
+						"trace_no": commodities[key]["traceNumber"],
+						"batch_no": commodities[key]["batchNumber"],
+						"origin": commodities[key]["origin"],
+						"brand" : commodities[key]["brand"],
+						"unit" : commodities[key]["unit"],
+						"note": commodities[key]["remark"],
+						"amount": parseFloat(value["amount"]),
+						"type": "others"
+					})
+				}
 			}
 			console.log(commodity_arr);
-			const result = await request.post(`/trace/${traceId}/add-commodity`, {
-				commodities_arr: commodity_arr
-			});
-			console.log(result);
+			if (method[0].value === "選擇進貨") {
+				const result = await request.post(`/trace/${traceId}/add-commodity`, {
+					commodities_arr: commodity_arr
+				});
+				console.log(result);
+			} else {
+				const result = await request.post(`/trace/${traceId}/add-tmp-commodity`, {
+					commodities_arr: commodity_arr
+				});
+				console.log(result);
+			}
+			
 		} catch (err) {
 			console.log(err);
 		}
+		history.push({pathname: RESUME});
 	}
 
 	const addRow = (head) => {
@@ -371,17 +540,54 @@ const AddResume = () => {
 					<Button background_color={'#FF902B'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={handleAdd}>新增</Button>
 				</ModalFooter>
 			</Modal>
+			<Modal onClose={closeCheck} isOpen={isOpenCheck}>
+				<ModalHeader>欄位未填</ModalHeader>
+				<ModalBody>
+					<Text>{checkMessage}</Text>
+				</ModalBody>
+				<ModalFooter>
+					<Button background_color={'#FF902B'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={closeCheck}>確認</Button>
+				</ModalFooter>
+			</Modal>
+			<Modal onClose={closeCommodity} isOpen={isOpenCommodity}>
+				<ModalHeader><Heading>新增品項</Heading></ModalHeader>
+				<ModalBody onChange={handelCommodity}>
+						<RowBox>
+							<InputBox><Text>進貨品名</Text><Input id={"name"} placeholder="輸入品名"/></InputBox>
+							<InputBox><Text>溯源履歷號碼</Text><Input id={"traceNumber"}   placeholder="輸入溯源履歷號碼"/></InputBox>
+						</RowBox>
+						<RowBox>
+							<InputBox><Text>原產地</Text><Input id={"origin"} placeholder="輸入原產地"/></InputBox>
+							<InputBox></InputBox>
+						</RowBox>
+						<RowBox>
+							<InputBox><Text>批號</Text><Input id={"batchNumber"} placeholder="輸入批號"/></InputBox>
+							<InputBox><Text>品牌</Text><Input id={"brand"} placeholder="輸入品牌"/></InputBox>
+						</RowBox>
+						<RowBox>
+							<InputBox><Text>數量</Text><Input type="Number" id={"amount"} placeholder="輸入數量"/></InputBox>
+							<InputBox><Text>單位</Text><Select id="unit" placeholder="選擇" labelKey="label" valueKey="value" searchable={false} options={unitList} value={unit}
+								onChange={({ value }) => {setUnit(value); commodityTemp.unit=value[0]['value']; setCommodityTemp(commodityTemp)}}/></InputBox>
+						</RowBox>
+						<RowBox>
+							<InputBox><Text>備註</Text><Input id={"remark"} placeholder="" height="100px"/></InputBox>
+						</RowBox>
+				</ModalBody>
+				<ModalFooter>
+					<Button background_color={'#FF902B'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={submitCommodity}>確認</Button>
+				</ModalFooter>
+			</Modal>
 			<Row>
 				<Col md={12}>
 					<Title>履歷管理</Title>
 					<Wrapper>
 						<Heading>履歷資訊</Heading>
-						<SearchProductBox>
+						<RowBox>
 							<ContentBox>
 								<Text>製作日期</Text>
 								<Datepicker 
 									locale={tw}
-									onChange = {({ date }) => {MFG[0] = date; setMFG([...MFG])}}
+									onChange = {handleDate}
 									disabled={isCheck? true: false}
 								/>
 							</ContentBox>
@@ -398,8 +604,33 @@ const AddResume = () => {
 									disabled={isCheck? true: false}
 								/>
 							</ContentBox>
-						</SearchProductBox>
-						<SearchProductBox>
+						</RowBox>
+						<RowBox>
+							<ContentBox>
+								<Text>選擇上架時段</Text>
+								<Select
+									options = {onShelfTimeOptions}
+									labelKey="label"
+									valueKey="value"
+									placeholder='選擇'
+									value={onShelfTime}
+									searchable={false}
+									onChange={({value}) => setOnSelfTime(value)}
+									disabled={isCheck? true: false}
+								/>
+							</ContentBox>
+							<ContentBox>
+								<Text>輸入第幾次補貨</Text>
+								<Input 
+									placeholder = '輸入第幾次補貨'
+									type = 'Number'  
+									onChange = {(e) => {setAddTimes(e.target.value)}}
+									height = {'45px'}
+									disabled={isCheck? true: false}
+								/>
+							</ContentBox>
+						</RowBox>
+						<RowBox>
 							<ContentBox>
 								<Text>選擇進貨方式</Text>
 								<Select
@@ -416,13 +647,14 @@ const AddResume = () => {
 							<ContentBox>
 								<Text>製成數量</Text>
 								<Input 
-									placeholder = '輸入製成數量'    
+									placeholder = '輸入製成數量'
+									type = 'Number'  
 									onChange = {(e) => {setAmount(e.target.value)}}
 									height = {'45px'}
 									disabled={isCheck? true: false}
 								/>
 							</ContentBox>
-						</SearchProductBox>
+						</RowBox>
 						{isCheck ? null: (
 							<ButtonBox>
 								<Button margin='5px' width='80px' height='45px' background_color='#616D89' color={'#FFFFFF'} 
@@ -434,6 +666,19 @@ const AddResume = () => {
 								<Button margin='5px' width='80px' height='45px' background_color='#FF902B' color={'#FFFFFF'} onClick={check}>確認</Button>
 							</ButtonBox>
 						)}
+						{isCheck && method[0].value === '填寫進貨' ? (
+							<RowBox>
+							<div>
+								<Button
+								  background_color={'#FF902B'}
+								  color={'#FFFFFF'}
+								  margin={'5px'}
+								  height={'60%'}
+								  onClick={() => {setCommodityTemp(commodityFormat); setUnit([]); setIsOpenCommodity(true);}}
+								>新增品項</Button>
+							</div>
+						  </RowBox>
+						) : null}
 					</Wrapper>
 				</Col>
 			</Row>

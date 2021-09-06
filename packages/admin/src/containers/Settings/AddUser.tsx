@@ -346,7 +346,7 @@ const AddUser = () => {
                 <RowBox>
                   <InputBox>
                     <Text>地址</Text>
-                    <Input id={"address"} placeholder="輸入地址" value={userInfo['address']} disabled={currentRole!==0? true: false}/>
+                    <Input id={"address"} placeholder="輸入地址" value={currentRole!==0? userInfo['address']: ""} disabled={currentRole!==0? true: false}/>
                   </InputBox>
                 </RowBox>
                 <RowBox>

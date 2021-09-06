@@ -39,26 +39,6 @@ const Wrapper = styled('div', () => ({
     boxShadow: "-3px 3px 5px 1px #E0E0E0",
   }));
 
-const BottomWrapper = styled('div', () => ({
-    width: '100%',
-    display: "flex",
-    flexDirection: "column",
-    paddingTop: "5px",
-    paddingBottom: "5px",
-    paddingRight: "30px",
-    paddingLeft: "30px",
-    borderRadius: "6px",
-    backgroundColor: "#ffffff",
-    boxShadow: "-3px 3px 5px 1px #E0E0E0",
-}));
-
-const AddBox = styled('div', () => ({
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    width: '100%'
-}));
-
 const ButtonBox = styled('div', () => ({
   display: 'flex',
   flexDirection: 'row',

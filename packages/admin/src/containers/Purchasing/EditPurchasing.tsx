@@ -338,19 +338,21 @@ const EditPurchasing = () => {
                                 value={vendor}
                                 labelKey="label"
                                 valueKey="value"
+                                disabled={true}
                                 onChange={handleVendor}
                             />
                             <Button
                                 height={'48px'}
                                 background_color={'#FFD2AB'}
                                 color={'#FF902B'}
+                                disabled={true}
                                 onClick={()=>{setIsOpen(true);}}
                             >+</Button>
                         </VendorBox>
                       </InputBox>
                       <InputBox>
                         <Text>進貨日期</Text>
-                        <Datepicker locale={tw} value={purchasingDate} onChange={handleDate} />
+                        <Datepicker locale={tw} value={purchasingDate} disabled={true} onChange={handleDate} />
                       </InputBox>
                     </RowBox>
                     <RowBox>
