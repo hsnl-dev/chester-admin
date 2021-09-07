@@ -37,6 +37,16 @@ const Wrapper = styled('div', () => ({
 	boxShadow: "-3px 3px 5px 1px #E0E0E0",
 	marginBottom: '20px',
 }));
+
+const ModalWrapper = styled('div', () => ({
+    width: '100%',
+    display: "flex",
+    flexDirection: "column",
+    padding: "30px",
+    borderRadius: "6px",
+    backgroundColor: "#ffffff",
+    boxShadow: "-3px 3px 5px 1px #E0E0E0",
+}));
   
 const RowBox = styled('div', () => ({
 	display: 'flex',
@@ -80,7 +90,7 @@ const AddResume = () => {
 		{ value: 'kg', label: 'kg' },
 		{ value: 'ml', label: 'ml' },
 	];
-	const commodityFormat = {"id": "", "date": dayjs(new Date()).format("YYYY-MM-DD"), "name": "", "traceNumber": "", "origin": "", "batchNumber": "", "brand": "", "amount": "", "unit": null, "remark": ""};
+	const commodityFormat = {"id": "", "date": dayjs(new Date()).format("YYYY-MM-DD"), "name": "", "traceNumber": "", "origin": "", "batchNumber": "", "brand": "", "amount": "", "unit": null, "remark": "", "checked": "on"};
 	const [onShelfTime, setOnSelfTime] = useState([]);
 	const [addTimes, setAddTimes] = useState("");
 	const [productList, setProductList] = useState([]);
@@ -224,24 +234,15 @@ const AddResume = () => {
 			setCheckMessage("請選擇單位");
 			setIsOpenCheck(true);
 		} else {
-			if (foodOptions.length === 0) {
-				foodOptions.push({value: commodityTemp.name, label: commodityTemp.name});
-			} else {
-				let exist = false;
-				for (let i = 0; i < commodities.length; i++) {
-					if (commodities[i].name === commodityTemp.name) {
-						exist = true;
-						break;
-					} 	
-				}
-				if (!exist) {
-					foodOptions.push({value: commodityTemp.name, label: commodityTemp.name});
-				}
-			}
+			commodityTemp["foodName"] = commodityTemp["name"];
+			console.log(commodityTemp)
+			chooseFood[addFoodName][commodityTemp.id] = commodityTemp;
 			commodities.push(commodityTemp);
 			setCommodities(commodities);
-			setFoodOptions(foodOptions);
+			setChooseFood(chooseFood);
+			setCommodityTemp(commodityFormat);
 			closeCommodity();
+			console.log(chooseFood)
 		}
 	}
 
@@ -254,22 +255,29 @@ const AddResume = () => {
 	}
 
 	const setDialog = (head) => {
-		setAddFoodName(head);
-        setSelectFood([foodOptions[0]]);
-        setFoodTemp({});
-		let select_list = [];
-		for (let i = 0; i < commodities.length; i++) {
-			if (commodities[i].name === foodOptions[0].value) {
-				select_list.push(commodities[i]);
+		if (method[0].value === "選擇進貨") {
+			setAddFoodName(head);
+			setSelectFood([foodOptions[0]]);
+			setFoodTemp({});
+			let select_list = [];
+			for (let i = 0; i < commodities.length; i++) {
+				if (commodities[i].name === foodOptions[0].value) {
+					select_list.push(commodities[i]);
+				}
 			}
+			setSelectCommodities([...select_list]);
+			setIsOpen(true);
+		} else {
+			setUnit([]);
+			setAddFoodName(head);
+			setIsOpenCommodity(true);
 		}
-		setSelectCommodities([...select_list]);
-		setIsOpen(true);
+		
 	}
 
 	const handleSubmit = async () => {
 		try {
-			console.log(chooseFood)
+			console.log(commodities)
 			let commodity_arr = [];
 			for (const [key, value] of Object.entries(chooseFood["主菜"])) {
 				if (method[0].value === "選擇進貨") { 
@@ -549,7 +557,14 @@ const AddResume = () => {
 					<Button background_color={'#FF902B'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={closeCheck}>確認</Button>
 				</ModalFooter>
 			</Modal>
-			<Modal onClose={closeCommodity} isOpen={isOpenCommodity}>
+			<Modal onClose={closeCommodity} isOpen={isOpenCommodity} overrides={{
+          			Dialog: {
+            			style: {
+              				width: '80vw',
+              				height: '65vh',
+              				display: 'flex',
+              				flexDirection: 'column',
+           		},},}}>
 				<ModalHeader><Heading>新增品項</Heading></ModalHeader>
 				<ModalBody onChange={handelCommodity}>
 						<RowBox>
@@ -666,19 +681,6 @@ const AddResume = () => {
 								<Button margin='5px' width='80px' height='45px' background_color='#FF902B' color={'#FFFFFF'} onClick={check}>確認</Button>
 							</ButtonBox>
 						)}
-						{isCheck && method[0].value === '填寫進貨' ? (
-							<RowBox>
-							<div>
-								<Button
-								  background_color={'#FF902B'}
-								  color={'#FFFFFF'}
-								  margin={'5px'}
-								  height={'60%'}
-								  onClick={() => {setCommodityTemp(commodityFormat); setUnit([]); setIsOpenCommodity(true);}}
-								>新增品項</Button>
-							</div>
-						  </RowBox>
-						) : null}
 					</Wrapper>
 				</Col>
 			</Row>
