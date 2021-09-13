@@ -22,7 +22,8 @@ import {
   PASSWORD_RESET,
   FORGET_PASSWORD,
   VIEWUSER,
-  VIEWRESUME
+  VIEWRESUME, 
+  REALFOOD
 } from './settings/constants';
 import AuthProvider, { AuthContext } from './context/auth';
 import { InLineLoader } from './components/InlineLoader/InlineLoader';
@@ -50,7 +51,7 @@ const Login = lazy(() => import('./containers/Login/Login'));
 const NotFound = lazy(() => import('./containers/NotFound/NotFound'));
 const ForgetPassword = lazy(() => import('./containers/PasswordReset/ForgetPassword'));
 const PasswordReset = lazy(() => import('./containers/PasswordReset/PasswordReset'));
-
+const RealFood = lazy(() => import('./containers/RealFood/RealFood'));
 /**
  *
  *  A wrapper for <Route> that redirects to the login
@@ -226,6 +227,9 @@ const Routes = () => {
           </Route>
           <Route path={FORGET_PASSWORD}>
             <ForgetPassword />
+          </Route>
+          <Route path={REALFOOD}>
+            <RealFood />
           </Route>
           <Route component={NotFound} />
         </Switch>
