@@ -1,28 +1,33 @@
 import React, { useState, useEffect } from 'react';
-import { Wrapper, TitleBox, ProductBox, ImageBox, InfoBox, Name, Price, Line, Head, TableBox, Table, ThOrange, ThGrey, Td, Button, BottomBox, BottomText } from './RealFood.style';
+import { useParams } from 'react-router';
+import { Wrapper, TitleBox, ProductBox, ImageBox, InfoBox, Name, Price, Line, Head, TableBox, Table, ThOrange, ThGrey, Td, Button, BottomBox, BottomText, Arrow } from './RealFood.style';
+import { Link } from 'react-router-dom';
 import curveTop from '../../assets/image/parts/curveTop.png';
 import curveBottom from '../../assets/image/parts/curveBottom.png';
 import logo from '../../assets/image/parts/realfood.png';
-import test from '../../assets/image/parts/bento.jpg';
-
+import arrow from '../../assets/image/parts/right-arrow.png';
 import { request } from '../../utils/request';
 
+interface RouteParams {
+    traceId: string,
+};
+
 const RealFood = () => {
+    let params = useParams<RouteParams>();
+    let testId = "2021091411testproduct001-machine001";
 	const [name, setName] = useState("雞腿便當");
 	const [imageUrl, setImageUrl] = useState("");
 	const [price, setPrice] = useState("110");
-	const [food, setFood] = useState({"staple_food": [{'name': '米飯', 'origin': '嘉義縣', "fdaId": ""}], 
-																	"main_dish": [{'name': '雞腿', 'origin': '台南市', "fdaId": ""}], 
-																	"side_dish": [{'name': '滷蛋', 'origin': '宜蘭縣', "fdaId": ""}, {'name': '高麗菜', 'origin': '嘉義縣', "fdaId": ""}], 
-																	"others": []});
-	const [store, setStore] = useState({'name': '阿王水果行', 'address': '新北市三重區光復路1號', 'phone': '0922-123-456', 'food_industry_id': 'A-124975494-00000-2'})
-	const [machine, setMachine] = useState({'shelf_time': '2020/01/03 15:00', 'temperature': '70', 'name': '切斯特國際股份有限公司', 'address': '台北市中山區復興北路92號 10樓之1', 'phone': '02-2715-1011', 'food_industry_id':'12304'});
-	const [traceId, setTraceId] = useState("2021091411testproduct001-machine001");
-	
+	const [food, setFood] = useState({"staple_food": [], "main_dish": [], "side_dish": [], "others": []});
+	const [store, setStore] = useState({'name': '', 'address': '', 'phone': '', 'food_industry_id': ''})
+	const [machine, setMachine] = useState({'shelf_time': '', 'temperature': '', 'name': '', 'address': '', 'phone': '', 'food_industry_id':''});
+	const [traceId, setTraceId] = useState(params.traceId);
+    
 	const foodTable = (foodName, data) => {
 		if (data.length > 0) {
 			return (
 				<TableBox>
+                    
 					<Table>
 							<tr><ThOrange>{foodName}</ThOrange></tr>
 					</Table>
@@ -34,7 +39,7 @@ const RealFood = () => {
 						{data.map((item) => (
 							<tr>
 								<Td>{item.name}</Td>
-								<Td>{item.origin}</Td>
+								<Td>{item.origin}<a href = 'https://google.com/'><Arrow><img src={arrow} width="20px" height="20px"/></Arrow></a></Td>
 							</tr>
 						))}
 					</Table>
@@ -76,9 +81,9 @@ const RealFood = () => {
 		}
 	}
 
-	useEffect(() => {
-    getTraceInfo();
-  }, []);
+    useEffect(() => {
+        getTraceInfo();
+    }, []);
 
 	return (
 		<Wrapper>
@@ -86,6 +91,7 @@ const RealFood = () => {
 				<img src={logo} />
 				<img src={curveTop} width="100%"/>
 			</TitleBox>
+            
 			<ProductBox>
 				<ImageBox url={imageUrl}></ImageBox>
 				<InfoBox>
@@ -104,7 +110,7 @@ const RealFood = () => {
 			<TableBox>
 				<Table>
 					<tr><ThOrange>供應商資訊</ThOrange></tr>
-					<tr><Td>名稱:	{store.name}</Td></tr>
+					<tr><Td>名稱: {store.name}</Td></tr>
 					<tr><Td>地址: {store.address}</Td></tr>
 					<tr><Td>電話: {store.phone}</Td></tr>
 					<tr><Td>食品業者登錄字號: {store.food_industry_id}</Td></tr>
