@@ -11,7 +11,7 @@ import { useEffect } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { request } from "../../utils/request";
 import {Modal, ModalHeader, ModalBody, ModalFooter} from 'baseui/modal';
-import {ZipCodeTW} from "zipcode-tw-react";
+import TwCitySelector from 'tw-city-selector';
 
 
 import { forEachLeadingCommentRange } from 'typescript';
@@ -62,14 +62,23 @@ const InputBox = styled('div', () => ({
   marginTop: '10px',
 }));
 
+const SelectAddress = styled('select', () => ({
+  width: '50%',
+  height: '100%',
+  marginRight: '20px',
+
+}));
+
 const authorityList = [
   { value: '店家使用者', label: '店家使用者' },
   { value: '店家管理者', label: '店家管理者' },
 ];
 
+
+
 const AddUser = () => {
     const [authority, setAuthority] = useState([]);
-    const [userInfo, setUserInfo] = useState({"account": "", "authority":"", "name": "", "phone": "", "email": "", "storeName": "", "storePhone": "", "regNumber": "", "address": "", "remark": ""});
+    const [userInfo, setUserInfo] = useState({"account": "", "authority":"", "name": "", "phone": "", "email": "", "storeName": "", "storePhone": "", "regNumber": "", "addressCity": "", "addressDistrict": "", "addressStreet": "", "remark": ""});
     const [currentRole, setCurrentRole] = useState();
     const history = useHistory();
     const location = useLocation();
@@ -79,6 +88,7 @@ const AddUser = () => {
     const [machines, setMachines] = useState([]);
     const [existMachines, setExistMachines] = useState([]);
     const [selfRole, setSelfRole] = useState();
+    const [addressSelector, setAddressSelector] = useState();
 
     const closeCheck = () => {
       setIsOpenCheck(false);
@@ -99,6 +109,7 @@ const AddUser = () => {
     }
 
     const setCurrentUserInfo = ( info ) => {
+      console.log(info)
       userInfo['user_id'] = info[0]['user_id'];
       userInfo['account'] = info[0]['username'];
       userInfo['name'] = info[0]['name'];
@@ -107,7 +118,9 @@ const AddUser = () => {
       userInfo['storeName'] = info[1]['name'];
       userInfo['storePhone'] = info[1]['phone'];
       userInfo['regNumber'] = info[1]['food_industry_id'];
-      userInfo['address'] = info[1]['address'];
+      userInfo['addressCity'] = info[1]['address_city'];
+      userInfo['addressDistrict'] = info[1]['address_district'];
+      userInfo['addressStreet'] = info[1]['address_street'];
       userInfo['remark'] = info[1]['note'];
       if (info[0]['role'] === 1) {
         userInfo['authority'] = "店家管理者";
@@ -157,7 +170,9 @@ const AddUser = () => {
             partner_name: userInfo.storeName,
             partner_phone:  userInfo.storePhone,
             food_industry_id: userInfo.regNumber,
-            address: userInfo.address,
+            address_city: userInfo.addressCity,
+            address_district: userInfo.addressDistrict,
+            address_street: userInfo.addressStreet,
             note: userInfo.remark
           });
           if (response.status === 200) {
@@ -176,7 +191,9 @@ const AddUser = () => {
             partner_name: userInfo.storeName,
             partner_phone:  userInfo.storePhone,
             food_industry_id: userInfo.regNumber,
-            address: userInfo.address,
+            address_city: userInfo.addressCity,
+            address_district: userInfo.addressDistrict,
+            address_street: userInfo.addressStreet,
             note: userInfo.remark
           });
           if (response.status === 200) {
@@ -216,8 +233,14 @@ const AddUser = () => {
       } else if (userInfo.regNumber === "") {
         setCheckMessage("請輸入食品業者登錄字號");
         setIsOpenCheck(true);
-      } else if (userInfo.address === "") {
-        setCheckMessage("請輸入地址");
+      } else if (userInfo.addressCity === "") {
+        setCheckMessage("請選擇縣市");
+        setIsOpenCheck(true);
+      } else if (userInfo.addressDistrict === "") {
+        setCheckMessage("請選擇區域");
+        setIsOpenCheck(true);
+      } else if (userInfo.addressStreet === "") {
+        setCheckMessage("請輸入詳細地址");
         setIsOpenCheck(true);
       } else if (machines.length === 0) {
         setCheckMessage("請新增機器");
@@ -280,6 +303,11 @@ const AddUser = () => {
     useEffect(()=>{
       getRole();
       setCurrentUserInfo(location.state);
+      setAddressSelector(new TwCitySelector({
+        el: '.city-selector-set',
+        elCounty: '.county',
+        elDistrict: '.district',
+      }));
       // console.log(location.state)
     }, [])
   
@@ -308,55 +336,62 @@ const AddUser = () => {
                 <RowBox>
                   <InputBox>
                     <Text>帳號</Text>
-                    <Input id={"account"} placeholder="輸入帳號" value={userInfo['account']} disabled={isEdit && currentRole !== 0? true: false}/></InputBox>
+                    <Input id="account" placeholder="輸入帳號" value={userInfo['account']} disabled={isEdit && currentRole !== 0? true: false}/></InputBox>
                   <InputBox>
                     <Text>權限角色</Text>
-                    {<Select id={"role"} placeholder="選擇" labelKey="label" valueKey="value" searchable={false} disabled={isEdit && currentRole !== 0? true: false} options={authorityList} value={authority}
+                    {<Select id="role" placeholder="選擇" labelKey="label" valueKey="value" searchable={false} disabled={isEdit && currentRole !== 0? true: false} options={authorityList} value={authority}
                     onChange={handleAuthority}/>}
                   </InputBox>
                 </RowBox>
                 <RowBox>
                   <InputBox>
                     <Text>姓名</Text>
-                    <Input id={"name"} placeholder="輸入姓名" value={userInfo['name']}/>
+                    <Input id="name" placeholder="輸入姓名" value={userInfo['name']}/>
                   </InputBox>
                   <InputBox>
                     <Text>電話</Text>
-                    <Input id={"phone"} placeholder="輸入電話" disabled={(isEdit==true && currentRole!== 2)? false: true} value={userInfo['phone']}/>
+                    <Input id="phone" placeholder="輸入電話" disabled={(isEdit==true && currentRole!== 2)? false: true} value={userInfo['phone']}/>
                   </InputBox>
                 </RowBox>
                 <RowBox>
                   <InputBox>
                     <Text>E-MAIL</Text>
-                    <Input id={"email"} placeholder="輸入E-mail" disabled={(isEdit==true && currentRole!== 2)? false: true} value={userInfo['email']}/>
+                    <Input id="email" placeholder="輸入E-mail" disabled={(isEdit==true && currentRole!== 2)? false: true} value={userInfo['email']}/>
                   </InputBox>
                   <InputBox>
                     <Text>店家名稱</Text>
-                    <Input id={"storeName"} placeholder="輸入店家名稱" value={userInfo['storeName']} disabled={currentRole!==0? true: false}/>
+                    <Input id="storeName" placeholder="輸入店家名稱" value={userInfo['storeName']} disabled={currentRole!==0? true: false}/>
                   </InputBox>
                 </RowBox>
                 <RowBox>
                   <InputBox>
                     <Text>店家電話</Text>
-                    <Input id={"storePhone"} placeholder="輸入店家電話" value={currentRole!==0? userInfo['storePhone']: ""} disabled={currentRole!==0? true: false}/>
+                    <Input id="storePhone" placeholder="輸入店家電話" value={currentRole!==0? userInfo['storePhone']: ""} disabled={currentRole!==0? true: false}/>
                   </InputBox>
                   <InputBox>
                     <Text>食品業者登錄字號</Text>
-                    <Input id={"regNumber"} placeholder="輸入食品業者登錄字號" value={currentRole!==0? userInfo['regNumber']: ""} disabled={currentRole!==0? true: false}/>
+                    <Input id="regNumber" placeholder="輸入食品業者登錄字號" value={currentRole!==0? userInfo['regNumber']: ""} disabled={currentRole!==0? true: false}/>
                   </InputBox>
                 </RowBox>
                 <RowBox>
                   <InputBox>
-                    <Text>地址</Text>
-                    <Input id={"address"} placeholder="輸入地址" value={currentRole!==0? userInfo['address']: ""} disabled={currentRole!==0? true: false}/>
+                  <Text>店家地址</Text>
+                  <RowBox className="city-selector-set">
+                    <SelectAddress id="addressCity" onChange={()=>userInfo.addressDistrict = ""} className="county"/>
+                    <SelectAddress id="addressDistrict" className="district"/>
+                    <Input id="addressStreet" placeholder="輸入地址" value={currentRole!==0? userInfo['address']: ""} />
+                  </RowBox>
                   </InputBox>
+                  
                 </RowBox>
+                
                 <RowBox>
                   <InputBox>
                   <Text>備註</Text>
-                  <Input id={"remark"} placeholder="" value={userInfo['remark']} disabled={currentRole!==0? true: false} height="100px"/>
+                  <Input id="remark" placeholder="" value={userInfo['remark']} disabled={currentRole!==0? true: false} height="100px"/>
                 </InputBox>
                 </RowBox>
+                
               </Wrapper>
               <ButtonBox>
                   <Button

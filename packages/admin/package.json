@@ -32,7 +32,8 @@
     "styletron-react": "^5.2.7",
     "typescript": "^3.9.3",
     "yup": "^0.29.1",
-    "zipcode-tw-react": "^1.2.0"
+    "zipcode-tw-react": "^1.2.0",
+    "tw-city-selector": "^2.0.0"
   },
   "scripts": {
     "dev": "react-scripts start",
