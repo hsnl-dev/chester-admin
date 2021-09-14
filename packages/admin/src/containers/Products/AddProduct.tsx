@@ -91,7 +91,9 @@ const AddProduct = () => {
   const [preservation, setPreservation] = useState([]);
   const [PDUnit, setPDUnit] = useState([]);
   const [unit, setUnit] = useState([]);
-  const [itemsInfo, setItemsInfo] = useState({"productNumber": "", "productName":"", "specification": "", "unitPrice": "", "finalUnit": "", "weight": "", "unit": "", "PD": null, "PDUnit": "",  "preservation": "", "image": undefined, "imageInfo": "", "remark": ""});
+  const [itemsInfo, setItemsInfo] = useState({"productNumber": "", "productUUid": "", "productName":"", "specification": "", "unitPrice": "", "finalUnit": "", "weight": "", "unit": "", "PD": null, "PDUnit": "",  "preservation": "", "image": undefined, "imageInfo": "", "remark": ""});
+  const [productOptions, setProductOptions] = useState([]);
+  const [product, setProduct] = useState([]);
   const [productUnits, setProductUnits] = useState([]);
   const [weightUnits, setWeightUnits] = useState([]);
   const [storage, setStorage] = useState([]);
@@ -114,6 +116,12 @@ const AddProduct = () => {
       setImage(e.target.files[0]);
       console.log(e.target.files[0]);
     }
+  }
+
+  const handleProductChange = ({ value }) => {
+    setProduct(value); 
+    itemsInfo.productNumber = (value[0] !== undefined ? value[0]['label'] : null);
+    itemsInfo.productUUid = (value[0] !== undefined ? value[0]['value'] : null);
   }
 
   const closeImage = () => {
@@ -166,6 +174,7 @@ const AddProduct = () => {
       if (type === "add") {
         response = await request.post(`/product/create`, {
           product_no: itemsInfo.productNumber,
+          product_uuid: itemsInfo.productUUid,
           name: itemsInfo.productName,
           spec: itemsInfo.specification,
           product_unit: itemsInfo.finalUnit,
@@ -215,6 +224,7 @@ const AddProduct = () => {
       return;
     const productInfo = location.state.info;
     itemsInfo['productNumber'] = productInfo['product_no'];
+    itemsInfo['productUUid'] = productInfo['product_uuid'];
     itemsInfo['productName'] = productInfo['name'];
     itemsInfo['specification'] = productInfo['spec'];
     itemsInfo['unitPrice'] = productInfo['price'];
@@ -231,7 +241,23 @@ const AddProduct = () => {
     setUnit([{value: productInfo['weight_unit'], label: productInfo['weight_unit']}]);
     setPDUnit([{value: productInfo['shelflife_unit'], label: productInfo['shelflife_unit']}]);
     setPreservation([{value: productInfo['storage'], label: productInfo['storage']}]);
+    setProduct([{value: productInfo['product_uuid'], label: productInfo['product_no']}]);
     console.log(productInfo)
+  }
+
+  const getProductList = async () => {
+    if (location.state.type === 'add') {
+      try {
+        const reponse = await request.get(`/product/init-list`);
+        const productList = reponse.data;
+        productList.forEach(element => {
+          productOptions.push({label: element.product_no, value: element.uuid});
+        });
+        // console.log(productOptions);
+      } catch (err) {
+        console.log(err);
+      }
+    }
   }
 
   const getProductUnits = async () => {
@@ -242,7 +268,7 @@ const AddProduct = () => {
         label: element
       };
     });
-    console.log(unit_list);
+    // console.log(unit_list);
     setProductUnits(unit_list);
   }
 
@@ -254,7 +280,7 @@ const AddProduct = () => {
         label: element
       };
     });
-    console.log(weight_unit_list);
+    // console.log(weight_unit_list);
     setWeightUnits(weight_unit_list);
   }
 
@@ -266,7 +292,7 @@ const AddProduct = () => {
         label: element
       };
     });
-    console.log(storage_list);
+    // console.log(storage_list);
     setStorage(storage_list);
   }
 
@@ -281,8 +307,7 @@ const AddProduct = () => {
     };
     const response = await axios.post("https://api.cloudinary.com/v1_1/ktgincot/image/upload", data, config);
     if (response) {
-      console.log(response);
-      console.log(response.data.url);
+      // console.log(response.data.url);
       itemsInfo.image = response.data.url
       setItemsInfo({...itemsInfo});
     }
@@ -293,6 +318,7 @@ const AddProduct = () => {
     getWeightUnits();
     getStorage();
     getProductInfo();
+    getProductList();
   }, [])
 
   return (
@@ -300,7 +326,7 @@ const AddProduct = () => {
       <Modal onClose={closeImage} isOpen={isOpenImage}>
         <ModalHeader>照片</ModalHeader>
         <ModalBody>
-          <img src={itemsInfo['image']} alt={"商品照片"}/>
+          <img width="450px" height="300px" src={itemsInfo['image']} alt={"商品照片"}/>
         </ModalBody>
         <ModalFooter>
           <Button background_color={'#616D89'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={closeImage}>關閉</Button>
@@ -323,7 +349,7 @@ const AddProduct = () => {
             <Wrapper onChange={handleInfoChange}>
               <Heading>{type === "add"? "新增": type === "edit"? "編輯": "查看"}商品</Heading>
               <RowBox>
-                <InputBox><Text>商品編號</Text><Input height='100%' id={"productNumber"} placeholder="輸入商品編號" value={itemsInfo["productNumber"]} disabled={type==="view"? true: false}/></InputBox>
+                <InputBox><Text>商品編號</Text><Select placeholder="選擇商品編號" labelKey="label" valueKey="value" searchable={false} options={productOptions} value={product} disabled={type==="view"? true: false} onChange={handleProductChange}/></InputBox>
                 <InputBox><Text>商品名稱</Text><Input height='100%' id={"productName"} placeholder="輸入商品名稱" value={itemsInfo["productName"]} disabled={type==="view"? true: false}/></InputBox>
               </RowBox>
               <RowBox>
