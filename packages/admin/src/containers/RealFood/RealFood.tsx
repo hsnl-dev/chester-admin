@@ -11,13 +11,13 @@ const RealFood = () => {
 	const [name, setName] = useState("雞腿便當");
 	const [imageUrl, setImageUrl] = useState("");
 	const [price, setPrice] = useState("110");
-	const [food, setFood] = useState({"staple_food": [{'name': '米飯', 'origin': '嘉義縣', "fdaId": ""}], 
-																	"main_dish": [{'name': '雞腿', 'origin': '台南市', "fdaId": ""}], 
-																	"side_dish": [{'name': '滷蛋', 'origin': '宜蘭縣', "fdaId": ""}, {'name': '高麗菜', 'origin': '嘉義縣', "fdaId": ""}], 
+	const [food, setFood] = useState({"staple_food": [{'name': '米飯', 'origin': '嘉義縣', "url": ""}], 
+																	"main_dish": [{'name': '雞腿', 'origin': '台南市', "url": ""}], 
+																	"side_dish": [{'name': '滷蛋', 'origin': '宜蘭縣', "url": ""}, {'name': '高麗菜', 'origin': '嘉義縣', "url": ""}], 
 																	"others": []});
 	const [store, setStore] = useState({'name': '阿王水果行', 'address': '新北市三重區光復路1號', 'phone': '0922-123-456', 'food_industry_id': 'A-124975494-00000-2'})
 	const [machine, setMachine] = useState({'shelf_time': '2020/01/03 15:00', 'temperature': '70', 'name': '切斯特國際股份有限公司', 'address': '台北市中山區復興北路92號 10樓之1', 'phone': '02-2715-1011', 'food_industry_id':'12304'});
-	const [traceId, setTraceId] = useState("2021091411testproduct001-machine001");
+	const [traceId, setTraceId] = useState("2021091411testproduct006-machine001");
 	
 	const foodTable = (foodName, data) => {
 		if (data.length > 0) {
