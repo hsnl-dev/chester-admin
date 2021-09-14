@@ -23,7 +23,7 @@ export const STAFF_MEMBERS = '/staff-members';
 export const SITE_SETTINGS = '/site-settings';
 export const FORGET_PASSWORD = '/password-reset';
 export const PASSWORD_RESET = '/password-reset/:user_id/:token';
-export const REALFOOD = '/realFood';
+export const REALFOOD = '/realFood/:traceId';
 // **************** ROUTE CONSTANT END **************************
 
 export const CURRENCY = '$';

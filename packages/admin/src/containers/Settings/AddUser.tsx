@@ -11,6 +11,8 @@ import { useEffect } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { request } from "../../utils/request";
 import {Modal, ModalHeader, ModalBody, ModalFooter} from 'baseui/modal';
+import {ZipCodeTW} from "zipcode-tw-react";
+
 
 import { forEachLeadingCommentRange } from 'typescript';
 

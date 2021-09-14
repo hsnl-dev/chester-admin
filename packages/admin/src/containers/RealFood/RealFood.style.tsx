@@ -1,6 +1,8 @@
 import { styled } from "baseui";
 import Background from '../../assets/image/parts/vegetables-pattern.png';
 
+
+
 export const Wrapper = styled("div", ({ $theme }) => ({
     width: "100%",    
     display: "flex",
@@ -143,4 +145,10 @@ export const BottomText = styled("div", () => ({
     fontFamily: "Poppins",
     fontSize: "20px",
     color: '#FFFFFF'
-}))
+}));
+
+export const Arrow = styled("a", () => ({
+    width: "20px",
+    height: "20px",
+    marginLeft: "10px",
+}));
