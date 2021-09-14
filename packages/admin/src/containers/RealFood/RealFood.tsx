@@ -39,7 +39,11 @@ const RealFood = () => {
 						{data.map((item) => (
 							<tr>
 								<Td>{item.name}</Td>
-								<Td>{item.origin}<a href = 'https://google.com/'><Arrow><img src={arrow} width="20px" height="20px"/></Arrow></a></Td>
+								<Td>{item.origin}
+								{item.url.length !== ""?
+									(<a href = {item.url}><Arrow><img src={arrow} width="20px" height="20px"/></Arrow></a>) 
+								:(null)}
+								</Td>
 							</tr>
 						))}
 					</Table>
