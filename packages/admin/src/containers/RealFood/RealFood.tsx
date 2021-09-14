@@ -41,7 +41,7 @@ const RealFood = () => {
 								<Td>{item.name}</Td>
 								<Td>{item.origin}
 								{item.url.length !== ""?
-									(<a href = {item.url}><Arrow><img src={arrow} width="20px" height="20px"/></Arrow></a>) 
+									(<a href = {item.url} target="_blank"><Arrow><img src={arrow} width="20px" height="20px"/></Arrow></a>) 
 								:(null)}
 								</Td>
 							</tr>

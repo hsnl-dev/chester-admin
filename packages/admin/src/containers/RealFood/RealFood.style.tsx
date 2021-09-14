@@ -10,7 +10,6 @@ export const Wrapper = styled("div", ({ $theme }) => ({
     alignItems: "center",
     backgroundColor: "#fff",
     
-  
     "@media only screen and (max-width: 520px)": {
       backgroundColor: "#fff"
     }
@@ -30,7 +29,8 @@ export const TitleBox = styled("div", () => ({
 export const ProductBox = styled("div", () => ({
     display: "flex",
     flexDirection: 'row',
-    justifyContent: "center"
+    justifyContent: "center",
+    marginTop: '80px'
 }));
 
 export const ImageBox = styled("div", (props) => ({
@@ -69,7 +69,8 @@ export const Line = styled("div", () => ({
     backgroundColor: "#FFB524",
     width: "1000px",
     height: "10px",
-    marginTop: '40px',
+    marginTop: '100px',
+    marginBottom: '100px'
 }));
 
 export const Head = styled("h2", () => ({
@@ -125,7 +126,7 @@ export const Button = styled("button", () => ({
     fontSize: "14px",
     borderRadius: '20px',
     borderColor: '#FFFFFF',
-    marginTop: '40px',
+    marginTop: '100px',
     
 }));
 
@@ -139,16 +140,19 @@ export const BottomBox = styled("div", () => ({
     backgroundColor: "#333333",
     backgroundImage: "url(" + Background + ")",
     marginTop: '40px',
+    
 }));
 
 export const BottomText = styled("div", () => ({
     fontFamily: "Poppins",
     fontSize: "20px",
-    color: '#FFFFFF'
+    color: '#FFFFFF', 
+    marginBottom: "80px"
 }));
 
 export const Arrow = styled("a", () => ({
     width: "20px",
     height: "20px",
     marginLeft: "10px",
+    
 }));
