@@ -212,7 +212,7 @@ const Resume = () => {
 	}	
 
 	const checkResume = async (e) => {
-		const resume_id = resumes[e.target.id]['id'];
+		const resume_id = resumes[e.target.id]['trace_no'];
 		try {
 			const result = await request.get(`/trace/${resume_id}/view`);
 			console.log(result.data);
@@ -223,14 +223,14 @@ const Resume = () => {
 	}
 
 	const manageLabel = (e) => {
-		const resume_id = resumes[e.target.id]['id'];
+		const resume_id = resumes[e.target.id]['trace_no'];
 		setSelectId(resume_id);
 		setIsOpenLabel(true);
 	}
 
 	const deleteResumeTemp = (e) => {
 		console.log(resumes)
-		let resume_id = resumes[e.target.id]['id'];
+		let resume_id = resumes[e.target.id]['trace_no'];
 		setSelectId(resume_id);
 		setIsOpen(true);
 	}
@@ -251,7 +251,7 @@ const Resume = () => {
 			const resume_arr = result.data;
 			console.log(resume_arr);
 			for (let i = 0; i < resume_arr.length; i++) {
-				displayTemp.push({'index': i, 'date': resume_arr[i]['create_date'], 'number': resume_arr[i]['id'], 'name': resume_arr[i]['product_name']});
+				displayTemp.push({'index': i, 'date': resume_arr[i]['create_date'], 'number': resume_arr[i]['trace_no'], 'name': resume_arr[i]['product_name']});
 			}
 			setDisplayInfo(displayTemp);
 			setResumes(resume_arr);

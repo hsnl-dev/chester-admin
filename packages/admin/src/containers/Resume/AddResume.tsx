@@ -155,19 +155,20 @@ const AddResume = () => {
 				setFoodOptions([]);
 				setCommodities([]);
 			}
-			// try {
-			// 	const response = await request.post(`/trace/create`, {
-			// 		product_id: product[0].value,
-			// 		amount: amount,
-			// 		create_date: MFG
-			// 	});
-			// 	console.log(response.data);
-			// 	setTraceId(response.data.trace_id);
-			// } catch (err) {
-			// 	console.log(err);
-			// }
+			try {
+				const response = await request.post(`/trace/create`, {
+					product_id: product[0].value,
+					amount: amount,
+					create_date: MFG,
+					time_period: onShelfTime,
+					batch: addTimes
+				});
+				console.log(response.data);
+				setTraceId(response.data.trace_id);
+			} catch (err) {
+				console.log(err);
+			}
 		}
-		
 	}
 	
 	const handleDate = ({ date }) => {
