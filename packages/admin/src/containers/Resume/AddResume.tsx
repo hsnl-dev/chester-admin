@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory } from 'react-router';
+import { useHistory, useLocation } from 'react-router';
 import { styled, withStyle } from 'baseui';
 import { Datepicker } from 'baseui/datepicker';
 import { Modal, ModalHeader, ModalBody, ModalFooter } from 'baseui/modal';
@@ -15,6 +15,8 @@ import dayjs from 'dayjs';
 
 import { RESUME } from '../../settings/constants';
 import { request } from '../../utils/request';
+
+dayjs.locale("zh-tw");
 
 const Col = withStyle(Column, () => ({
 	'@media only screen and (max-width: 574px)': {
@@ -91,11 +93,12 @@ const AddResume = () => {
 		{ value: 'ml', label: 'ml' },
 	];
 	const commodityFormat = {"id": "", "date": dayjs(new Date()).format("YYYY-MM-DD"), "name": "", "traceNumber": "", "origin": "", "batchNumber": "", "brand": "", "amount": "", "unit": null, "remark": "", "checked": "on"};
-	const [onShelfTime, setOnSelfTime] = useState([]);
+	const [onShelfTime, setOnSelfTime] = useState([{}]);
 	const [addTimes, setAddTimes] = useState("");
+	const [lowTimes, setLowTimes] = useState("");
 	const [productList, setProductList] = useState([]);
 	const [method, setMethod] = useState([]);
-	const [product, setProduct] = useState([]);
+	const [product, setProduct] = useState([{}]);
 	const [MFG, setMFG] = useState(null);
 	const column_names = ['選取', '進料日期', '數量', '選取數量', '單位'];
 	const display_column_name = ['進貨品名', '進貨日期', '數量', '單位', '刪除'];
@@ -116,6 +119,7 @@ const AddResume = () => {
 	const [unit, setUnit] = useState([]);
 	const [traceId, setTraceId] = useState(-1);
 	const history = useHistory();
+	const location = useLocation();
 
 	const close = () => {
 		setIsOpen(false);
@@ -130,14 +134,14 @@ const AddResume = () => {
 	}
 
 	const check = async () => {
-		console.log(amount)
+		
 		if (MFG === null) {
 			setCheckMessage("請選擇日期");
 			setIsOpenCheck(true);
-		} else if (product.length === 0) {
+		} else if (product[0]['value'] === undefined) {
 			setCheckMessage("請選擇商品");
 			setIsOpenCheck(true);
-		} else if (onShelfTime.length === 0){
+		} else if (onShelfTime[0]['value'] === undefined){
 			setCheckMessage("請選擇上架時段");
 			setIsOpenCheck(true);
 		} else if (addTimes === "" || addTimes === "0") {
@@ -157,7 +161,7 @@ const AddResume = () => {
 			}
 			try {
 				const response = await request.post(`/trace/create`, {
-					product_id: product[0].value,
+					product_id: product[0]['value'],
 					amount: amount,
 					create_date: MFG,
 					time_period: onShelfTime,
@@ -173,6 +177,23 @@ const AddResume = () => {
 	
 	const handleDate = ({ date }) => {
 		setMFG(date);
+		if (product[0]['value'] !== undefined && onShelfTime[0]['value'] !== undefined)
+			getLowAddTimes("MFG", date);	
+	}
+
+	const handleProduct = ({ value }) => {
+	
+		product[0] = value[0];
+		setProduct(value);
+		if (MFG !== null && onShelfTime[0]['value'] !== undefined)
+			getLowAddTimes("product", product[0]['value']);
+	}
+
+	const handleSelfTime = ({ value }) => {
+		onShelfTime[0] = value[0];
+		setOnSelfTime(value);
+		if (MFG !== null && product[0]['value'] !== undefined)
+			getLowAddTimes("shelfTime", onShelfTime[0]['value']);
 	}
 
 	const handleFoodChange = (e) => {
@@ -274,6 +295,22 @@ const AddResume = () => {
 			setIsOpenCommodity(true);
 		}
 		
+	}
+
+	const getLowAddTimes = (type, data) => {
+		let resumes = location.state['data'];
+		let date = type==="MFG"? data: MFG
+		setLowTimes("0");
+		for (let i = 0; i < resumes.length; i++) {
+			let resume = resumes[i];
+			console.log(dayjs(resume.create_date).format("YYYY-MM-DD"))
+			if (dayjs(date).format("YYYY-MM-DD") === dayjs(resume.create_date).format("YYYY-MM-DD") && product[0]['label'] === resume.product_name && onShelfTime[0]['value'] === resume.time_period) {
+				let times = (parseInt(resume.batch) + 1).toString()
+				setLowTimes(times);
+				setAddTimes(times);
+				break;
+			}
+		}
 	}
 
 	const handleSubmit = async () => {
@@ -562,7 +599,6 @@ const AddResume = () => {
           			Dialog: {
             			style: {
               				width: '80vw',
-              				height: '65vh',
               				display: 'flex',
               				flexDirection: 'column',
            		},},}}>
@@ -616,7 +652,7 @@ const AddResume = () => {
 									placeholder="選擇"
 									value={product}
 									searchable={false}
-									onChange={({value}) => setProduct(value)}
+									onChange={handleProduct}
 									disabled={isCheck? true: false}
 								/>
 							</ContentBox>
@@ -631,7 +667,7 @@ const AddResume = () => {
 									placeholder='選擇'
 									value={onShelfTime}
 									searchable={false}
-									onChange={({value}) => setOnSelfTime(value)}
+									onChange={handleSelfTime}
 									disabled={isCheck? true: false}
 								/>
 							</ContentBox>
@@ -642,6 +678,8 @@ const AddResume = () => {
 									type = 'Number'  
 									onChange = {(e) => {setAddTimes(e.target.value)}}
 									height = {'45px'}
+									min = {lowTimes}
+									value = {addTimes}
 									disabled={isCheck? true: false}
 								/>
 							</ContentBox>
