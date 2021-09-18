@@ -239,8 +239,10 @@ const AddPurchasing = () => {
         note: newVendor["note"],
       });
       const data = response.data;
+      
       if (data.status === 1) {
-        vendorList.push({value: vendorList.length, label: newVendor["vendor_name"]});
+        vendorList.push({value: data.vendor_id, label: newVendor["vendor_name"]});
+        console.log(vendorList);
         setVendorList(vendorList);
       } else if (data.status === 0) {
         console.log(data.message);

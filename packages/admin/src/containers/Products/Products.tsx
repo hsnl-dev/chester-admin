@@ -201,10 +201,12 @@ const Products = () => {
       const product_unit_arr = result.data.options.product_unit;
       const weight_unit_arr = result.data.options.weight_unit;
       const storage_arr = result.data.options.storage;
+      let temp = [];
       for (let i = 0; i < product_arr.length; i++) {
-        displayTemp.push({'index': i, 'product_no': product_arr[i]['product_no'], 'name': product_arr[i]['name'], 'price': product_arr[i]['price'], 'spec': product_arr[i]['spec'], "activate": product_arr[i]['activate']});
+        temp.push({'index': i, 'product_no': product_arr[i]['product_no'], 'name': product_arr[i]['name'], 'price': product_arr[i]['price'], 'spec': product_arr[i]['spec'], "activate": product_arr[i]['activate']});
       }
-      setDisplayProducts(displayTemp);
+      setDisplayTemp(temp);
+      setDisplayProducts(temp);
       setProducts(product_arr);
       setProductUnit(product_unit_arr);
       setWeightUnit(weight_unit_arr);

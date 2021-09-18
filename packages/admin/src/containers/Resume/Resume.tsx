@@ -15,6 +15,7 @@ import NoResult from '../../components/NoResult/NoResult';
 import { Heading, StyledTable, StyledTd, StyledTh, StyledButtonBox, SubHeadingLeft, SubHeadingRight, Title } from '../../components/DisplayTable/DisplayTable';
 import { ADDRESUME, VIEWRESUME } from '../../settings/constants';
 import { request } from '../../utils/request';
+import { useLocation } from 'react-router-dom';
 
 const Col = withStyle(Column, () => ({
 	'@media only screen and (max-width: 574px)': {
@@ -250,10 +251,12 @@ const Resume = () => {
 			const result = await request.get(`/trace`);
 			const resume_arr = result.data;
 			console.log(resume_arr);
+			let temp = [];
 			for (let i = 0; i < resume_arr.length; i++) {
-				displayTemp.push({'index': i, 'date': resume_arr[i]['create_date'], 'number': resume_arr[i]['trace_no'], 'name': resume_arr[i]['product_name']});
+				temp.push({'index': i, 'date': resume_arr[i]['create_date'], 'number': resume_arr[i]['trace_no'], 'name': resume_arr[i]['product_name']});
 			}
-			setDisplayInfo(displayTemp);
+			setDisplayTemp(temp);
+			setDisplayInfo(temp);
 			setResumes(resume_arr);
 		} catch (err) {
 			console.log(err);
@@ -339,7 +342,8 @@ const Resume = () => {
 						<ButtonBox>
 							<Button margin='5px' width='80px' height='45px' background_color='#FF902B' color={'#FFFFFF'} 
 								onClick={() => history.push({
-								pathname: ADDRESUME
+									pathname: ADDRESUME,
+									state: {data: resumes}
 								})}>
 								新增
 							</Button>
