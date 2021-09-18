@@ -84,7 +84,7 @@ interface LocationState {
 };
 
 const AddPurchasing = () => {
-  const itemsInfoTemp = {"name": "", "batchNumber":"", "origin": "", "brand": "", "amount": "", "unit": "g", "PD": null, "Exp": null, "unitPrice": "", "totalPrice": "", "remark": ""};
+  const itemsInfoTemp = {"name": "", "batchNumber":"", "origin": "", "brand": "", "amount": "", "unit": "g", "PD": null, "Exp": null, "unitPrice": "", "totalPrice": "", "remark": "", "period": null, "periodDisable": true};
   const [vendor, setVendor] = useState([]);
   const [newVendor, setNewVendor] = useState({"vendor_name": "", "note": ""});
   const [vendorList, setVendorList] = useState([]);
@@ -148,6 +148,12 @@ const AddPurchasing = () => {
       let totalPrice = amount* unitPrice;
       itemsInfo[index].totalPrice = String(totalPrice);
     }
+    if (type === "brand") {
+      if (e.target.value === "三光米")
+        itemsInfo[index].periodDisable = false;
+      else
+        itemsInfo[index].periodDisable = true;
+    }
     setItemsInfo([...itemsInfo]);
   }
 
@@ -169,7 +175,8 @@ const AddPurchasing = () => {
           EXP: moment(element.Exp).format("YYYY-MM-DD"),
           unit_price: element.unitPrice,
           gross_price: element.totalPrice,
-          note: element.remark
+          note: element.remark,
+          produce_period: element.period
         });
         history.push(PURCHASING);
         if (response) {
@@ -390,16 +397,15 @@ const AddPurchasing = () => {
                     <Heading>新增品項</Heading>
                     <RowBox>
                       <InputBox><Text>進貨品名</Text><Input id={"name_" + index} placeholder="輸入品名"/></InputBox>
-                      
                       <InputBox><Text>溯源履歷號碼</Text><Input id={"traceNumber_" + index}   placeholder="輸入溯源履歷號碼"/></InputBox>
                     </RowBox>
                     <RowBox>
                       <InputBox><Text>原產地</Text><Input id={"origin_" + index} placeholder="輸入原產地"/></InputBox>
-                      <InputBox></InputBox>
+                      <InputBox><Text>品牌</Text><Input id={"brand_" + index} placeholder="輸入品牌"/></InputBox>
                     </RowBox>
                     <RowBox>
                       <InputBox><Text>批號</Text><Input id={"batchNumber_" + index} placeholder="輸入批號"/></InputBox>
-                      <InputBox><Text>品牌</Text><Input id={"brand_" + index} placeholder="輸入品牌"/></InputBox>
+                      <InputBox><Text>幾年幾期</Text><Input id={"period_" + index} placeholder="輸入三光米幾年幾期" disabled={itemsInfo[index]["periodDisable"]}/></InputBox>
                     </RowBox>
                     <RowBox>
                       <InputBox><Text>數量</Text><Input type="Number" id={"amount_" + index} placeholder="輸入數量"/></InputBox>

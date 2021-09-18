@@ -41,7 +41,7 @@ const ViewPruchasing = () => {
     const [vendor, setVendor] = useState({});
     const location = useLocation();
     const history = useHistory();
-    const column_names = ['進貨品名', '溯源履歷號碼', '原產地', '批號', '品牌', '數量', '單位', '製造日期', '有效日期', '單價', '總價', '備註'];
+    const column_names = ['進貨品名', '溯源履歷號碼', '原產地', '批號', '品牌', '幾年幾期', '數量', '單位', '製造日期', '有效日期', '單價', '總價', '備註'];
 
     const getInfo = async (info) => {
         // console.log(info);
@@ -85,6 +85,7 @@ const ViewPruchasing = () => {
                                 <StyledTableBodyCell>{commodities[index].origin}</StyledTableBodyCell>
                                 <StyledTableBodyCell>{commodities[index].batch_no}</StyledTableBodyCell>
                                 <StyledTableBodyCell>{commodities[index].brand}</StyledTableBodyCell>
+                                <StyledTableBodyCell>{commodities[index].produce_period}</StyledTableBodyCell>
                                 <StyledTableBodyCell>{commodities[index].amount}</StyledTableBodyCell>
                                 <StyledTableBodyCell>{commodities[index].unit}</StyledTableBodyCell>
                                 <StyledTableBodyCell>{dayjs(commodities[index].MFG).format('YYYY-MM-DD')}</StyledTableBodyCell>
