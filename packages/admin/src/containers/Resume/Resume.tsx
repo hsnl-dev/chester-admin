@@ -20,6 +20,7 @@ import { useReactToPrint } from 'react-to-print';
 
 import logo from '../../assets/image/parts/Logo.jpg';
 
+import QRCode from 'react-qr-code';
 
 const Col = withStyle(Column, () => ({
 	'@media only screen and (max-width: 574px)': {
@@ -223,6 +224,13 @@ const Resume = () => {
 				element.labelAmount = 0
 			});
 			setMachines(restoreMachine);
+
+			// generate QR code
+			for (var element of print_arr) {
+				const url = `http://localhost:3000/realFood/${selectId}-${element.machine_id}`;
+				// <QRCode value=url />
+			}
+
 		} catch (err) {
 			console.log(err);
 		}
