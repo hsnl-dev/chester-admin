@@ -13,14 +13,9 @@ import Input from '../../components/Input/Input';
 import { Grid, Row, Col as Column } from '../../components/FlexBox/FlexBox';
 import NoResult from '../../components/NoResult/NoResult';
 import { Heading, StyledTable, StyledTd, StyledTh, StyledButtonBox, SubHeadingLeft, SubHeadingRight, Title } from '../../components/DisplayTable/DisplayTable';
-import { ADDRESUME, VIEWRESUME } from '../../settings/constants';
+import { ADDRESUME, VIEWRESUME, LABEL } from '../../settings/constants';
 import { request } from '../../utils/request';
 import { useLocation } from 'react-router-dom';
-import { useReactToPrint } from 'react-to-print';
-
-import logo from '../../assets/image/parts/Logo.jpg';
-
-import QRCode from 'react-qr-code';
 
 const Col = withStyle(Column, () => ({
 	'@media only screen and (max-width: 574px)': {
@@ -98,45 +93,6 @@ const RowBox = styled('div', () => ({
 	padding: '0px'
 }));
 
-const LabelBox = styled('div', () => ({
-	width: '425px',
-	height: '350px',
-	backgroundColor: '#D3D3D3',
-	display: 'flex',
-	flexDirection: 'column',
-	alignItems: 'center',
-	justifyContent: 'center'
-	
-}))
-
-const Label = styled('div', () => ({
-	display: 'flex',
-	flexDirection: 'column',
-	width: '375px',
-	height: '300px',
-	backgroundColor: '#FFFFFF',
-}));
-
-const LabelRow = styled('div', () => ({
-	display: 'flex',
-	flexDirection: 'Row',
-	alignItems: 'center',
-	justifyContent: 'space-between',
-	padding: '5px'
-}));
-
-const LabelText = styled('div', () => ({
-	fontFamily: "Microsoft JhengHei",
-	fontWeight: '400'
-}));
-
-const LabelProductBox = styled('div', () => ({
-	display: 'flex',
-	flexDirection: 'column',
-	justifyContent: 'flex-start',
-	padding: '10px'
-}));
-
 const Resume = () => {
 	const amountSelectOptions = [
 			{ value: 10, label: '10' },
@@ -155,18 +111,18 @@ const Resume = () => {
 	const [displayAmount, setDisplayAmount] = useState([]);
 	const [resumes, setResumes] = useState([]);
 	const [selectId, setSelectId] = useState();
+	const [selectProduct, setSelectProduct] = useState({});
+	const [MFG, setMFG] = useState('');
+	const [storeName, setStoreName] = useState('');
 	const [isOpen, setIsOpen] = useState(false);
 	const [isOpenLabel, setIsOpenLabel] = useState(false);
+	const [isOpenPrint, setIsOpenPrint] = useState(false);
 	const [labelAction, setLabelAction] = useState([labelOptions[0]]);
 	const [labelAmount, setLabelAmount] = useState();
 	const [machines, setMachines] = useState([]);
 	const [searchName, setSearchName] = useState("");
 	const [searchDate, setSearchDate] = useState(null)
 	const history = useHistory();
-	const componentRef = useRef();
-	const handlePrint = useReactToPrint({
-		content: () => componentRef.current,
-	});
 
 	const close = () => {
 		setIsOpen(false);
@@ -176,33 +132,19 @@ const Resume = () => {
 		setIsOpenLabel(false);
 	}
 
-	class ComponentToPrint extends React.PureComponent {
-		render() {
-		  return (
-			<Label>
-				<LabelRow>
-					<img src={logo} width='215' height='80'/>
-					<LabelText>查看商品履歷請掃碼</LabelText>
-				</LabelRow>
-				<LabelProductBox>
-					<LabelText>商品名稱: 雞腿便當</LabelText>
-					<LabelText>{' '}</LabelText>
-					<LabelText>製造日期: 2020/01/01</LabelText>
-					<LabelText>保存期限: 2020/01/01</LabelText>
-					<LabelText>履歷號碼: 01234</LabelText>
-				</LabelProductBox>
-			</Label>
-		  );
-		}
-	  }
+	const closePrint = () => {
+		setIsOpenPrint(false);
+	}
 
 	const submitLabel = async () => {
 		try {
+			console.log(machines)
 			const total_amount = machines.map(element => parseInt(element.labelAmount))
 										.filter(element => Number.isInteger(element))
 										.reduce((a, b) => a+b);
 			const print_arr = machines.map(function(element) {
 				return {
+					"machine_name": element.machine_name,
 					"machine_id": element.machine_id,
 					"amount": parseInt(element.labelAmount)
 				}
@@ -224,12 +166,23 @@ const Resume = () => {
 				element.labelAmount = 0
 			});
 			setMachines(restoreMachine);
+			let data = [];
 
-			// generate QR code
-			for (var element of print_arr) {
-				const url = `http://localhost:3000/realFood/${selectId}-${element.machine_id}`;
-				// <QRCode value=url />
-			}
+			print_arr.forEach(element => {
+				for (let i = 0; i < element.amount; i++) {
+					data.push({
+						'name': selectProduct['name'], 
+						'traceNumber': selectId, 
+						'store': storeName, 
+						'MFG': MFG, 
+						'storeMethod': selectProduct['storage'] + '/' + selectProduct['shelflife'] + selectProduct['shelflife_unit'], 
+						'machine': element.machine_name,  
+						'url': `http://localhost:3000/realFood/${selectId}-${element.machine_id}`
+					})
+				}
+			});
+
+			history.push(LABEL, [data]);
 
 		} catch (err) {
 			console.log(err);
@@ -298,8 +251,24 @@ const Resume = () => {
 		}
 	}
 
+	const getProduct = async (product_id) => {
+		try {
+			const result = await request.get(`/product/${product_id}/view`);
+			setSelectProduct(result.data);
+			console.log(result.data);
+			
+			const result2 = await request.get(`/users`);
+			setStoreName(result2.data.partner.name)
+		
+		} catch (err) {
+			console.log(err);
+		}
+	}
+
 	const manageLabel = (e) => {
 		const resume_id = resumes[e.target.id]['trace_no'];
+		setMFG(dayjs(resumes[e.target.id]['create_date']).format('YYYY-MM-DD'))
+		getProduct(resumes[e.target.id]['product_id'])
 		setSelectId(resume_id);
 		setIsOpenLabel(true);
 	}
@@ -362,7 +331,7 @@ const Resume = () => {
 			<Modal onClose={closeLabel} isOpen={isOpenLabel}>
 				<ModalHeader>標籤管理</ModalHeader>
 				<ModalBody>
-					{/* <SelectBox>
+					<SelectBox>
 						<Text>選擇列印動作</Text>
 						<Select
 							options = {labelOptions}
@@ -386,14 +355,12 @@ const Resume = () => {
 								</InputBox>
 							</RowBox>
 						);
-					})} */}
-					<LabelBox>
-						<ComponentToPrint ref={componentRef} />
-					</LabelBox>
+					})}
+					
 				</ModalBody>
 				<ModalFooter>
 					<Button background_color={'#616D89'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={closeLabel}>取消</Button>
-					<Button background_color={'#FF902B'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={handlePrint}>確定</Button>
+					<Button background_color={'#FF902B'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={submitLabel}>確定</Button>
 				</ModalFooter>
 			</Modal>
 			<Row>

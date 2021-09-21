@@ -92,7 +92,7 @@ const AddResume = () => {
 		{ value: 'kg', label: 'kg' },
 		{ value: 'ml', label: 'ml' },
 	];
-	const commodityFormat = {"id": "", "date": dayjs(new Date()).format("YYYY-MM-DD"), "name": "", "traceNumber": "", "origin": "", "batchNumber": "", "brand": "", "amount": "", "unit": null, "remark": "", "checked": "on"};
+	const commodityFormat = {"id": "", "date": dayjs(new Date()).format("YYYY-MM-DD"), "name": "", "traceNumber": "", "origin": "", "batchNumber": "", "brand": "", "amount": "", "unit": null, "remark": "", "checked": "on", 'period': '', 'periodDisable': true};
 	const [onShelfTime, setOnSelfTime] = useState([{}]);
 	const [addTimes, setAddTimes] = useState("");
 	const [lowTimes, setLowTimes] = useState("");
@@ -201,12 +201,12 @@ const AddResume = () => {
 		let split = e.target.id.split('_');
 		let key = split[0];
 		let index = String(split[1]);
-		let id = String(commodities[parseInt(index)].id);
+		let id = String(selectCommodities[parseInt(index)].id);
 		
 		if (keys.indexOf(id) !== -1) {
 			foodTemp[id][key] = e.target.value;
 		}	else {
-			let temp = {'id': commodities[parseInt(index)].id,'foodName': selectFood[0].value, 'checked': '', 'date': commodities[parseInt(index)].date, 'amount': '', 'unit': commodities[parseInt(index)].unit};
+			let temp = {'id': selectCommodities[parseInt(index)].id,'foodName': selectFood[0].value, 'checked': '', 'date': selectCommodities[parseInt(index)].date, 'amount': '', 'unit': selectCommodities[parseInt(index)].unit};
 			temp[key] = e.target.value;
 			foodTemp[id] = temp;
 		}
@@ -225,6 +225,12 @@ const AddResume = () => {
 	const handelCommodity = (e) => {
 		if (commodityTemp.id === "") {
 			commodityTemp.id = String(commodities.length);
+		}
+		
+		if (e.target.id === "brand") {
+			console.log(e.target.id)
+				commodityTemp['periodDisable'] = false;
+			
 		}
 		commodityTemp[e.target.id] = e.target.value;
 		setCommodityTemp(commodityTemp);
@@ -257,14 +263,12 @@ const AddResume = () => {
 			setIsOpenCheck(true);
 		} else {
 			commodityTemp["foodName"] = commodityTemp["name"];
-			console.log(commodityTemp)
 			chooseFood[addFoodName][commodityTemp.id] = commodityTemp;
 			commodities.push(commodityTemp);
 			setCommodities(commodities);
 			setChooseFood(chooseFood);
 			setCommodityTemp(commodityFormat);
 			closeCommodity();
-			console.log(chooseFood)
 		}
 	}
 
@@ -331,6 +335,7 @@ const AddResume = () => {
 						"batch_no": commodities[key]["batchNumber"],
 						"origin": commodities[key]["origin"],
 						"brand" : commodities[key]["brand"],
+						"produce_period": commodities[key]["period"],
 						"unit" : commodities[key]["unit"],
 						"note": commodities[key]["remark"],
 						"amount": parseFloat(value["amount"]),
@@ -352,6 +357,7 @@ const AddResume = () => {
 						"batch_no": commodities[key]["batchNumber"],
 						"origin": commodities[key]["origin"],
 						"brand" : commodities[key]["brand"],
+						"produce_period": commodities[key]["period"],
 						"unit" : commodities[key]["unit"],
 						"note": commodities[key]["remark"],
 						"amount": parseFloat(value["amount"]),
@@ -373,6 +379,7 @@ const AddResume = () => {
 						"batch_no": commodities[key]["batchNumber"],
 						"origin": commodities[key]["origin"],
 						"brand" : commodities[key]["brand"],
+						"produce_period": commodities[key]["period"],
 						"unit" : commodities[key]["unit"],
 						"note": commodities[key]["remark"],
 						"amount": parseFloat(value["amount"]),
@@ -394,6 +401,7 @@ const AddResume = () => {
 						"batch_no": commodities[key]["batchNumber"],
 						"origin": commodities[key]["origin"],
 						"brand" : commodities[key]["brand"],
+						"produce_period": commodities[key]["period"],
 						"unit" : commodities[key]["unit"],
 						"note": commodities[key]["remark"],
 						"amount": parseFloat(value["amount"]),
@@ -610,11 +618,11 @@ const AddResume = () => {
 						</RowBox>
 						<RowBox>
 							<InputBox><Text>原產地</Text><Input id={"origin"} placeholder="輸入原產地"/></InputBox>
-							<InputBox></InputBox>
+							<InputBox><Text>品牌</Text><Input id={"brand"} placeholder="輸入品牌"/></InputBox>
 						</RowBox>
 						<RowBox>
 							<InputBox><Text>批號</Text><Input id={"batchNumber"} placeholder="輸入批號"/></InputBox>
-							<InputBox><Text>品牌</Text><Input id={"brand"} placeholder="輸入品牌"/></InputBox>
+							<InputBox><Text>幾年幾期</Text><Input id={"period"} placeholder="輸入三光米幾年幾期"/></InputBox>
 						</RowBox>
 						<RowBox>
 							<InputBox><Text>數量</Text><Input type="Number" id={"amount"} placeholder="輸入數量"/></InputBox>

@@ -5,6 +5,7 @@ import {
   PRODUCTS,
   ADDPRODUCT,
   RESUME,
+  LABEL,
   ADDRESUME,
   PURCHASING,
   REPURCHASING,
@@ -39,6 +40,7 @@ const EditPurchasing = lazy(() => import('./containers/Purchasing/EditPurchasing
 const AddUser = lazy(() => import('./containers/Settings/AddUser'));
 const ViewUser = lazy(() => import('./containers/Settings/ViewUser'));
 const Resume = lazy(() => import('./containers/Resume/Resume'));
+const Label = lazy(() => import('./containers/Resume/Label'));
 const AddResume = lazy(() => import('./containers/Resume/AddResume'));
 const ViewResume = lazy(() => import('./containers/Resume/ViewResume'));
 const Orders = lazy(() => import('./containers/Orders/Orders'));
@@ -146,6 +148,13 @@ const Routes = () => {
             <AdminLayout>
               <Suspense fallback={<InLineLoader />}>
                 <Resume />
+              </Suspense>
+            </AdminLayout>
+          </PrivateRoute>
+          <PrivateRoute path={LABEL}>
+            <AdminLayout>
+              <Suspense fallback={<InLineLoader />}>
+                <Label />
               </Suspense>
             </AdminLayout>
           </PrivateRoute>
