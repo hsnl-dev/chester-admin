@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useHistory } from 'react-router';
 import { styled, withStyle } from 'baseui';
 import { Modal, ModalHeader, ModalBody, ModalFooter } from 'baseui/modal';
@@ -16,6 +16,10 @@ import { Heading, StyledTable, StyledTd, StyledTh, StyledButtonBox, SubHeadingLe
 import { ADDRESUME, VIEWRESUME } from '../../settings/constants';
 import { request } from '../../utils/request';
 import { useLocation } from 'react-router-dom';
+import { useReactToPrint } from 'react-to-print';
+
+import logo from '../../assets/image/parts/Logo.jpg';
+
 
 const Col = withStyle(Column, () => ({
 	'@media only screen and (max-width: 574px)': {
@@ -93,6 +97,45 @@ const RowBox = styled('div', () => ({
 	padding: '0px'
 }));
 
+const LabelBox = styled('div', () => ({
+	width: '425px',
+	height: '350px',
+	backgroundColor: '#D3D3D3',
+	display: 'flex',
+	flexDirection: 'column',
+	alignItems: 'center',
+	justifyContent: 'center'
+	
+}))
+
+const Label = styled('div', () => ({
+	display: 'flex',
+	flexDirection: 'column',
+	width: '375px',
+	height: '300px',
+	backgroundColor: '#FFFFFF',
+}));
+
+const LabelRow = styled('div', () => ({
+	display: 'flex',
+	flexDirection: 'Row',
+	alignItems: 'center',
+	justifyContent: 'space-between',
+	padding: '5px'
+}));
+
+const LabelText = styled('div', () => ({
+	fontFamily: "Microsoft JhengHei",
+	fontWeight: '400'
+}));
+
+const LabelProductBox = styled('div', () => ({
+	display: 'flex',
+	flexDirection: 'column',
+	justifyContent: 'flex-start',
+	padding: '10px'
+}));
+
 const Resume = () => {
 	const amountSelectOptions = [
 			{ value: 10, label: '10' },
@@ -119,6 +162,10 @@ const Resume = () => {
 	const [searchName, setSearchName] = useState("");
 	const [searchDate, setSearchDate] = useState(null)
 	const history = useHistory();
+	const componentRef = useRef();
+	const handlePrint = useReactToPrint({
+		content: () => componentRef.current,
+	});
 
 	const close = () => {
 		setIsOpen(false);
@@ -127,6 +174,26 @@ const Resume = () => {
 	const closeLabel = () => {
 		setIsOpenLabel(false);
 	}
+
+	class ComponentToPrint extends React.PureComponent {
+		render() {
+		  return (
+			<Label>
+				<LabelRow>
+					<img src={logo} width='215' height='80'/>
+					<LabelText>查看商品履歷請掃碼</LabelText>
+				</LabelRow>
+				<LabelProductBox>
+					<LabelText>商品名稱: 雞腿便當</LabelText>
+					<LabelText>{' '}</LabelText>
+					<LabelText>製造日期: 2020/01/01</LabelText>
+					<LabelText>保存期限: 2020/01/01</LabelText>
+					<LabelText>履歷號碼: 01234</LabelText>
+				</LabelProductBox>
+			</Label>
+		  );
+		}
+	  }
 
 	const submitLabel = async () => {
 		try {
@@ -287,7 +354,7 @@ const Resume = () => {
 			<Modal onClose={closeLabel} isOpen={isOpenLabel}>
 				<ModalHeader>標籤管理</ModalHeader>
 				<ModalBody>
-					<SelectBox>
+					{/* <SelectBox>
 						<Text>選擇列印動作</Text>
 						<Select
 							options = {labelOptions}
@@ -311,11 +378,14 @@ const Resume = () => {
 								</InputBox>
 							</RowBox>
 						);
-					})}
+					})} */}
+					<LabelBox>
+						<ComponentToPrint ref={componentRef} />
+					</LabelBox>
 				</ModalBody>
 				<ModalFooter>
 					<Button background_color={'#616D89'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={closeLabel}>取消</Button>
-					<Button background_color={'#FF902B'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={submitLabel}>確定</Button>
+					<Button background_color={'#FF902B'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={handlePrint}>確定</Button>
 				</ModalFooter>
 			</Modal>
 			<Row>
