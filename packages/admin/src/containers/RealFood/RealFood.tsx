@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router';
-import { Wrapper, TitleBox, ProductBox, ImageBox, InfoBox, Name, Price, Line, Head, TableBox, Table, ThOrange, ThGrey, Td, Button, BottomBox, BottomText, Arrow } from './RealFood.style';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faShieldAlt } from '@fortawesome/free-solid-svg-icons';
+import { Wrapper, TitleBox, ProductBox, ImageBox, InfoBox, Name, Price, Line, Head, TableBox, Table, ThOrange, ThGrey, Td, Button, Button2, BottomBox, BottomText, Arrow } from './RealFood.style';
 import { Link } from 'react-router-dom';
 import curveTop from '../../assets/image/parts/curveTop.png';
 import curveBottom from '../../assets/image/parts/curveBottom.png';
@@ -13,8 +15,9 @@ interface RouteParams {
 };
 
 const RealFood = () => {
-    let params = useParams<RouteParams>();
-    let testId = "2021091411testproduct001-machine001";
+	let params = useParams<RouteParams>();
+	let testId = "2021091411testproduct001-machine001";
+	const [blockHash, setBlockHash] = useState("");
 	const [name, setName] = useState("雞腿便當");
 	const [imageUrl, setImageUrl] = useState("");
 	const [price, setPrice] = useState("110");
@@ -27,7 +30,6 @@ const RealFood = () => {
 		if (data.length > 0) {
 			return (
 				<TableBox>
-                    
 					<Table>
 							<tr><ThOrange>{foodName}</ThOrange></tr>
 					</Table>
@@ -40,9 +42,22 @@ const RealFood = () => {
 							<tr>
 								<Td>{item.name}</Td>
 								<Td>{item.origin}
-								{item.url.length !== ""?
-									(<a href = {item.url} target="_blank"><Arrow><img src={arrow} width="20px" height="20px"/></Arrow></a>) 
-								:(null)}
+								{
+									item.url !== "" ? (
+										<a href = {item.url} target="_blank">
+											<Arrow><img alt="arrow" src={arrow} width="20px" height="20px"/></Arrow>
+											產銷履歷
+										</a>) 
+									: (null)
+								}
+								{
+									item.bc_url !== "" ? (
+											<a href = {item.bc_url} target="_blank">
+												<Arrow><img alt="arrow" src={arrow} width="20px" height="20px"/></Arrow>
+												區塊鏈溯源
+											</a>
+									) : (null)
+								}
 								</Td>
 							</tr>
 						))}
@@ -56,7 +71,9 @@ const RealFood = () => {
 		try {
 			const result = await request.get(`/api/${traceId}`);
 			console.log(result);
-			const data = result.data;
+			const data = result.data.data;
+			const block_hash = result.data.block_hash;
+			setBlockHash(block_hash);
 			setName(data.product_name);
 			setImageUrl(data.product_picture);
 			setPrice(data.product_price);
@@ -104,7 +121,17 @@ const RealFood = () => {
 				</InfoBox>
 			</ProductBox>
 			<Line/>
-			<Head>商品履歷</Head>
+			<Head>
+				商品履歷
+				<Button2
+					onClick={() =>
+						window.open("https://goerli.etherscan.io/tx/" + blockHash)
+					}
+				>
+					<FontAwesomeIcon icon={faShieldAlt} />
+					詳細區塊鏈資訊...
+				</Button2>
+			</Head>
 
 			{foodTable('主食', food.staple_food)}
 			{foodTable('主菜', food.main_dish)}
@@ -142,7 +169,7 @@ const RealFood = () => {
 				</Table>
 			</TableBox>
 			<Button>了解更多</Button>
-
+			
 			<BottomBox>
 				<img src={curveBottom} width="100%" />
 				<BottomText>Copyright © 2021 切斯特國際股份有限公司. All rights reserved.</BottomText>
