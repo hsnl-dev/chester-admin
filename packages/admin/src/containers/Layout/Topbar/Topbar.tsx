@@ -25,8 +25,8 @@ import {
   CloseButton,
   DrawerWrapper,
 } from './Topbar.style';
-import Logoimage from '../../../assets/image/PickBazar.png';
-import UserImage from '../../../assets/image/user.jpg';
+import Logoimage from '../../../assets/image/LogoHome.png';
+import LogoutImage from '../../../assets/image/logout.png';
 import { useDrawerDispatch } from '../../../context/DrawerContext';
 import Drawer, { ANCHOR } from '../../../components/Drawer/Drawer';
 import Sidebar from '../Sidebar/Sidebar';
@@ -101,50 +101,10 @@ const Topbar = ({ refs }: any) => {
 
       <TopbarRightSide>
         <Popover
-          content={({ close }) => <Notification data={data} onClear={close} />}
-          accessibilityType={'tooltip'}
-          placement={PLACEMENT.bottomRight}
-          overrides={{
-            Body: {
-              style: {
-                width: '330px',
-                zIndex: 2,
-              },
-            },
-            Inner: {
-              style: {
-                backgroundColor: '#ffffff',
-              },
-            },
+          onClick={() => {
+            signout();
           }}
-        >
-          <NotificationIconWrapper>
-            <NotificationIcon />
-            <AlertDot>
-              <AlertDotIcon />
-            </AlertDot>
-          </NotificationIconWrapper>
-        </Popover>
-
-        <Popover
-          content={({ close }) => (
-            <UserDropdowItem>
-              <NavLink to={STAFF_MEMBERS} exact={false} onClick={close}>
-                Staff
-              </NavLink>
-              <NavLink to={SETTINGS} exact={false} onClick={close}>
-                Settings
-              </NavLink>
-              <LogoutBtn
-                onClick={() => {
-                  signout();
-                  close();
-                }}
-              >
-                Logout
-              </LogoutBtn>
-            </UserDropdowItem>
-          )}
+              
           accessibilityType={'tooltip'}
           placement={PLACEMENT.bottomRight}
           overrides={{
@@ -162,7 +122,7 @@ const Topbar = ({ refs }: any) => {
           }}
         >
           <ProfileImg>
-            <Image src={UserImage} alt='user' />
+            <Image src={LogoutImage} alt='user' />
           </ProfileImg>
         </Popover>
       </TopbarRightSide>

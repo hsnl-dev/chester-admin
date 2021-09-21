@@ -82,17 +82,6 @@ export default withRouter(function Sidebar({
           </NavLink>
         ))}
       </MenuWrapper>
-
-      <LogoutBtn
-        onClick={() => {
-          signout();
-        }}
-      >
-        <Svg>
-          <LogoutIcon />
-        </Svg>
-        Logout
-      </LogoutBtn>
     </SidebarWrapper>
   );
 });
