@@ -168,7 +168,13 @@ const RealFood = () => {
 					<tr><Td>食品業者登錄字號: {machine.food_industry_id}</Td></tr>
 				</Table>
 			</TableBox>
-			<Button>了解更多</Button>
+			<Button 
+				onClick={() =>
+					window.open("https://lin.ee/U71tKeD")
+				}
+			>
+				了解更多
+			</Button>
 			
 			<BottomBox>
 				<img src={curveBottom} width="100%" />
