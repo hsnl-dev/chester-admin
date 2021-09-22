@@ -12,6 +12,23 @@ import ApolloClient from 'apollo-boost';
 import * as serviceWorker from './serviceWorker';
 import './theme/global.css';
 
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDIbYr1PWgESCldK_C0OYoVOQMjU_lEJig",
+  authDomain: "fresh-io.firebaseapp.com",
+  databaseURL: "https://fresh-io.firebaseio.com",
+  projectId: "fresh-io",
+  storageBucket: "fresh-io.appspot.com",
+  messagingSenderId: "51185430857",
+  appId: "1:51185430857:web:de29941c9b5ee51b09aa98",
+  measurementId: "G-9WS3L8QVF7"
+};
+
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+
 const client = new ApolloClient({
   uri: process.env.REACT_APP_API_URL,
 });
