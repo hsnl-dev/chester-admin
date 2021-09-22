@@ -15853,6 +15853,15 @@ qr.js@0.0.0:
   resolved "https://registry.yarnpkg.com/qr.js/-/qr.js-0.0.0.tgz#cace86386f59a0db8050fa90d9b6b0e88a1e364f"
   integrity sha1-ys6GOG9ZoNuAUPqQ2baw6IoeNk8=
 
+qrcode.react@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/qrcode.react/-/qrcode.react-1.0.1.tgz#2834bb50e5e275ffe5af6906eff15391fe9e38a5"
+  integrity sha512-8d3Tackk8IRLXTo67Y+c1rpaiXjoz/Dd2HpcMdW//62/x8J1Nbho14Kh8x974t9prsLHN6XqVgcnRiBGFptQmg==
+  dependencies:
+    loose-envify "^1.4.0"
+    prop-types "^15.6.0"
+    qr.js "0.0.0"
+
 qs@6.7.0:
   version "6.7.0"
   resolved "https://registry.npmjs.org/qs/-/qs-6.7.0.tgz"
@@ -16282,14 +16291,6 @@ react-papaparse@^3.17.1:
     "@types/papaparse" "^5.0.4"
     papaparse "^5.2.0"
 
-react-qr-code@^2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/react-qr-code/-/react-qr-code-2.0.2.tgz#64107c869079aceb897c97496d163720ab2820e8"
-  integrity sha512-73VGe81MgeE5FJNFgdY42ez/wPPJTHuooU3iE4CX+6F8M88O1Gg4zNA0L4bKEpoySQ0QjqreJgyXjFrG/QfsdA==
-  dependencies:
-    prop-types "^15.7.2"
-    qr.js "0.0.0"
-
 react-range@^1.8.0:
   version "1.8.9"
   resolved "https://registry.yarnpkg.com/react-range/-/react-range-1.8.9.tgz#4d8f6ed44eddbc493d3272dc5f71fab367d9efae"
@@ -16459,6 +16460,13 @@ react-text-mask@^5.4.3:
   integrity sha1-mR77QpnjDC5sLEbRP2FxaUY+DS0=
   dependencies:
     prop-types "^15.5.6"
+
+react-to-print@^2.13.0:
+  version "2.13.0"
+  resolved "https://registry.yarnpkg.com/react-to-print/-/react-to-print-2.13.0.tgz#f2422a5665e08a9186eb9f7a2fad6ad1efd9f3a0"
+  integrity sha512-JMX+HrMtBXWDh2ohPT2IeBkaGY4QpFeloXTXBA7hBK7dXJQei/UXMvQqbZHb0rqJwzAHltZ2zXevuSK/ReKI5w==
+  dependencies:
+    prop-types "^15.7.2"
 
 react-transition-group@^4.3.0:
   version "4.4.1"
