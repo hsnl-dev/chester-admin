@@ -44,13 +44,6 @@ const LabelRow = styled('div', () => ({
 	display: 'flex',
 	flexDirection: 'Row',
 	alignItems: 'center',
-	padding: '10px',
-}));
-
-const LabelCRow = styled('div', () => ({
-	display: 'flex',
-	flexDirection: 'Row',
-	alignItems: 'center',
     justifyContent: 'space-between',
 	padding: '10px',
 }));
@@ -89,19 +82,19 @@ class ComponentToPrint extends React.Component<props> {
                                 <img src={logo} width='179' height='67'/>
                                 <LabelText>查看商品履歷請掃碼</LabelText>
                             </LabelRow>
-                            <LabelCRow>
+                            <LabelRow>
                                 <LabelProductBox>
                                     <LabelText>名稱: {item.name}</LabelText>
                                     <LabelText>履歷號碼: {item.traceNumber}</LabelText>
                                     <LabelText>供應商: {item.store}</LabelText>
                                     <LabelText>製造日期: {item.MFG}</LabelText>
                                     <LabelText>保存方式: {item.storeMethod}</LabelText>
-                                    <LabelText>智飯機名稱: {item.machine}</LabelText>
+                                    <LabelText>智販機名稱: {item.machine}</LabelText>
                                 </LabelProductBox>
                                 <QRcodeBox>
                                     <QRCode value={item.url} />
                                 </QRcodeBox>
-                            </LabelCRow>
+                            </LabelRow>
                             <img src={logoBottom} width='100%' height='70' />
                         </Label>
                     )
