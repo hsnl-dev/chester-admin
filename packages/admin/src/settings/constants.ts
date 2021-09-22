@@ -9,6 +9,7 @@ export const EDITPURCHASING = '/editPurchasing';
 export const PRODUCTS = '/products';
 export const ADDPRODUCT = '/addProduct';
 export const RESUME = '/resume';
+export const LABEL='/label';
 export const ADDRESUME = '/addResume';
 export const VIEWRESUME = '/viewResume';
 export const LOGIN = '/login';

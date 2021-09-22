@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useHistory } from 'react-router';
 import { styled, withStyle } from 'baseui';
 import { Modal, ModalHeader, ModalBody, ModalFooter } from 'baseui/modal';
@@ -13,10 +13,9 @@ import Input from '../../components/Input/Input';
 import { Grid, Row, Col as Column } from '../../components/FlexBox/FlexBox';
 import NoResult from '../../components/NoResult/NoResult';
 import { Heading, StyledTable, StyledTd, StyledTh, StyledButtonBox, SubHeadingLeft, SubHeadingRight, Title } from '../../components/DisplayTable/DisplayTable';
-import { ADDRESUME, VIEWRESUME } from '../../settings/constants';
+import { ADDRESUME, VIEWRESUME, LABEL } from '../../settings/constants';
 import { request } from '../../utils/request';
 import { useLocation } from 'react-router-dom';
-import QRCode from 'react-qr-code';
 
 const Col = withStyle(Column, () => ({
 	'@media only screen and (max-width: 574px)': {
@@ -112,8 +111,12 @@ const Resume = () => {
 	const [displayAmount, setDisplayAmount] = useState([]);
 	const [resumes, setResumes] = useState([]);
 	const [selectId, setSelectId] = useState();
+	const [selectProduct, setSelectProduct] = useState({});
+	const [MFG, setMFG] = useState('');
+	const [storeName, setStoreName] = useState('');
 	const [isOpen, setIsOpen] = useState(false);
 	const [isOpenLabel, setIsOpenLabel] = useState(false);
+	const [isOpenPrint, setIsOpenPrint] = useState(false);
 	const [labelAction, setLabelAction] = useState([labelOptions[0]]);
 	const [labelAmount, setLabelAmount] = useState();
 	const [machines, setMachines] = useState([]);
@@ -129,13 +132,19 @@ const Resume = () => {
 		setIsOpenLabel(false);
 	}
 
+	const closePrint = () => {
+		setIsOpenPrint(false);
+	}
+
 	const submitLabel = async () => {
 		try {
+			console.log(machines)
 			const total_amount = machines.map(element => parseInt(element.labelAmount))
 										.filter(element => Number.isInteger(element))
 										.reduce((a, b) => a+b);
 			const print_arr = machines.map(function(element) {
 				return {
+					"machine_name": element.machine_name,
 					"machine_id": element.machine_id,
 					"amount": parseInt(element.labelAmount)
 				}
@@ -157,12 +166,23 @@ const Resume = () => {
 				element.labelAmount = 0
 			});
 			setMachines(restoreMachine);
+			let data = [];
 
-			// generate QR code
-			for (var element of print_arr) {
-				const url = `http://localhost:3000/realFood/${selectId}-${element.machine_id}`;
-				// <QRCode value=url />
-			}
+			print_arr.forEach(element => {
+				for (let i = 0; i < element.amount; i++) {
+					data.push({
+						'name': selectProduct['name'], 
+						'traceNumber': selectId, 
+						'store': storeName, 
+						'MFG': MFG, 
+						'storeMethod': selectProduct['storage'] + '/' + selectProduct['shelflife'] + selectProduct['shelflife_unit'], 
+						'machine': element.machine_name,  
+						'url': `http://localhost:3000/realFood/${selectId}-${element.machine_id}`
+					})
+				}
+			});
+
+			history.push(LABEL, [data]);
 
 		} catch (err) {
 			console.log(err);
@@ -231,8 +251,24 @@ const Resume = () => {
 		}
 	}
 
+	const getProduct = async (product_id) => {
+		try {
+			const result = await request.get(`/product/${product_id}/view`);
+			setSelectProduct(result.data);
+			console.log(result.data);
+			
+			const result2 = await request.get(`/users`);
+			setStoreName(result2.data.partner.name)
+		
+		} catch (err) {
+			console.log(err);
+		}
+	}
+
 	const manageLabel = (e) => {
 		const resume_id = resumes[e.target.id]['trace_no'];
+		setMFG(dayjs(resumes[e.target.id]['create_date']).format('YYYY-MM-DD'))
+		getProduct(resumes[e.target.id]['product_id'])
 		setSelectId(resume_id);
 		setIsOpenLabel(true);
 	}
@@ -320,6 +356,7 @@ const Resume = () => {
 							</RowBox>
 						);
 					})}
+					
 				</ModalBody>
 				<ModalFooter>
 					<Button background_color={'#616D89'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={closeLabel}>取消</Button>
