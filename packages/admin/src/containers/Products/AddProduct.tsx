@@ -119,9 +119,16 @@ const AddProduct = () => {
   }
 
   const handleProductChange = ({ value }) => {
-    setProduct(value); 
-    itemsInfo.productNumber = (value[0] !== undefined ? value[0]['label'] : null);
+    setProduct(value);
+    if (value[0] !== undefined) {
+      let temp = value[0]['label'].split('(');
+      itemsInfo.productNumber = temp[0];
+      itemsInfo.productName = temp[1].replace(')', '');
+    } else {
+      itemsInfo.productNumber = null;
+    }
     itemsInfo.productUUid = (value[0] !== undefined ? value[0]['value'] : null);
+    console.log(itemsInfo);
   }
 
   const closeImage = () => {
@@ -241,7 +248,7 @@ const AddProduct = () => {
     setUnit([{value: productInfo['weight_unit'], label: productInfo['weight_unit']}]);
     setPDUnit([{value: productInfo['shelflife_unit'], label: productInfo['shelflife_unit']}]);
     setPreservation([{value: productInfo['storage'], label: productInfo['storage']}]);
-    setProduct([{value: productInfo['product_uuid'], label: productInfo['product_no']}]);
+    setProduct([{value: productInfo['product_uuid'], label: productInfo['product_no'] + '(' + itemsInfo['productName'] + ')'}]);
     console.log(productInfo)
   }
 
@@ -250,9 +257,11 @@ const AddProduct = () => {
       try {
         const reponse = await request.get(`/product/init-list`);
         const productList = reponse.data;
+        
         console.log(productList);
         productList.forEach(element => {
-          productOptions.push({label: element.product_no, value: element.uuid});
+          const product_noName = element.product_no + '(' + element.product_name + ')';
+          productOptions.push({label: product_noName, value: element.uuid});
         });
         // console.log(productOptions);
       } catch (err) {
@@ -350,8 +359,8 @@ const AddProduct = () => {
             <Wrapper onChange={handleInfoChange}>
               <Heading>{type === "add"? "新增": type === "edit"? "編輯": "查看"}商品</Heading>
               <RowBox>
-                <InputBox><Text>商品編號</Text><Select placeholder="選擇商品編號" labelKey="label" valueKey="value" searchable={false} options={productOptions} value={product} disabled={type==="view"? true: false} onChange={handleProductChange}/></InputBox>
-                <InputBox><Text>商品名稱</Text><Input height='100%' id={"productName"} placeholder="輸入商品名稱" value={itemsInfo["productName"]} disabled={type==="view"? true: false}/></InputBox>
+                <InputBox><Text>商品編號</Text><Select placeholder="選擇商品編號" labelKey="label" valueKey="value" searchable={false} options={productOptions} value={product} disabled={type==="add"? false: true} onChange={handleProductChange}/></InputBox>
+                <InputBox></InputBox>
               </RowBox>
               <RowBox>
                 <InputBox><Text>規格</Text><Input height='100%' id={"specification"} placeholder="輸入規格" value={itemsInfo["specification"]} disabled={type==="view"? true: false}/></InputBox>
