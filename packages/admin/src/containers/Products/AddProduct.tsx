@@ -260,7 +260,7 @@ const AddProduct = () => {
         
         console.log(productList);
         productList.forEach(element => {
-          const product_noName = element.product_no + '(' + element.product_name + ')';
+          const product_noName = element.product_no + '  (' + element.product_name + ')';
           productOptions.push({label: product_noName, value: element.uuid});
         });
         // console.log(productOptions);
