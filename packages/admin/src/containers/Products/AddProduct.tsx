@@ -250,6 +250,7 @@ const AddProduct = () => {
       try {
         const reponse = await request.get(`/product/init-list`);
         const productList = reponse.data;
+        console.log(productList);
         productList.forEach(element => {
           productOptions.push({label: element.product_no, value: element.uuid});
         });
