@@ -109,7 +109,7 @@ const RealFood = () => {
 	return (
 		<Wrapper>
 			<TitleBox>
-				<img src={logo} />
+				<img src={logo} width="80%" height="80%"/>
 				<img src={curveTop} width="100%"/>
 			</TitleBox>
             
@@ -120,7 +120,7 @@ const RealFood = () => {
 					<Price>${price}</Price>
 				</InfoBox>
 			</ProductBox>
-			<Line/>
+			 <Line/>
 			<Head>
 				商品履歷
 				<Button2
@@ -174,7 +174,7 @@ const RealFood = () => {
 				}
 			>
 				了解更多
-			</Button>
+			</Button> 
 			
 			<BottomBox>
 				<img src={curveBottom} width="100%" />

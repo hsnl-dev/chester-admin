@@ -6,10 +6,12 @@ export const Wrapper = styled("div", ({ $theme }) => ({
 	display: "flex",
 	flexDirection: 'column',
 	alignItems: "center",
+	
 	backgroundColor: "#fff",
 	
 	"@media only screen and (max-width: 520px)": {
-		backgroundColor: "#fff"
+		backgroundColor: "#fff",
+		
 	}
 }));
 
@@ -25,6 +27,7 @@ export const TitleBox = styled("div", () => ({
 }));
 
 export const ProductBox = styled("div", () => ({
+	width: "100%",
 	display: "flex",
 	flexDirection: 'row',
 	justifyContent: "center",
@@ -36,7 +39,13 @@ export const ImageBox = styled("div", (props) => ({
 	height: "300px",
 	backgroundImage: "url("+ props.url +")",
 	backgroundSize: 'cover',
-	borderRadius: '10px'
+	borderRadius: '10px',
+
+	"@media only screen and (max-width: 520px)": {
+		width: "250px",
+		height: "150px",
+	}
+
 }));
 
 export const InfoBox = styled("div", () => ({
@@ -44,7 +53,11 @@ export const InfoBox = styled("div", () => ({
 	height: "300px",
 	display: "flex",
 	flexDirection: 'column',
-	paddingLeft: "1%"
+	paddingLeft: "1%",
+	"@media only screen and (max-width: 520px)": {
+		width: "100px",
+		height: "60px",
+	}
 }));
 
 export const Name = styled("h2", () => ({
@@ -68,7 +81,10 @@ export const Line = styled("div", () => ({
 	width: "1000px",
 	height: "10px",
 	marginTop: '100px',
-	marginBottom: '100px'
+	marginBottom: '100px',
+	"@media only screen and (max-width: 520px)": {
+		width: "100%",
+	}
 }));
 
 export const Head = styled("h2", () => ({
@@ -78,6 +94,12 @@ export const Head = styled("h2", () => ({
 	marginTop: "40px",
 	width: "1000px",
 	display: "flex",
+
+	"@media only screen and (max-width: 520px)": {
+		width: "70%",
+		fontSize: "28px",
+		
+	}
 }));
 
 export const Note = styled("h3", () => ({
@@ -87,14 +109,22 @@ export const Note = styled("h3", () => ({
 }));
 
 export const TableBox = styled("div", () => ({
-	marginTop: "40px"
+	marginTop: "40px",
+
+	"@media only screen and (max-width: 520px)": {
+		width: "70%",
+	}
 }))
 
 export const Table = styled("table", () => ({
 	width: "950px",
 	fontFamily: "Poppins",
 	fontSize: "20px",
-	borderCollapse: "collapse"
+	borderCollapse: "collapse",
+
+	"@media only screen and (max-width: 520px)": {
+		width: "100%",
+	}
 }));
 
 export const ThOrange = styled("th", () => ({
@@ -155,6 +185,10 @@ export const Button2 = styled("button", () => ({
 		borderColor: "#71869d",
 		cursor: "pointer"
 	},
+	"@media only screen and (max-width: 520px)": {
+		fontSize: "10px",
+		
+	}
 }));
 
 export const BottomBox = styled("div", () => ({
