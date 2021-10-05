@@ -310,7 +310,9 @@ const AddUser = () => {
 
     useEffect(()=>{
       getRole();
-      setCurrentUserInfo(location.state);
+      if (isEdit) {
+        setCurrentUserInfo(location.state);
+      }
       setAddressSelector(new TwCitySelector({
         el: '.city-selector-set',
         elCounty: '.county',
@@ -357,36 +359,36 @@ const AddUser = () => {
                   </InputBox>
                   <InputBox>
                     <Text>電話</Text>
-                    <Input id="phone" placeholder="輸入電話" disabled={(isEdit==true && currentRole!== 2)? false: true} value={userInfo['phone']}/>
+                    <Input id="phone" placeholder="輸入電話" disabled={(currentRole!== 2)? false: true} value={userInfo['phone']}/>
                   </InputBox>
                 </RowBox>
                 <RowBox>
                   <InputBox>
                     <Text>E-MAIL</Text>
-                    <Input id="email" placeholder="輸入E-mail" disabled={(isEdit==true && currentRole!== 2)? false: true} value={userInfo['email']}/>
+                    <Input id="email" placeholder="輸入E-mail" disabled={(currentRole!== 2)? false: true} value={userInfo['email']}/>
                   </InputBox>
                   <InputBox>
                     <Text>店家名稱</Text>
-                    <Input id="storeName" placeholder="輸入店家名稱" value={userInfo['storeName']} disabled={currentRole!==0? true: false}/>
+                    <Input id="storeName" placeholder="輸入店家名稱" value={userInfo['storeName']} disabled={isEdit && currentRole!==0? true: false}/>
                   </InputBox>
                 </RowBox>
                 <RowBox>
                   <InputBox>
                     <Text>店家電話</Text>
-                    <Input id="storePhone" placeholder="輸入店家電話" value={currentRole!==0? userInfo['storePhone']: ""} disabled={currentRole!==0? true: false}/>
+                    <Input id="storePhone" placeholder="輸入店家電話" value={currentRole!==0? userInfo['storePhone']: ""} disabled={isEdit && currentRole!==0? true: false}/>
                   </InputBox>
                   <InputBox>
                     <Text>食品業者登錄字號</Text>
-                    <Input id="regNumber" placeholder="輸入食品業者登錄字號" value={currentRole!==0? userInfo['regNumber']: ""} disabled={currentRole!==0? true: false}/>
+                    <Input id="regNumber" placeholder="輸入食品業者登錄字號" value={currentRole!==0? userInfo['regNumber']: ""} disabled={isEdit && currentRole!==0? true: false}/>
                   </InputBox>
                 </RowBox>
                 <RowBox>
                   <InputBox>
                   <Text>店家地址</Text>
                   <RowBox className="city-selector-set">
-                    <SelectAddress id="addressCity" onChange={()=>userInfo.addressDistrict = ""} className="county"/>
-                    <SelectAddress id="addressDistrict" className="district"/>
-                    <Input id="addressStreet" placeholder="輸入地址" value={currentRole!==0? userInfo['address']: ""} />
+                    <SelectAddress id="addressCity" disabled={isEdit && currentRole!==0? true: false} onChange={()=>userInfo.addressDistrict = ""} className="county"/>
+                    <SelectAddress id="addressDistrict"  disabled={isEdit && currentRole!==0? true: false} className="district"/>
+                    <Input id="addressStreet" disabled={isEdit && currentRole!==0? true: false} placeholder="輸入地址" value={currentRole!==0? userInfo['address']: ""} />
                   </RowBox>
                   </InputBox>
                   
@@ -395,7 +397,7 @@ const AddUser = () => {
                 <RowBox>
                   <InputBox>
                   <Text>備註</Text>
-                  <Input id="remark" placeholder="" value={userInfo['remark']} disabled={currentRole!==0? true: false} height="100px"/>
+                  <Input id="remark" placeholder="" value={userInfo['remark']} disabled={isEdit && currentRole!==0? true: false} height="100px"/>
                 </InputBox>
                 </RowBox>
                 
