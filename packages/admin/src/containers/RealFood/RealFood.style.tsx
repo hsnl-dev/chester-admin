@@ -207,7 +207,9 @@ export const BottomText = styled("div", () => ({
 	fontFamily: "Poppins",
 	fontSize: "20px",
 	color: '#FFFFFF', 
-	marginBottom: "80px"
+	marginBottom: "80px",
+	marginLeft: '20px',
+	marginRight: '20px',
 }));
 
 export const Arrow = styled("a", () => ({
