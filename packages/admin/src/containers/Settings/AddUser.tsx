@@ -70,6 +70,7 @@ const SelectAddress = styled('select', () => ({
 }));
 
 const authorityList = [
+  { value: '系統維護', label: '系統維護' },
   { value: '店家使用者', label: '店家使用者' },
   { value: '店家管理者', label: '店家管理者' },
 ];
@@ -126,9 +127,13 @@ const AddUser = () => {
         userInfo['authority'] = "店家管理者";
         setAuthority([{ value: '店家管理者', label: '店家管理者' }]);
       }
-      else {
+      else if (info[0]['role'] === 2){
         userInfo['authority'] = "店家使用者";
         setAuthority([{ value: '店家使用者', label: '店家使用者' }]);
+      }
+      else {
+        userInfo['authority'] = "系統維護";
+        setAuthority([{ value: '系統維護', label: '系統維護' }]);
       }
       let tmpMachines = [];
       info[3].forEach(element => {
@@ -153,10 +158,13 @@ const AddUser = () => {
     }
 
     const handleSubmit = async () => {
-      let role = 2;
+      let role = 0;
       if (userInfo.authority === "店家管理者") {
         role = 1;
-      } 
+      }
+      else if (userInfo.authority === "店家使用者") {
+        role = 2;
+      }
       console.log(role);
       let response;
       try {
@@ -339,8 +347,7 @@ const AddUser = () => {
                     <Input id="account" placeholder="輸入帳號" value={userInfo['account']} disabled={isEdit && currentRole !== 0? true: false}/></InputBox>
                   <InputBox>
                     <Text>權限角色</Text>
-                    {<Select id="role" placeholder="選擇" labelKey="label" valueKey="value" searchable={false} disabled={isEdit && currentRole !== 0? true: false} options={authorityList} value={authority}
-                    onChange={handleAuthority}/>}
+                    {<Select id="role" placeholder="選擇" labelKey="label" valueKey="value" searchable={false} disabled={(isEdit && currentRole !== 0) || userInfo.authority === '系統維護'? true: false} options={authorityList.slice(1)} value={authority} onChange={handleAuthority}/>}
                   </InputBox>
                 </RowBox>
                 <RowBox>
