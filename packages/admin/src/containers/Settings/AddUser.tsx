@@ -375,11 +375,11 @@ const AddUser = () => {
                 <RowBox>
                   <InputBox>
                     <Text>店家電話</Text>
-                    <Input id="storePhone" placeholder="輸入店家電話" value={currentRole!==0? userInfo['storePhone']: ""} disabled={isEdit && currentRole!==0? true: false}/>
+                    <Input id="storePhone" placeholder="輸入店家電話" value={userInfo['storePhone']} disabled={isEdit && currentRole!==0? true: false}/>
                   </InputBox>
                   <InputBox>
                     <Text>食品業者登錄字號</Text>
-                    <Input id="regNumber" placeholder="輸入食品業者登錄字號" value={currentRole!==0? userInfo['regNumber']: ""} disabled={isEdit && currentRole!==0? true: false}/>
+                    <Input id="regNumber" placeholder="輸入食品業者登錄字號" value={userInfo['regNumber']} disabled={isEdit && currentRole!==0? true: false}/>
                   </InputBox>
                 </RowBox>
                 <RowBox>
@@ -388,7 +388,7 @@ const AddUser = () => {
                   <RowBox className="city-selector-set">
                     <SelectAddress id="addressCity" disabled={isEdit && currentRole!==0? true: false} onChange={()=>userInfo.addressDistrict = ""} className="county"/>
                     <SelectAddress id="addressDistrict"  disabled={isEdit && currentRole!==0? true: false} className="district"/>
-                    <Input id="addressStreet" disabled={isEdit && currentRole!==0? true: false} placeholder="輸入地址" value={currentRole!==0? userInfo['address']: ""} />
+                    <Input id="addressStreet" disabled={isEdit && currentRole!==0? true: false} placeholder="輸入地址" value={userInfo['address']} />
                   </RowBox>
                   </InputBox>
                   
