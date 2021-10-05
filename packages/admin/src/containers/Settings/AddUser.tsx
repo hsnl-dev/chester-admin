@@ -111,20 +111,20 @@ const AddUser = () => {
 
     const setCurrentUserInfo = ( info ) => {
       console.log(info)
-      userInfo['storeName'] = info[1]['name'];
-      userInfo['storePhone'] = info[1]['phone'];
-      userInfo['regNumber'] = info[1]['food_industry_id'];
-      userInfo['addressCity'] = info[1]['address_city'];
-      userInfo['addressDistrict'] = info[1]['address_district'];
-      userInfo['addressStreet'] = info[1]['address_street'];
-      if (!isEdit) {
+      
+      if (isEdit) {
+        userInfo['storeName'] = info[1]['name'];
+        userInfo['storePhone'] = info[1]['phone'];
+        userInfo['regNumber'] = info[1]['food_industry_id'];
+        userInfo['addressCity'] = info[1]['address_city'];
+        userInfo['addressDistrict'] = info[1]['address_district'];
+        userInfo['addressStreet'] = info[1]['address_street'];
         userInfo['user_id'] = info[0]['user_id'];
         userInfo['account'] = info[0]['username'];
         userInfo['name'] = info[0]['name'];
         userInfo['phone'] = info[0]['phone'];
         userInfo['email'] = info[0]['email'];
         userInfo['remark'] = info[1]['note'];
-      } else {
         if (info[0]['role'] === 1) {
           userInfo['authority'] = "店家管理者";
           setAuthority([{ value: '店家管理者', label: '店家管理者' }]);
@@ -371,26 +371,26 @@ const AddUser = () => {
                   </InputBox>
                   <InputBox>
                     <Text>店家名稱</Text>
-                    <Input id="storeName" placeholder="輸入店家名稱" value={userInfo['storeName']} disabled={true}/>
+                    <Input id="storeName" placeholder="輸入店家名稱" value={userInfo['storeName']}/>
                   </InputBox>
                 </RowBox>
                 <RowBox>
                   <InputBox>
                     <Text>店家電話</Text>
-                    <Input id="storePhone" placeholder="輸入店家電話" value={userInfo['storePhone']} disabled={true}/>
+                    <Input id="storePhone" placeholder="輸入店家電話" value={userInfo['storePhone']} />
                   </InputBox>
                   <InputBox>
                     <Text>食品業者登錄字號</Text>
-                    <Input id="regNumber" placeholder="輸入食品業者登錄字號" value={userInfo['regNumber']} disabled={true}/>
+                    <Input id="regNumber" placeholder="輸入食品業者登錄字號" value={userInfo['regNumber']}/>
                   </InputBox>
                 </RowBox>
                 <RowBox>
                   <InputBox>
                   <Text>店家地址</Text>
                   <RowBox className="city-selector-set" >
-                    <SelectAddress id="addressCity" disabled={true} data-value={userInfo['addressCity']} onChange={()=>userInfo.addressDistrict = ""} className="county"/>
-                    <SelectAddress id="addressDistrict"  disabled={true} data-value={userInfo['addressDistrict']} className="district"/>
-                    <Input id="addressStreet" disabled={true}  placeholder="輸入地址" value={userInfo['addressStreet']} />
+                    <SelectAddress id="addressCity" data-value={userInfo['addressCity']} onChange={()=>userInfo.addressDistrict = ""} className="county"/>
+                    <SelectAddress id="addressDistrict"  data-value={userInfo['addressDistrict']} className="district"/>
+                    <Input id="addressStreet"  placeholder="輸入地址" value={userInfo['addressStreet']} />
                   </RowBox>
                   </InputBox>
                   
