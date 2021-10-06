@@ -167,17 +167,17 @@ const Resume = () => {
 			});
 			setMachines(restoreMachine);
 			let data = [];
-
+			console.log(print_arr)
 			print_arr.forEach(element => {
 				for (let i = 0; i < element.amount; i++) {
 					data.push({
 						'name': selectProduct['name'], 
-						'traceNumber': selectId, 
+						'traceNumber': String(selectId).slice(0, 10), 
 						'store': storeName, 
 						'MFG': MFG, 
 						'storeMethod': selectProduct['storage'] + '/' + selectProduct['shelflife'] + selectProduct['shelflife_unit'], 
 						'machine': element.machine_name,  
-						'url': `http://localhost:3000/realFood/${selectId}-${element.machine_id}`
+						'url': `https://app.realfoodtw.com/realFood/${selectId}-${element.machine_id}`
 					})
 				}
 			});
