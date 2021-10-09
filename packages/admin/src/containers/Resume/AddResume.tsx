@@ -479,20 +479,20 @@ const AddResume = () => {
 
 	async function getProductList() {
 		try {
-			const result = await request.get(`/product`);
-			const product_arr = result.data.products;
+			const result = await request.get(`/product/activate-product`);
+			const product_arr = result.data;
 			console.log(product_arr);
 			let product_list = [];
-      		product_arr.forEach(element => {
+      product_arr.forEach(element => {
 				product_list.push({
 					value: element.id,
 					label: element.name
 				});
 			});
 			console.log(product_list);
-      		setProductList(product_list);
+      	setProductList(product_list);
     	} catch (err) {
-      		console.log(err);
+      	console.log(err);
     	}
 	}
 

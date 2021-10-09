@@ -62,9 +62,7 @@ export default function Settings() {
   const [isOpen, setIsOpen] = useState(false);
   const [userActivate, setUserActivate] = useState();
   const [role, setRole] = useState([-1]);
-  const [partnerData, setPartnerData] = useState([]);
   const [machines, setMachines] = useState([]);
-  const data = [{'account': '123456789','name': 'ABC', 'authority': '店家管理者'}];
   const history = useHistory();
 
   const close = () => {
@@ -169,8 +167,6 @@ export default function Settings() {
       setDisplayMembers(displayTemp);
       setMembers(member_arr);
       setPartner(result.data['partner']);
-      const partner_data = result.data.partner;
-      setPartnerData(partner_data);
       const result2 = await request.get(`/users/partner-machines`);
       setMachines(result2.data);
     } catch (err) {
