@@ -109,6 +109,7 @@ const ImportPurchasing = () => {
           batch_no: element.data.batch_no,
           origin: element.data.origin,
           brand: element.data.brand,
+          produce_period: element.data.produce_period,
           amount: element.data.amount,
           unit: element.data.unit,
           MFG: moment(element.data.MFG).format("YYYY-MM-DD"),
