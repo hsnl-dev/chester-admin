@@ -219,7 +219,10 @@ const RePurchasing = () => {
         update_amount = result;
       }
     }
-    commodities[selectIndex]['amount'] = update_amount;
+    commodities[selectIndex]['amount'] = Number(update_amount);
+    if (commodities[selectIndex]['amount'] === 0) {
+      commodities.splice(selectIndex, 1);
+    }
     setCommodities([...commodities]);
     close();
   } 
@@ -307,7 +310,8 @@ const RePurchasing = () => {
               </StyledTableHeadRow>
               {commodities.map((item) => Object.values(item))
                 .map((row: Array<string>, index) => (
-                  <StyledTableBodyRow>
+                  commodities[index].amount !== 0? (
+                    <StyledTableBodyRow>
                     <StyledTableBodyCell>{commodities[index].name}</StyledTableBodyCell>
                     <StyledTableBodyCell>{commodities[index].trace_no}</StyledTableBodyCell>
                     <StyledTableBodyCell>{commodities[index].origin}</StyledTableBodyCell>
@@ -319,7 +323,7 @@ const RePurchasing = () => {
                     <StyledTableBodyCell>{dayjs(commodities[index].MFG).format('YYYY-MM-DD')}</StyledTableBodyCell>
                     <StyledTableBodyCell>{dayjs(commodities[index].EXP).format('YYYY-MM-DD')}</StyledTableBodyCell>
                     <StyledTableBodyCell>{commodities[index].unit_price}</StyledTableBodyCell>
-                    <StyledTableBodyCell>{commodities[index].gross_price}</StyledTableBodyCell>
+                    <StyledTableBodyCell>{commodities[index].amount * commodities[index].unit_price}</StyledTableBodyCell>
                     <StyledTableBodyCell>{commodities[index].note}</StyledTableBodyCell>
                     <StyledTableBodyCell>{type === 'return'? (
                         <Button id={index} margin='5px' width='80px' height='40px' background_color='#F55252' color={'#FFFFFF'} onClick={handleOpen}>退貨</Button>
@@ -328,13 +332,20 @@ const RePurchasing = () => {
                       )}
                     </StyledTableBodyCell>
                   </StyledTableBodyRow>
+                  ):(null)
                 ))
               }
             </StyledTable>
           </StyledRoot>
           <ButtonBox>
-            <Button margin='5px' width='120px' height='45px' background_color={type === 'return'?'#616D89': '#EAF0F9'} color={type === 'return'?'#FFFFFF': '#616D89'} onClick={()=>{history.push(PURCHASING)}}>取消</Button>
+            <Button margin='5px' width='80px' height='40px' background_color={type === 'return'?'#616D89': '#EAF0F9'} color={type === 'return'?'#FFFFFF': '#616D89'} onClick={()=>{history.push(PURCHASING)}}>取消</Button>
+            {type === 'return'? (
+              <Button margin='5px' width='120px' height='40px' background_color='#F55252' color={'#FFFFFF'} onClick={() => history.push(PURCHASING)}>完成退貨</Button>
+            ):(
+              <Button margin='5px' width='120px' height='40px' background_color='#616D89' color={'#FFFFFF'} onClick={() => history.push(PURCHASING)}>完成報銷</Button>
+            )}
           </ButtonBox>
+         
         </Wrapper>
         </Col>
       </Row>

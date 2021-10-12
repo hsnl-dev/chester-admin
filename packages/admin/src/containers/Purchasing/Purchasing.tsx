@@ -194,23 +194,25 @@ const Purchasing = () => {
       const vendors_arr = result.data.vendors;
       const commodities_arr = result.data.commodities;
       let merge_data = {};
-      console.log(vendors_arr)
-      console.log(commodities_arr)
+      console.log(vendors_arr);
+      console.log(commodities_arr);
       for (let i = 0; i < commodities_arr.length; i++) {
-        let vendor;
-        for (let j = 0; j < vendors_arr.length; j++){
-          if(vendors_arr[j]['id'] === commodities_arr[i]['vendor_id']){
-            vendor = vendors_arr[j];
-            break;
+        if (commodities_arr[i]['amount'] !== 0) {
+          let vendor;
+          for (let j = 0; j < vendors_arr.length; j++){
+            if(vendors_arr[j]['id'] === commodities_arr[i]['vendor_id']){
+              vendor = vendors_arr[j];
+              break;
+            }
           }
-        }
-        let keys = Object.keys(merge_data);
-        if (keys.indexOf(vendor['id'] + '_' + dayjs(commodities_arr[i]['create_at']).format('YYYY-MM-DD')) === -1) {
-          displayTemp.push({'index': Object.keys(merge_data).length, 'vendor_id': vendor['id'], 'vendor_name': vendor['name'], 'create_at': dayjs(commodities_arr[i]['create_at']).format('YYYY-MM-DD')});
-          merge_data[vendor['id'] + '_' + dayjs(commodities_arr[i]['create_at']).format('YYYY-MM-DD')] = [commodities_arr[i]];
-        }
-        else {
-          merge_data[vendor['id'] + '_' + dayjs(commodities_arr[i]['create_at']).format('YYYY-MM-DD')].push(commodities_arr[i]);
+          let keys = Object.keys(merge_data);
+          if (keys.indexOf(vendor['id'] + '_' + dayjs(commodities_arr[i]['create_at']).format('YYYY-MM-DD')) === -1) {
+            displayTemp.push({'index': Object.keys(merge_data).length, 'vendor_id': vendor['id'], 'vendor_name': vendor['name'], 'create_at': dayjs(commodities_arr[i]['create_at']).format('YYYY-MM-DD')});
+            merge_data[vendor['id'] + '_' + dayjs(commodities_arr[i]['create_at']).format('YYYY-MM-DD')] = [commodities_arr[i]];
+          }
+          else {
+            merge_data[vendor['id'] + '_' + dayjs(commodities_arr[i]['create_at']).format('YYYY-MM-DD')].push(commodities_arr[i]);
+          }
         }
       }
       setDisplayInfo([...displayTemp]);

@@ -124,29 +124,30 @@ const EditPurchasing = () => {
         vendor['value'] = info[1].id;
         vendor['label'] = info[1].name;
         for (let i = 0; i < info[2].length; i++) {
-            vendorList.push({value: info[2][i].id, label: info[2][i].name});
+          vendorList.push({value: info[2][i].id, label: info[2][i].name});
         }
-        for (let i = 0; i < commodities.length; i++) {
-            let temp = itemsInfoTemp;
-            temp.id = commodities[i].id;
-            temp.name = commodities[i].name;
-            temp.traceNumber = commodities[i].trace_no;
-            temp.origin = commodities[i].origin;
-            temp.batchNumber = commodities[i].batch_no;
-            temp.brand = commodities[i].brand;
-            temp.amount = commodities[i].amount;
-            temp.unit = commodities[i].unit;
-            temp.PD = commodities[i].MFG;
-            temp.Exp = commodities[i].EXP;
-            temp.unitPrice = commodities[i].unit_price;
-            temp.totalPrice = commodities[i].gross_price;
-            temp.remark= commodities[i].note;
-            temp.period = commodities[i].produce_period;
-            if (temp.brand === "三光米")
-              temp.periodDisable = false;
-            itemsInfo.push(temp);
-        }
+        commodities.forEach(element => {
+          let temp = [];
+          temp['id'] = element.id;
+          temp['name'] = element.name;
+          temp['traceNumber'] = element.trace_no;
+          temp['origin'] = element.origin;
+          temp['batchNumber'] = element.batch_no;
+          temp['brand'] = element.brand;
+          temp['amount'] = element.amount;
+          temp['unit'] = element.unit;
+          temp['PD'] = element.MFG;
+          temp['Exp'] = element.EXP;
+          temp['unitPrice'] = element.unit_price;
+          temp['totalPrice'] = element.gross_price;
+          temp['remark'] = element.note;
+          temp['period'] = element.produce_period;
+          if (temp['brand'] === "三光米")
+            temp['periodDisable'] = false;
+          itemsInfo.push(temp);
+        });
         
+        console.log(itemsInfo)
         setItemsInfo([...itemsInfo]);
         setVendor({...vendor});
         console.log(vendor)
@@ -213,7 +214,6 @@ const EditPurchasing = () => {
             console.log("vendor: ", vendor['value']);
             console.log("element: ", element);
             const response = await request.post(`/commodity/${element.id}/edit`, {
-              vendor_id: vendor['value'],
               name: element.name,
               trace_no: element.traceNumber,
               batch_no: element.batchNumber,
@@ -242,55 +242,47 @@ const EditPurchasing = () => {
 
     const checkItemInfo = () => {
       let check = true;
-      if (vendor !== null) {
-        setCheckMessage("請選擇廠商");
-        setIsOpenCheck(true);
-      } else {
-        if (itemsInfo.length >= 0) {
-          for (let i = 0; i < itemsInfo.length; i++) {
-            let element = itemsInfo[i];
-            if (element.name === "") {
-              setCheckMessage("請填寫品名");
-              setIsOpenCheck(true);
-              check = false;
-              break;
-            } else if (element.origin === "") {
-              setCheckMessage("請填寫原產地");
-              setIsOpenCheck(true);
-              check = false;
-              break;
-            } else if (element.Exp === null ) {
-              setCheckMessage("請選擇有效日期");
-              setIsOpenCheck(true);
-              check = false;
-              break;
-            } else if (element.PD === null ) {
-              setCheckMessage("請選擇製造日期");
-              setIsOpenCheck(true); 
-              check = false;
-              break;
-            } else if (element.amount === "") {
-              setCheckMessage("請填寫數量");
-              setIsOpenCheck(true);
-              check = false;
-              break;
-            }
-            if (check) {
-              
-              handleSubmit();
-            }
+      if (itemsInfo.length >= 0) {
+        for (let i = 0; i < itemsInfo.length; i++) {
+          let element = itemsInfo[i];
+          if (element.name === "") {
+            setCheckMessage("請填寫品名");
+            setIsOpenCheck(true);
+            check = false;
+            break;
+          } else if (element.origin === "") {
+            setCheckMessage("請填寫原產地");
+            setIsOpenCheck(true);
+            check = false;
+            break;
+          } else if (element.Exp === null ) {
+            setCheckMessage("請選擇有效日期");
+            setIsOpenCheck(true);
+            check = false;
+            break;
+          } else if (element.PD === null ) {
+            setCheckMessage("請選擇製造日期");
+            setIsOpenCheck(true); 
+            check = false;
+            break;
+          } else if (element.amount === "") {
+            setCheckMessage("請填寫數量");
+            setIsOpenCheck(true);
+            check = false;
+            break;
           }
-          console.log(itemsInfo);
-        } else {
-          setCheckMessage("請新增品項");
-          setIsOpenCheck(true);
+          if (check) {
+            handleSubmit();
+          }
         }
+        console.log(itemsInfo);
+      } else {
+        setCheckMessage("請新增品項");
+        setIsOpenCheck(true);
       }
     }
-
     useEffect(() => {
         getInfo(location.state);
-       
     }, [])
 
     return (
