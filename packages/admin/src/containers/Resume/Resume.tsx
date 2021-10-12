@@ -308,7 +308,7 @@ const Resume = () => {
 	}
 
 	async function getMachines() {
-		const result = await request.get(`/users/partner-machines`);
+		const result = await request.get(`/users/machines`);
 		setMachines([...result.data]);
 	}
 
