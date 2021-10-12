@@ -7,9 +7,11 @@ import Button from '../../components/Button/Button';
 import { ButtonBox, Text } from '../../components/SearchCard/SearchCard';
 
 import logo from '../../assets/image/parts/Logo.jpg';
-import logoBottom from '../../assets/image/parts/LogoBottom.png';
-
+import { ReactComponent as NONGJINLIAN } from '../../assets/image/parts/logo_bottom.svg';
+import { ReactComponent as TextLogo } from '../../assets/image/parts/textLogo.svg';
+import { ReactComponent as TopLogo } from '../../assets/image/parts/Top_logo.svg';
 import QRCode from 'qrcode.react';
+
 import { useHistory, useLocation } from 'react-router-dom';
 import { useReactToPrint } from 'react-to-print';
 
@@ -35,9 +37,18 @@ const LabelBox = styled('div', () => ({
 const Label = styled('div', () => ({
 	display: 'flex',
 	flexDirection: 'column',
-	width: '400px',
-	height: '335px',
+	width: '284.53px',
+	height: '239.63px',
 	backgroundColor: '#FFFFFF',
+    paddingTop: '10px'
+}));
+
+const LabelRowP = styled('div', () => ({
+	display: 'flex',
+	flexDirection: 'Row',
+	alignItems: 'center',
+    justifyContent: 'space-between',
+	padding: '0px 20px',
 }));
 
 const LabelRow = styled('div', () => ({
@@ -45,19 +56,25 @@ const LabelRow = styled('div', () => ({
 	flexDirection: 'Row',
 	alignItems: 'center',
     justifyContent: 'space-between',
-	padding: '10px',
+	padding: '0px 5px',
 }));
+
 
 const LabelText = styled('div', () => ({
 	fontFamily: "Microsoft JhengHei",
 	fontWeight: '700',
-	paddingLeft: '10px'
+    fontSize: '8px'
+}));
+
+const BottomText = styled('div', () => ({
+	transform: 'scale(0.9)',
+	fontWeight: '700',
+    fontSize: '4px'
 }));
 
 const LabelProductBox = styled('div', () => ({
 	display: 'flex',
 	flexDirection: 'column',
-	
 }));
 
 const QRcodeBox = styled('div', () => ({
@@ -79,10 +96,10 @@ class ComponentToPrint extends React.Component<props> {
                     return (
                         <Label>
                             <LabelRow>
-                                <img src={logo} width='179' height='67'/>
+                                <img src={logo} width='125' height='37'/>
                                 <LabelText>查看商品履歷請掃碼</LabelText>
                             </LabelRow>
-                            <LabelRow>
+                            <LabelRowP>
                                 <LabelProductBox>
                                     <LabelText>名稱: {item.name}</LabelText>
                                     <LabelText>履歷號碼: {item.traceNumber}</LabelText>
@@ -92,10 +109,20 @@ class ComponentToPrint extends React.Component<props> {
                                     <LabelText>智販機名稱: {item.machine}</LabelText>
                                 </LabelProductBox>
                                 <QRcodeBox>
-                                    <QRCode value={item.url} />
+                                    <QRCode value={item.url} size={64} renderAs='svg' />
                                 </QRcodeBox>
+                            </LabelRowP>
+                            <LabelRow>
+                                <TextLogo />
                             </LabelRow>
-                            <img src={logoBottom} width='100%' height='70' />
+                            <LabelRow>
+                                <NONGJINLIAN />
+                                <LabelProductBox>
+                                    <BottomText>國立清華大學LPWAN產學小聯盟</BottomText>
+                                    <BottomText>http://lpwan.cs.nthu.edu.tw/</BottomText>
+                                </LabelProductBox>
+                            </LabelRow>
+                            
                         </Label>
                     )
                 })}
@@ -126,6 +153,7 @@ const LabelPrint = () => {
 				</Button>
 				<Button margin='5px' width='110px' height='45px' background_color='#FF902B' color={'#FFFFFF'} onClick={handlePrint}>列印</Button>
 			</ButtonBox>
+            
         </Grid>
     )
     
