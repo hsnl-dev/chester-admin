@@ -71,8 +71,8 @@ const SelectAddress = styled('select', () => ({
 
 const authorityList = [
   { value: '系統維護', label: '系統維護' },
-  { value: '店家使用者', label: '店家使用者' },
   { value: '店家管理者', label: '店家管理者' },
+  { value: '店家使用者', label: '店家使用者' },
 ];
 
 
@@ -419,7 +419,7 @@ const AddUser = () => {
                     <Input id="account" placeholder="輸入帳號" value={userInfo['account']} disabled={isEdit && currentRole !== 0? true: false}/></InputBox>
                   <InputBox>
                     <Text>權限角色</Text>
-                    {<Select id="role" placeholder="選擇" labelKey="label" valueKey="value" searchable={false} disabled={(isEdit && currentRole !== 0) || (isEdit && userInfo.authority === '系統維護')? true: false} options={authorityList.slice(1)} value={authority} onChange={handleAuthority}/>}
+                    {<Select id="role" placeholder="選擇" labelKey="label" valueKey="value" searchable={false} disabled={(isEdit && currentRole !== 1) || (isEdit && userInfo.authority === '系統維護')? true: false} options={currentRole === 0? [authorityList[1]]: authorityList.slice(1)} value={authority} onChange={handleAuthority}/>}
                   </InputBox>
                 </RowBox>
                 <RowBox>
