@@ -161,7 +161,7 @@ const AddProduct = () => {
     } else if (itemsInfo.preservation === "") {
       setCheckMessage("請選擇保存性質");
       setIsOpenCheck(true);
-    } else if (image === undefined) {
+    } else if (image === undefined && type === 'add') {
       setCheckMessage("請上傳照片");
       setIsOpenCheck(true);
     } else {
