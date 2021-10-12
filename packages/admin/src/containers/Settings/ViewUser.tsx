@@ -10,6 +10,7 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { request } from "../../utils/request";
+import TwCitySelector from 'tw-city-selector';
 
 const Col = withStyle(Column, () => ({
     '@media only screen and (max-width: 574px)': {
@@ -70,20 +71,27 @@ const InputBox = styled('div', () => ({
   marginTop: '10px',
 }));
 
+const SelectAddress = styled('select', () => ({
+  width: '50%',
+  height: '100%',
+  marginRight: '20px',
+}));
+
 const authorityList = [
+  { value: '系統維護', label: '系統維護' },
   { value: '店家使用者', label: '店家使用者' },
   { value: '店家管理者', label: '店家管理者' },
 ];
 
 const ViewUser = () => {
     const [authority, setAuthority] = useState([]);
-    const [userInfo, setUserInfo] = useState({"account": "", "authority":"", "name": "", "phone": "", "email": "", "storeName": "", "storePhone": "", "regNumber": "", "address": "", "remark": ""});
-    const [currentRole, setCurentRole] = useState();
+    const [userInfo, setUserInfo] = useState({"account": "", "authority":"", "name": "", "phone": "", "email": "", "storeName": "", "storePhone": "", "regNumber": "", "city": "", "district": "", "street": "", "remark": "", "role": 0});
     const history = useHistory();
     const location = useLocation();
     const [isEdit, setIsNew] = useState(location.state[2]);
     const [selfRole, setSelfRole] = useState();
     const [machines, setMachines] = useState([]);
+    const [addressSelector, setAddressSelector] = useState();
 
     const handleInfoChange = (e) => {
       console.log(e.target.id);
@@ -109,31 +117,55 @@ const ViewUser = () => {
       userInfo['name'] = info[0]['name'];
       userInfo['phone'] = info[0]['phone'];
       userInfo['email'] = info[0]['email'];
-      userInfo['storeName'] = info[1]['name'];
-      userInfo['storePhone'] = info[1]['phone'];
-      userInfo['regNumber'] = info[1]['food_industry_id'];
-      userInfo['address'] = info[1]['address'];
-      userInfo['remark'] = info[1]['note'];
+      userInfo['storeName'] = info[0]['partner_name'];
+      userInfo['storePhone'] = info[0]['partner_phone'];
+      userInfo['regNumber'] = info[0]['partner_fid'];
+      userInfo['addressCity'] = info[0]['partner_address_city'];
+      userInfo['addressDistrict'] = info[0]['partner_address_district'];
+      userInfo['addressStreet'] = info[0]['partner_address_street'];
+      userInfo['remark'] = info[0]['partner_note'];
+      userInfo['role'] = info[0]['role'];
       
-      setCurentRole(info[0]['role']);
       if (info[0]['role'] === 1) {
         userInfo['authority'] = "店家管理者";
         setAuthority([{ value: '店家管理者', label: '店家管理者' }]);
       }
-      else {
+      else if (info[0]['role'] === 2){
         userInfo['authority'] = "店家使用者";
         setAuthority([{ value: '店家使用者', label: '店家使用者' }]);
       }
+      else {
+        userInfo['authority'] = "系統維護";
+        setAuthority([{ value: '系統維護', label: '系統維護' }]);
+      }
+
+      console.log(info)
+      if (info[0]['role'] !== 0) {
+        getMachines(info[0]['partner_id']);
+      }
       
-      let tmpMachines = [];
-      info[2].forEach(element => {
-        tmpMachines.push({
-          "name": element.machine_name,
-          "number": element.machine_id
-        });
-      })
-      setMachines(tmpMachines);
-      console.log(tmpMachines);
+    }
+
+    const getMachines = async ( partner_id ) => {
+      const resultRole = await request.get(`/users/role`);
+      console.log(resultRole.data.role)
+      if (resultRole.data.role === 0) {
+        try {
+          const result = await request.get(`/users/${partner_id}/machines`)
+          setMachines(result.data);
+          console.log(result.data)
+        } catch (err) {
+          console.log(err);
+        }
+      } else {
+        try {
+          const result = await request.get(`/users/machines`)
+          setMachines(result.data);
+          console.log(result.data)
+        } catch (err) {
+          console.log(err);
+        }
+      }
     }
 
     const getRole = async () => {
@@ -149,6 +181,11 @@ const ViewUser = () => {
     useEffect(()=>{
       getRole();
       setCurrentUserInfo(location.state);
+      setAddressSelector(new TwCitySelector({
+        el: '.city-selector-set',
+        elCounty: '.county',
+        elDistrict: '.district',
+      }));
     }, [])
   
 
@@ -159,6 +196,31 @@ const ViewUser = () => {
                 <Title>查看</Title>
             </Col>
           </Row>
+          {userInfo.role !== 0? (
+            <Row>
+              <Col md={12}>
+                <Wrapper>
+                  <Heading>智販機</Heading>
+                  {machines.length === 0? (null):(
+                    Object(machines).map((item, index) => {
+                      return (
+                      <RowBox>
+                        <InputBox>
+                          <Text>智販機名稱</Text>
+                          <Input id={"name_" + index} disabled={true} value={item.machine_name}/>
+                        </InputBox>
+                        <InputBox>
+                          <Text>智販機編號</Text>
+                          <Input id={"number_" + index} disabled={true} value={item.machine_id}/>
+                        </InputBox>
+                      </RowBox>
+                    )})
+                  )}
+                </Wrapper>
+              </Col>
+            </Row>
+          ):(null)}
+          
           <Row>
             <Col md={12}>
               <Wrapper>
@@ -205,8 +267,12 @@ const ViewUser = () => {
                 </RowBox>
                 <RowBox>
                   <InputBox>
-                    <Text>地址</Text>
-                    <Input id={"address"} placeholder="輸入地址" value={userInfo['address']} disabled={true}/>
+                  <Text>店家地址</Text>
+                  <RowBox className="city-selector-set" >
+                    <SelectAddress id="addressCity" data-value={userInfo['addressCity']} className="county" disabled={true} />
+                    <SelectAddress id="addressDistrict"  data-value={userInfo['addressDistrict']} className="district" disabled={true}/>
+                    <Input id="addressStreet"  placeholder="輸入地址" value={userInfo['addressStreet']} disabled={true} />
+                  </RowBox>
                   </InputBox>
                 </RowBox>
                 <RowBox>

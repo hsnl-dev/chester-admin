@@ -49,6 +49,7 @@ const RowBox = styled('div', () => ({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'space-between',
+  alignItems: 'center',
   width: '100%',
   marginTop: '10px',
 }));
@@ -66,7 +67,6 @@ const SelectAddress = styled('select', () => ({
   width: '50%',
   height: '100%',
   marginRight: '20px',
-
 }));
 
 const authorityList = [
@@ -79,20 +79,26 @@ const authorityList = [
 
 const AddUser = () => {
     const [authority, setAuthority] = useState([]);
-    const [userInfo, setUserInfo] = useState({"account": "", "authority":"", "name": "", "phone": "", "email": "", "storeName": "", "storePhone": "", "regNumber": "", "addressCity": "", "addressDistrict": "", "addressStreet": "", "remark": ""});
+    const [userInfo, setUserInfo] = useState({"account": "", "authority":"", "name": "", "phone": "", "email": "", "storeName": "", "storePhone": "", "regNumber": "", "addressCity": "", "addressDistrict": "", "addressStreet": "", "remark": "", 'partner_id': 0});
     const [currentRole, setCurrentRole] = useState();
     const history = useHistory();
     const location = useLocation();
-    const [isEdit, setIsNew] = useState(location.state[2]);
+    const [isEdit, setIsEdit] = useState(location.state[2]);
     const [isOpenCheck, setIsOpenCheck] = useState(false);
+    const [isMachineOpenCheck, setIsMachineOpenCheck] = useState(false);
     const [checkMessage, setCheckMessage] = useState("");
+    const [checkTitle, setCheckTitle] = useState("");
     const [machines, setMachines] = useState([]);
+    const [newMachine, setNewMachine] = useState({'name': '', 'id': ''});
     const [existMachines, setExistMachines] = useState([]);
-    const [selfRole, setSelfRole] = useState();
     const [addressSelector, setAddressSelector] = useState();
 
     const closeCheck = () => {
       setIsOpenCheck(false);
+    }
+
+    const closeMachineCheck = () => {
+      setIsMachineOpenCheck(false);
     }
 
     const handleInfoChange = (e) => {
@@ -113,18 +119,20 @@ const AddUser = () => {
       console.log(info)
       
       if (isEdit) {
-        userInfo['storeName'] = info[1]['name'];
-        userInfo['storePhone'] = info[1]['phone'];
-        userInfo['regNumber'] = info[1]['food_industry_id'];
-        userInfo['addressCity'] = info[1]['address_city'];
-        userInfo['addressDistrict'] = info[1]['address_district'];
-        userInfo['addressStreet'] = info[1]['address_street'];
-        userInfo['user_id'] = info[0]['user_id'];
         userInfo['account'] = info[0]['username'];
         userInfo['name'] = info[0]['name'];
         userInfo['phone'] = info[0]['phone'];
         userInfo['email'] = info[0]['email'];
-        userInfo['remark'] = info[1]['note'];
+        userInfo['storeName'] = info[0]['partner_name'];
+        userInfo['storePhone'] = info[0]['partner_phone'];
+        userInfo['regNumber'] = info[0]['partner_fid'];
+        userInfo['addressCity'] = info[0]['partner_address_city'];
+        userInfo['addressDistrict'] = info[0]['partner_address_district'];
+        userInfo['addressStreet'] = info[0]['partner_address_street'];
+        userInfo['remark'] = info[0]['partner_note'];
+        userInfo['role'] = info[0]['role'];
+        userInfo['partner_id'] = info[0]['partner_id'];
+
         if (info[0]['role'] === 1) {
           userInfo['authority'] = "店家管理者";
           setAuthority([{ value: '店家管理者', label: '店家管理者' }]);
@@ -138,16 +146,33 @@ const AddUser = () => {
           setAuthority([{ value: '系統維護', label: '系統維護' }]);
         }
       }
-     
-      let tmpMachines = [];
-      info[3].forEach(element => {
-        tmpMachines.push({
-          "name": element.machine_name,
-          "number": element.machine_id
-        });
-      })
-      setExistMachines(tmpMachines);
+
+      if (info[0]['role'] !== 0 && isEdit) {
+        getMachines(info[0]['partner_id']);
+      }
       console.log(userInfo);
+    }
+
+    const getMachines = async ( partner_id ) => {
+      const resultRole = await request.get(`/users/role`);
+      console.log(resultRole.data.role)
+      if (resultRole.data.role === 0) {
+        try {
+          const result = await request.get(`/users/${partner_id}/machines`)
+          setMachines(result.data);
+          console.log(result.data)
+        } catch (err) {
+          console.log(err);
+        }
+      } else {
+        try {
+          const result = await request.get(`/users/machines`)
+          setMachines(result.data);
+          console.log(result.data)
+        } catch (err) {
+          console.log(err);
+        }
+      }
     }
 
     const getRole = async () => {
@@ -155,7 +180,6 @@ const AddUser = () => {
         const result = await request.get(`/users/role`)
         let role = result.data.role;
         setCurrentRole(role);
-        setSelfRole(role);
       } catch (err) {
         console.log(err);
       }
@@ -187,11 +211,6 @@ const AddUser = () => {
             address_street: userInfo.addressStreet,
             note: userInfo.remark
           });
-          if (response.status === 200) {
-            const response2 = await request.post(`/users/add-machines`, {
-              machines: machines
-            });
-          }
         }
         else {
           response = await request.post(`/users/create`, {
@@ -208,11 +227,6 @@ const AddUser = () => {
             address_street: userInfo.addressStreet,
             note: userInfo.remark
           });
-          if (response.status === 200) {
-            const response2 = await request.post(`/users/add-machines`, {
-              machines: machines
-            });
-          }
         }
         history.push(SETTINGS);
       } catch (err) {
@@ -221,6 +235,7 @@ const AddUser = () => {
     }
 
     const checkUserInfo = () => {
+      setCheckTitle("欄位未填");
       if (userInfo.account === "") {
         setCheckMessage("請輸入帳號");
         setIsOpenCheck(true);
@@ -263,8 +278,39 @@ const AddUser = () => {
       
     }
 
-    const addMachine = () => {
-      machines.push({'name': '', 'number': ''});
+    const addMachine = async () => {
+      // machines.push({'name': '', 'number': ''});
+      // setMachines([...machines]);
+      if (newMachine.name === "") {
+        setCheckMessage("請輸入智販機名稱");
+        setIsOpenCheck(true);
+      } else if (newMachine.id === "") {
+        setCheckMessage("請輸入智販機編號");
+        setIsOpenCheck(true);
+      } else {
+        try{
+          const response = await request.post(`/users/${userInfo['partner_id']}/add-machines`, {
+            machines: [newMachine]
+          });
+        } catch (err) {
+          console.log(err);
+        }
+        machines.push({'machine_name': newMachine.name, 'machine_id': newMachine.id});
+        setNewMachine({'name': '', 'id': ''});
+        closeMachineCheck();
+      }
+    }
+
+    const deleteMachine = async (e) => {
+      let index = e.target.id;
+      try{
+        const response = await request.post(`/users/${userInfo['partner_id']}/delete-machine`, {
+          machine_id: machines[index]['machine_id']
+        });
+      } catch (err) {
+        console.log(err);
+      }
+      machines.splice(index, 1);
       setMachines([...machines]);
     }
 
@@ -274,12 +320,11 @@ const AddUser = () => {
       let index = split[1];
       machines[index][key] = e.target.value;
       setMachines([...machines]);
-      console.log(machines);
     }
 
     const machinesRow = () => {
       return (
-        <Row>
+        isEdit? (<Row>
           <Col md={12}>
             <Wrapper>
               <Heading>綁定智販機</Heading>
@@ -289,26 +334,33 @@ const AddUser = () => {
                   <RowBox onChange={handleMachine}>
                     <InputBox>
                       <Text>智販機名稱</Text>
-                      <Input id={"name_" + index} placeholder="輸入智販機名稱" value={item.name}/>
+                      <Input id={"name_" + index} placeholder="輸入智販機名稱" value={item.machine_name} disabled={currentRole !== 2? false: true}/>
                     </InputBox>
                     <InputBox>
                       <Text>智販機編號</Text>
-                      <Input id={"number_" + index} placeholder="輸入智販機編號" value={item.number}/>
+                      <Input id={"id_" + index} placeholder="輸入智販機編號" value={item.machine_id} disabled={true}/>
                     </InputBox>
+                    <ButtonBox>
+                      <Button id={index} background_color='#F55252' color={'#FFFFFF'} margin={'5px'} height={'40px'} width={'80px'}  onClick={deleteMachine}>刪除</Button>
+                    </ButtonBox>
                   </RowBox>
                 )})
               )}
-              <Button
-                background_color={'#FF902B'}
-                color={'#FFFFFF'}
-                margin={'5px'}
-                height={'60%'}
-                width={'10%'}
-                onClick={addMachine}
-              >新增機器</Button>
+              {currentRole !== 2? (
+                <Button
+                  background_color={'#FF902B'}
+                  color={'#FFFFFF'}
+                  margin={'5px'}
+                  height={'60%'}
+                  width={'10%'}
+                  onClick={() => setIsMachineOpenCheck(true)}
+                >新增機器</Button>
+              ):(null)}
+              
             </Wrapper>
           </Col>
-        </Row>
+        </Row>) 
+        :(null)
       )
     }
 
@@ -327,12 +379,28 @@ const AddUser = () => {
     return (
         <Grid fluid={true}>
           <Modal onClose={closeCheck} isOpen={isOpenCheck}>
-            <ModalHeader>欄位未填</ModalHeader>
+            <ModalHeader>{checkTitle}</ModalHeader>
             <ModalBody>
               <Text>{checkMessage}</Text>
             </ModalBody>
             <ModalFooter>
               <Button background_color={'#FF902B'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={closeCheck}>確認</Button>
+            </ModalFooter>
+          </Modal>
+          <Modal onClose={closeMachineCheck} isOpen={isMachineOpenCheck}>
+            <ModalHeader>智販機資訊</ModalHeader>
+            <ModalBody>
+              <RowBox><InputBox><Text>智販機名稱</Text>
+                <Input onChange={(e)=>{newMachine.name = e.target.value}}/>
+              </InputBox></RowBox>
+              <RowBox><InputBox><Text>智販機編號</Text>
+                <Input onChange={(e)=>{newMachine.id = e.target.value}}/>
+              </InputBox></RowBox>
+              
+            </ModalBody>
+            <ModalFooter>
+              <Button background_color={'#616D89'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={closeMachineCheck}>取消</Button>
+              <Button background_color={'#FF902B'} color={'#FFFFFF'} margin={'5px'} height={'40px'} onClick={addMachine}>確認</Button>
             </ModalFooter>
           </Modal>
           <Row>
@@ -393,7 +461,6 @@ const AddUser = () => {
                     <Input id="addressStreet"  placeholder="輸入地址" value={userInfo['addressStreet']} />
                   </RowBox>
                   </InputBox>
-                  
                 </RowBox>
                 
                 <RowBox>

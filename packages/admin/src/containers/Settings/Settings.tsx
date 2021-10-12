@@ -81,15 +81,18 @@ export default function Settings() {
   }
 
   const editUser = (e) => {  // 跳到有form的頁面
-    console.log(e.target.id);
-    console.log(members[e.target.id]);
     let chooseInfo = members[e.target.id];
-    history.push(ADDUSER, [chooseInfo, partner, true, machines]);
+    history.push(ADDUSER, [chooseInfo, partner, true]);
     
   }
 
   const addUser = () => {
-    history.push(ADDUSER, [{}, partner, false, machines]);
+    history.push(ADDUSER, [{}, partner, false]);
+  }
+
+  const viewUser = (e) => {
+    let chooseInfo = members[e.target.id];
+    history.push(VIEWUSER, [chooseInfo]);
   }
 
   const activateUserTemp = (e) => {
@@ -115,11 +118,6 @@ export default function Settings() {
     } catch (err) {
       console.log(err);
     }
-  }
-
-  const viewUser = (e) => {
-    let chooseInfo = members[e.target.id];
-    history.push(VIEWUSER, [chooseInfo, partner, machines]);
   }
 
   const handleSearch = (e) => {  // 資料全部都在members裡面，前端根據條件filter就可以
@@ -153,7 +151,8 @@ export default function Settings() {
   async function getMembers() {
     try {
       const result = await request.get(`/users`);
-      const member_arr = result.data['members'];
+      console.log(result);
+      const member_arr = result.data;
       const current_user = localStorage.getItem('name');
       for (let i = 0; i < member_arr.length; i++) {
         let role_ = '系統維護';
@@ -166,9 +165,6 @@ export default function Settings() {
       }
       setDisplayMembers(displayTemp);
       setMembers(member_arr);
-      setPartner(result.data['partner']);
-      const result2 = await request.get(`/users/partner-machines`);
-      setMachines(result2.data);
     } catch (err) {
       console.log(err);
     }
