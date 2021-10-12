@@ -324,7 +324,7 @@ const AddUser = () => {
 
     const machinesRow = () => {
       return (
-        isEdit? (<Row>
+        isEdit && userInfo['role'] === 1? (<Row>
           <Col md={12}>
             <Wrapper>
               <Heading>綁定智販機</Heading>
