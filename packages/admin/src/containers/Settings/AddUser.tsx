@@ -269,7 +269,7 @@ const AddUser = () => {
       } else if (userInfo.addressStreet === "") {
         setCheckMessage("請輸入詳細地址");
         setIsOpenCheck(true);
-      } else if (machines.length === 0 && userInfo.authority !== '店家使用者') {
+      } else if (machines.length === 0 && userInfo.authority === '店家管理者' && isEdit) {
         setCheckMessage("請新增機器");
         setIsOpenCheck(true);
       } else {
