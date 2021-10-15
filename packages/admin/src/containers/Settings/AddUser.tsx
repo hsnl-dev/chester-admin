@@ -449,37 +449,35 @@ const AddUser = () => {
                   </InputBox>
                   <InputBox>
                     <Text>店家名稱</Text>
-                    <Input id="storeName" placeholder="輸入店家名稱" disabled={(currentRole=== 0)? false: true} value={userInfo['storeName']}/>
+                    <Input id="storeName" placeholder="輸入店家名稱" disabled={(currentRole === 0 && userInfo.authority !== '系統維護')? false: true} value={userInfo['storeName']}/>
                   </InputBox>
                 </RowBox>
                 <RowBox>
                   <InputBox>
                     <Text>店家電話</Text>
-                    <Input id="storePhone" placeholder="輸入店家電話" disabled={(currentRole=== 0)? false: true} value={userInfo['storePhone']} />
+                    <Input id="storePhone" placeholder="輸入店家電話" disabled={(currentRole === 0 && userInfo.authority !== '系統維護')? false: true} value={userInfo['storePhone']} />
                   </InputBox>
                   <InputBox>
                     <Text>食品業者登錄字號</Text>
-                    <Input id="regNumber" placeholder="輸入食品業者登錄字號" disabled={(currentRole=== 0)? false: true} value={userInfo['regNumber']}/>
+                    <Input id="regNumber" placeholder="輸入食品業者登錄字號" disabled={(currentRole === 0 && userInfo.authority !== '系統維護')? false: true} value={userInfo['regNumber']}/>
                   </InputBox>
                 </RowBox>
                 <RowBox>
                   <InputBox>
                   <Text>店家地址</Text>
                   <RowBox className="city-selector-set" >
-                    <SelectAddress id="addressCity" data-value={userInfo['addressCity']} disabled={(currentRole=== 0)? false: true} onChange={()=>userInfo.addressDistrict = ""} className="county"/>
-                    <SelectAddress id="addressDistrict"  data-value={userInfo['addressDistrict']} disabled={(currentRole=== 0)? false: true} className="district"/>
-                    <Input id="addressStreet"  placeholder="輸入地址" disabled={(currentRole=== 0)? false: true} value={userInfo['addressStreet']} />
+                    <SelectAddress id="addressCity" data-value={userInfo['addressCity']} disabled={(currentRole === 0 && userInfo.authority !== '系統維護')? false: true} onChange={()=>userInfo.addressDistrict = ""} className="county"/>
+                    <SelectAddress id="addressDistrict"  data-value={userInfo['addressDistrict']} disabled={(currentRole === 0 && userInfo.authority !== '系統維護')? false: true} className="district"/>
+                    <Input id="addressStreet"  placeholder="輸入地址" disabled={(currentRole === 0 && userInfo.authority !== '系統維護')? false: true} value={userInfo['addressStreet']} />
                   </RowBox>
                   </InputBox>
                 </RowBox>
-                
                 <RowBox>
                   <InputBox>
                   <Text>備註</Text>
-                  <Input id="remark" placeholder="" value={userInfo['remark']} disabled={currentRole===0? false: true} height="100px"/>
+                  <Input id="remark" placeholder="" value={userInfo['remark']} disabled={(currentRole === 0 && userInfo.authority !== '系統維護')? false: true} height="100px"/>
                 </InputBox>
                 </RowBox>
-                
               </Wrapper>
               <ButtonBox>
                   <Button
