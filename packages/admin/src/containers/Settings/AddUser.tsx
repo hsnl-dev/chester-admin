@@ -79,7 +79,7 @@ const authorityList = [
 
 const AddUser = () => {
     const [authority, setAuthority] = useState([]);
-    const [userInfo, setUserInfo] = useState({"account": "", "authority":"", "name": "", "phone": "", "email": "", "storeName": "", "storePhone": "", "regNumber": "", "addressCity": "", "addressDistrict": "", "addressStreet": "", "remark": "", 'partner_id': 0});
+    const [userInfo, setUserInfo] = useState({"account": "", "authority":"", "name": "", "phone": "", "email": "", "storeName": "", "storePhone": "", "regNumber": "", "addressCity": "", "addressDistrict": "", "addressStreet": "", "remark": "", 'partner_id': 0, "user_id": 0});
     const [currentRole, setCurrentRole] = useState();
     const history = useHistory();
     const location = useLocation();
@@ -119,6 +119,7 @@ const AddUser = () => {
       console.log(info)
       
       if (isEdit) {
+        userInfo['user_id'] = info[0]['user_id'];
         userInfo['account'] = info[0]['username'];
         userInfo['name'] = info[0]['name'];
         userInfo['phone'] = info[0]['phone'];
@@ -145,6 +146,16 @@ const AddUser = () => {
           userInfo['authority'] = "系統維護";
           setAuthority([{ value: '系統維護', label: '系統維護' }]);
         }
+      }
+      else {
+        userInfo['storeName'] = info[1]['partner_name'];
+        userInfo['storePhone'] = info[1]['partner_phone'];
+        userInfo['regNumber'] = info[1]['partner_fid'];
+        userInfo['addressCity'] = info[1]['partner_address_city'];
+        userInfo['addressDistrict'] = info[1]['partner_address_district'];
+        userInfo['addressStreet'] = info[1]['partner_address_street'];
+        userInfo['remark'] = info[1]['partner_note'];
+        userInfo['partner_id'] = info[1]['partner_id'];
       }
 
       if (info[0]['role'] !== 0 && isEdit) {
@@ -178,8 +189,7 @@ const AddUser = () => {
     const getRole = async () => {
       try {
         const result = await request.get(`/users/role`)
-        let role = result.data.role;
-        setCurrentRole(role);
+        setCurrentRole(result.data.role);
       } catch (err) {
         console.log(err);
       }
@@ -236,7 +246,7 @@ const AddUser = () => {
 
     const checkUserInfo = () => {
       setCheckTitle("欄位未填");
-      if (userInfo.account === "") {
+      if (userInfo.account === "" && currentRole !== 2) {
         setCheckMessage("請輸入帳號");
         setIsOpenCheck(true);
       } else if (userInfo.authority === "") {
@@ -245,28 +255,28 @@ const AddUser = () => {
       } else if (userInfo.name === "") {
         setCheckMessage("請輸入姓名");
         setIsOpenCheck(true);
-      } else if (userInfo.phone === "") {
+      } else if (userInfo.phone === "" && currentRole !== 2) {
         setCheckMessage("請輸入電話");
         setIsOpenCheck(true);
-      } else if (userInfo.email === "") {
+      } else if (userInfo.email === "" && currentRole !== 2) {
         setCheckMessage("請輸入E-amil");
         setIsOpenCheck(true);
-      } else if (userInfo.storeName === "") {
+      } else if (userInfo.storeName === "" && currentRole === 0) {
         setCheckMessage("請輸入店家名稱");
         setIsOpenCheck(true);
-      } else if (userInfo.storePhone === "") {
+      } else if (userInfo.storePhone === "" && currentRole === 0) {
         setCheckMessage("請輸入店家電話");
         setIsOpenCheck(true);
-      } else if (userInfo.regNumber === "") {
+      } else if (userInfo.regNumber === "" && currentRole === 0) {
         setCheckMessage("請輸入食品業者登錄字號");
         setIsOpenCheck(true);
-      } else if (userInfo.addressCity === "") {
+      } else if (userInfo.addressCity === "" && currentRole === 0) {
         setCheckMessage("請選擇縣市");
         setIsOpenCheck(true);
-      } else if (userInfo.addressDistrict === "") {
+      } else if (userInfo.addressDistrict === "" && currentRole === 0) {
         setCheckMessage("請選擇區域");
         setIsOpenCheck(true);
-      } else if (userInfo.addressStreet === "") {
+      } else if (userInfo.addressStreet === "" && currentRole === 0) {
         setCheckMessage("請輸入詳細地址");
         setIsOpenCheck(true);
       } else if (machines.length === 0 && userInfo.authority === '店家管理者' && isEdit) {
@@ -419,7 +429,7 @@ const AddUser = () => {
                     <Input id="account" placeholder="輸入帳號" value={userInfo['account']} disabled={isEdit && currentRole !== 0? true: false}/></InputBox>
                   <InputBox>
                     <Text>權限角色</Text>
-                    {<Select id="role" placeholder="選擇" labelKey="label" valueKey="value" searchable={false} disabled={(isEdit && currentRole !== 1) || (isEdit && userInfo.authority === '系統維護')? true: false} options={currentRole === 0? [authorityList[1]]: authorityList.slice(1)} value={authority} onChange={handleAuthority}/>}
+                    {<Select id="role" placeholder="選擇" labelKey="label" valueKey="value" searchable={false} disabled={(isEdit && currentRole !== 1) || (isEdit && userInfo.authority === '系統維護')? true: false} options={currentRole === 0? [authorityList[1]]: [authorityList[2]]} value={authority} onChange={handleAuthority}/>}
                   </InputBox>
                 </RowBox>
                 <RowBox>
@@ -439,26 +449,26 @@ const AddUser = () => {
                   </InputBox>
                   <InputBox>
                     <Text>店家名稱</Text>
-                    <Input id="storeName" placeholder="輸入店家名稱" value={userInfo['storeName']}/>
+                    <Input id="storeName" placeholder="輸入店家名稱" disabled={(currentRole=== 0)? false: true} value={userInfo['storeName']}/>
                   </InputBox>
                 </RowBox>
                 <RowBox>
                   <InputBox>
                     <Text>店家電話</Text>
-                    <Input id="storePhone" placeholder="輸入店家電話" value={userInfo['storePhone']} />
+                    <Input id="storePhone" placeholder="輸入店家電話" disabled={(currentRole=== 0)? false: true} value={userInfo['storePhone']} />
                   </InputBox>
                   <InputBox>
                     <Text>食品業者登錄字號</Text>
-                    <Input id="regNumber" placeholder="輸入食品業者登錄字號" value={userInfo['regNumber']}/>
+                    <Input id="regNumber" placeholder="輸入食品業者登錄字號" disabled={(currentRole=== 0)? false: true} value={userInfo['regNumber']}/>
                   </InputBox>
                 </RowBox>
                 <RowBox>
                   <InputBox>
                   <Text>店家地址</Text>
                   <RowBox className="city-selector-set" >
-                    <SelectAddress id="addressCity" data-value={userInfo['addressCity']} onChange={()=>userInfo.addressDistrict = ""} className="county"/>
-                    <SelectAddress id="addressDistrict"  data-value={userInfo['addressDistrict']} className="district"/>
-                    <Input id="addressStreet"  placeholder="輸入地址" value={userInfo['addressStreet']} />
+                    <SelectAddress id="addressCity" data-value={userInfo['addressCity']} disabled={(currentRole=== 0)? false: true} onChange={()=>userInfo.addressDistrict = ""} className="county"/>
+                    <SelectAddress id="addressDistrict"  data-value={userInfo['addressDistrict']} disabled={(currentRole=== 0)? false: true} className="district"/>
+                    <Input id="addressStreet"  placeholder="輸入地址" disabled={(currentRole=== 0)? false: true} value={userInfo['addressStreet']} />
                   </RowBox>
                   </InputBox>
                 </RowBox>
@@ -466,7 +476,7 @@ const AddUser = () => {
                 <RowBox>
                   <InputBox>
                   <Text>備註</Text>
-                  <Input id="remark" placeholder="" value={userInfo['remark']} disabled={isEdit && currentRole!==0? true: false} height="100px"/>
+                  <Input id="remark" placeholder="" value={userInfo['remark']} disabled={currentRole===0? false: true} height="100px"/>
                 </InputBox>
                 </RowBox>
                 

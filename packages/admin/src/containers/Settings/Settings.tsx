@@ -165,6 +165,7 @@ export default function Settings() {
       }
       setDisplayMembers(displayTemp);
       setMembers(member_arr);
+      setPartner(member_arr[0]);
     } catch (err) {
       console.log(err);
     }
