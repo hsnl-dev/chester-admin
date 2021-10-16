@@ -127,7 +127,7 @@ const EditPurchasing = () => {
           vendorList.push({value: info[2][i].id, label: info[2][i].name});
         }
         commodities.forEach(element => {
-          let temp = [];
+          let temp = {};
           temp['id'] = element.id;
           temp['name'] = element.name;
           temp['traceNumber'] = element.trace_no;
@@ -144,6 +144,8 @@ const EditPurchasing = () => {
           temp['period'] = element.produce_period;
           if (temp['brand'] === "三光米")
             temp['periodDisable'] = false;
+          else
+            temp['periodDisable'] = true;
           itemsInfo.push(temp);
         });
         
@@ -160,12 +162,24 @@ const EditPurchasing = () => {
     }
     
     const handleInfoChange = (e) => {
-        console.log(e.target.id);
-        let temp = e.target.id.split("_");
-        let type = temp[0];
-        let index = temp[1];
-        itemsInfo[index][type] = e.target.value;
-        setItemsInfo([...itemsInfo]);
+      console.log(e.target.id);
+      let temp = e.target.id.split("_");
+      let type = temp[0];
+      let index = temp[1];
+      itemsInfo[index][type] = e.target.value;
+      if (itemsInfo[index].amount !== "" && itemsInfo[index].unitPrice !== "") {
+        let amount = parseInt(itemsInfo[index]['amount']);
+        let unitPrice = itemsInfo[index]['unitPrice'];
+        let totalPrice = amount* unitPrice;
+        itemsInfo[index].totalPrice = String(totalPrice);
+      }
+      if (type === "brand") {
+        if (e.target.value === "三光米")
+          itemsInfo[index].periodDisable = false;
+        else
+          itemsInfo[index].periodDisable = true;
+      }
+      setItemsInfo([...itemsInfo]);
     }
 
     const createVendor = async () => {
@@ -191,53 +205,54 @@ const EditPurchasing = () => {
     }
 
     const handleVendor = ({ value }) => {
-        console.log(value);
-        setVendor(value);
+      console.log(value);
+      setVendor(value);
     }
     
     const handleImport = () => {
+      console.log(vendor);
+      if (Object.keys(vendor).length !== 0) {
         console.log(vendor);
-        if (Object.keys(vendor).length !== 0) {
-          console.log(vendor);
-          history.push({
-            pathname: IMPORTPURCHASING,
-            state: {vendor_id: vendor['value']}
-          });
-        } else {
-          setIsOpenError(true);
-        }
+        history.push({
+          pathname: IMPORTPURCHASING,
+          state: {vendor_id: vendor['value']}
+        });
+      } else {
+        setIsOpenError(true);
+      }
     }
 
     const handleSubmit = async () => {
-        itemsInfo.forEach(async function (element) {
-          try {
-            console.log("vendor: ", vendor['value']);
-            console.log("element: ", element);
-            const response = await request.post(`/commodity/${element.id}/edit`, {
-              name: element.name,
-              trace_no: element.traceNumber,
-              batch_no: element.batchNumber,
-              origin: element.origin,
-              brand: element.brand,
-              amount: element.amount,
-              unit:  element.unit,
-              MFG: moment(element.PD).format("YYYY-MM-DD"),
-              EXP: moment(element.Exp).format("YYYY-MM-DD"),
-              unit_price: element.unitPrice,
-              gross_price: element.totalPrice,
-              note: element.remark,
-              produce_period: element.period
-            });
-            history.push(PURCHASING);
-            if (response) {
-              console.log("Add commodity successful");
-            } else {
-              console.log("Add commodity failed");
-            }
-          } catch (err) {
-            console.log(err);
+      itemsInfo.forEach(async function (element) {
+        try {
+          console.log("vendor: ", vendor['value']);
+          console.log("element: ", element);
+          const response = await request.post(`/commodity/${element.id}/edit`, {
+            name: element.name,
+            trace_no: element.traceNumber,
+            batch_no: element.batchNumber,
+            origin: element.origin,
+            brand: element.brand,
+            amount: element.amount,
+            unit:  element.unit,
+            MFG: moment(element.PD).format("YYYY-MM-DD"),
+            EXP: moment(element.Exp).format("YYYY-MM-DD"),
+            unit_price: element.unitPrice,
+            gross_price: element.totalPrice,
+            note: element.remark,
+            produce_period: element.period
+          });
+          
+          if (response) {
+            console.log("Add commodity successful");
+          } else {
+            console.log("Add commodity failed");
           }
-        });
+        } catch (err) {
+          console.log(err);
+        }
+      });
+      history.push(PURCHASING);
     }
 
     const checkItemInfo = () => {
@@ -271,9 +286,9 @@ const EditPurchasing = () => {
             check = false;
             break;
           }
-          if (check) {
-            handleSubmit();
-          }
+        }
+        if (check) {
+          handleSubmit();
         }
         console.log(itemsInfo);
       } else {
@@ -319,7 +334,7 @@ const EditPurchasing = () => {
           <Row>
             <Col md={12}>
                 <Title>
-                    新增
+                    編輯
                 </Title>
                 <Wrapper>
                     <Heading>{'進貨資訊'}</Heading>
@@ -352,46 +367,6 @@ const EditPurchasing = () => {
                       </InputBox>
                     </RowBox>
                     <RowBox>
-                      {/* <div>
-                        {itemsInfo.length == 0 ? (
-                          <Button
-                            background_color={'#FF902B'}
-                            color={'#FFFFFF'}
-                            margin={'5px'}
-                            height={'60%'}
-                            onClick={addOneItems}
-                          >新增品項</Button>
-                        ):(null)}
-                        <Button
-                            background_color={'#40C057'}
-                            color={'#FFFFFF'}
-                            margin={'5px'}
-                            height={'60%'}
-                        >掃描進貨</Button>
-                        <Button
-                            background_color={'#2F8BE6'}
-                            color={'#FFFFFF'}
-                            margin={'5px'}
-                            height={'60%'}
-                            onClick={handleImport}
-                        >匯入進貨</Button>
-                      </div>
-                      <div>
-                        <Button
-                            background_color={'#616D89'}
-                            color={'#FFFFFF'}
-                            margin={'5px'}
-                            height={'60%'}
-                            onClick={()=> history.push(PURCHASING)}
-                        >取消</Button>
-                        <Button
-                            background_color={'#FF902B'}
-                            color={'#FFFFFF'}
-                            margin={'5px'}
-                            height={'60%'}
-                            onClick={handleSubmit}
-                        >確認送出</Button>
-                      </div> */}
                     </RowBox>
                 </Wrapper>
             </Col>
@@ -426,7 +401,7 @@ const EditPurchasing = () => {
                           <InputBox><Text>有效日期</Text><Datepicker value={new Date(item.Exp)}  locale={tw} onChange={({date})=>{itemsInfo[index]["Exp"]=date; setItemsInfo([...itemsInfo])}} /></InputBox>
                         </RowBox>
                         <RowBox>
-                          <InputBox><Text>單價</Text><Input type="Number" value={item.unitPrice} id={"unitPrice_" + index} placeholder="輸入單價"/></InputBox>
+                          <InputBox><Text>單價</Text><Input type="text" value={item.unitPrice} id={"unitPrice_" + index} placeholder="輸入單價"/></InputBox>
                           <InputBox><Text>總價</Text><Input type="Number" value={item.totalPrice} id={"totalPrice_" + index} placeholder="輸入總價"/></InputBox>
                         </RowBox>
                         <RowBox>

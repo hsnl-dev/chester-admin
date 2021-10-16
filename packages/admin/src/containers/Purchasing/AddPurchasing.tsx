@@ -144,7 +144,7 @@ const AddPurchasing = () => {
     itemsInfo[index][type] = e.target.value;
     if (itemsInfo[index].amount !== "" && itemsInfo[index].unitPrice !== "") {
       let amount = parseInt(itemsInfo[index]['amount']);
-      let unitPrice = parseInt(itemsInfo[index]['unitPrice']);
+      let unitPrice = itemsInfo[index]['unitPrice'];
       let totalPrice = amount* unitPrice;
       itemsInfo[index].totalPrice = String(totalPrice);
     }
@@ -178,7 +178,6 @@ const AddPurchasing = () => {
           note: element.remark,
           produce_period: element.period
         });
-        history.push(PURCHASING);
         if (response) {
           console.log("Add commodity successful");
         } else {
@@ -188,6 +187,7 @@ const AddPurchasing = () => {
         console.log(err);
       }
     });
+    history.push(PURCHASING);
   }
 
   const checkItemInfo = () => {
@@ -225,10 +225,9 @@ const AddPurchasing = () => {
             check = false;
             break;
           }
-          if (check) {
-            
-            handleSubmit();
-          }
+        }
+        if (check) {
+          handleSubmit();
         }
         console.log(itemsInfo);
       } else {
@@ -417,7 +416,7 @@ const AddPurchasing = () => {
                       <InputBox><Text>有效日期</Text><Datepicker locale={tw} onChange={({date})=>{itemsInfo[index]["Exp"]=date; setItemsInfo([...itemsInfo])}} /></InputBox>
                     </RowBox>
                     <RowBox>
-                      <InputBox><Text>單價</Text><Input type="Number" id={"unitPrice_" + index} placeholder="輸入單價"/></InputBox>
+                      <InputBox><Text>單價</Text><Input type="text" id={"unitPrice_" + index} placeholder="輸入單價"/></InputBox>
                       <InputBox><Text>總價</Text><Input type="Number" value={itemsInfo[index]["totalPrice"]} id={"totalPrice_" + index} placeholder="輸入總價"/></InputBox>
                     </RowBox>
                     <RowBox>
