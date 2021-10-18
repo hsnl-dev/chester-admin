@@ -10,7 +10,8 @@ request.interceptors.response.use(
   (response) => response,
   (error) => {
     // Customize error handling
-    toaster.negative(error.response.data);
+    if (error.response.data !== 'Invalid token')
+      toaster.negative(error.response.data);
     return Promise.reject(error);
   }
 );
