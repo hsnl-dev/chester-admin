@@ -138,7 +138,6 @@ const Resume = () => {
 
 	const submitLabel = async () => {
 		try {
-			console.log(machines)
 			const total_amount = machines.map(element => parseInt(element.labelAmount))
 										.filter(element => Number.isInteger(element))
 										.reduce((a, b) => a+b);
@@ -255,10 +254,9 @@ const Resume = () => {
 		try {
 			const result = await request.get(`/product/${product_id}/view`);
 			setSelectProduct(result.data);
-			console.log(result.data);
 			
 			const result2 = await request.get(`/users`);
-			setStoreName(result2.data.partner.name)
+			setStoreName(result2.data[0].partner_name)
 		
 		} catch (err) {
 			console.log(err);
