@@ -37,10 +37,11 @@ const LabelBox = styled('div', () => ({
 const Label = styled('div', () => ({
 	display: 'flex',
 	flexDirection: 'column',
-	width: '284.53px',
-	height: '239.63px',
+	width: '285px',
+	height: '214.88px',
 	backgroundColor: '#FFFFFF',
-    paddingTop: '10px'
+    marginBottom: '2px',
+
 }));
 
 const LabelRowP = styled('div', () => ({
@@ -56,20 +57,20 @@ const LabelRow = styled('div', () => ({
 	flexDirection: 'Row',
 	alignItems: 'center',
     justifyContent: 'space-between',
-	padding: '0px 5px',
+	padding: '0px 8px',
 }));
 
 
 const LabelText = styled('div', () => ({
 	fontFamily: "Microsoft JhengHei",
 	fontWeight: '700',
-    fontSize: '8px'
+    fontSize: '12px'
 }));
 
 const BottomText = styled('div', () => ({
 	transform: 'scale(0.9)',
 	fontWeight: '700',
-    fontSize: '4px'
+    fontSize: '12px'
 }));
 
 const LabelProductBox = styled('div', () => ({
