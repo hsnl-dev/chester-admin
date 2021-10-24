@@ -111,6 +111,7 @@ const Resume = () => {
 	const [displayAmount, setDisplayAmount] = useState([]);
 	const [resumes, setResumes] = useState([]);
 	const [selectId, setSelectId] = useState();
+	const [selectIndex, setSelectIndex] = useState(0);
 	const [selectProduct, setSelectProduct] = useState({});
 	const [MFG, setMFG] = useState('');
 	const [storeName, setStoreName] = useState('');
@@ -268,6 +269,7 @@ const Resume = () => {
 		setMFG(dayjs(resumes[e.target.id]['create_date']).format('YYYY-MM-DD'))
 		getProduct(resumes[e.target.id]['product_id'])
 		setSelectId(resume_id);
+		setSelectIndex(e.target.id);
 		setIsOpenLabel(true);
 	}
 
@@ -295,7 +297,7 @@ const Resume = () => {
 			console.log(resume_arr);
 			let temp = [];
 			for (let i = 0; i < resume_arr.length; i++) {
-				temp.push({'index': i, 'date': resume_arr[i]['create_date'], 'number': resume_arr[i]['trace_no'], 'name': resume_arr[i]['product_name']});
+				temp.push({'index': i, 'date': resume_arr[i]['create_date'], 'number': resume_arr[i]['trace_no'], 'name': resume_arr[i]['product_name'], "disabled_machine": resume_arr[i]['disabled_machine']});
 			}
 			setDisplayTemp(temp);
 			setDisplayInfo(temp);
@@ -307,6 +309,7 @@ const Resume = () => {
 
 	async function getMachines() {
 		const result = await request.get(`/users/machines`);
+		console.log(result)
 		setMachines([...result.data]);
 	}
 
@@ -349,7 +352,11 @@ const Resume = () => {
 								</MBox>
 								<InputBox>
 									<Text>數量</Text>
-									<Input placeholder = '輸入數量' onChange = {(e) => {machines[index]['labelAmount'] = e.target.value; setMachines([...machines])}}/>
+									{displayInfo.length > 0 ? (
+										<Input placeholder = '輸入數量' disabled={displayInfo[selectIndex]['disabled_machine'].includes(item.machine_id)? true: false} onChange = {(e) => {machines[index]['labelAmount'] = e.target.value; setMachines([...machines])}}/>
+									): (null)
+									}
+									
 								</InputBox>
 							</RowBox>
 						);
@@ -432,7 +439,6 @@ const Resume = () => {
 													<StyledTd>{dayjs(row[1]).format('YYYY-MM-DD')}</StyledTd>
 													<StyledTd>{row[2]}</StyledTd>
 													<StyledTd>{row[3]}</StyledTd>
-													{row.length >= 5 && row[4] !== '' ? <StyledTd>{row[4]}</StyledTd>: null}
 													<StyledTd>
 														<StyledButtonBox>
 															<Button id={row[0]} margin='5px' width='80px' height='45px' background_color='#40C057' color={'#FFFFFF'} onClick={checkResume}>查看</Button>
