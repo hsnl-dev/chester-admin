@@ -15,7 +15,6 @@ import NoResult from '../../components/NoResult/NoResult';
 import { Heading, StyledTable, StyledTd, StyledTh, StyledButtonBox, SubHeadingLeft, SubHeadingRight, Title } from '../../components/DisplayTable/DisplayTable';
 import { ADDRESUME, VIEWRESUME, LABEL } from '../../settings/constants';
 import { request } from '../../utils/request';
-import { useLocation } from 'react-router-dom';
 
 const Col = withStyle(Column, () => ({
 	'@media only screen and (max-width: 574px)': {
@@ -109,6 +108,7 @@ const Resume = () => {
 	const [displayInfo, setDisplayInfo] = useState([]);
 	const [displayTemp, setDisplayTemp] = useState([]);
 	const [displayAmount, setDisplayAmount] = useState([]);
+	const [amountTemp, setAmountTemp] = useState(10);
 	const [resumes, setResumes] = useState([]);
 	const [selectId, setSelectId] = useState();
 	const [selectIndex, setSelectIndex] = useState(0);
@@ -122,7 +122,11 @@ const Resume = () => {
 	const [labelAmount, setLabelAmount] = useState();
 	const [machines, setMachines] = useState([]);
 	const [searchName, setSearchName] = useState("");
-	const [searchDate, setSearchDate] = useState(null)
+	const [searchDate, setSearchDate] = useState(null);
+	const [page, setPage] = useState(1);
+	const [maxPage, setMaxPage] = useState(2);
+	const [nextClick, setNextClick] = useState(true);
+	const [pastClick, setPastClick] = useState(false);
 	const history = useHistory();
 
 	const close = () => {
@@ -191,13 +195,25 @@ const Resume = () => {
 	}
 
 	const amountChange = ({ value }) => {
-		setDisplayAmount(value);
-		let amount = (value===[])? value[0].value: displayTemp.length;
+		let amount = 0;
+
+		if (value.length !== 0)
+		amount = value[0].value;
+		else
+		amount = 10;
+		
+		setAmountTemp(amount);
+		setDisplayAmount([{ value: amount, label: amount.toString() }]);
+		setMaxPage(Math.ceil(displayTemp.length/amount));
+		setPage(1);
+		setPastClick(false);
 		if (displayTemp.length > amount) {
-			setDisplayInfo(displayTemp.slice(amount));
+			setDisplayInfo(displayTemp.slice(0, amount));
+			setNextClick(true);
 		}
 		else {
 			setDisplayInfo(displayTemp);
+			setNextClick(false);
 		}
 	}
 
@@ -300,7 +316,9 @@ const Resume = () => {
 				temp.push({'index': i, 'date': resume_arr[i]['create_date'], 'number': resume_arr[i]['trace_no'], 'name': resume_arr[i]['product_name'], "disabled_machine": resume_arr[i]['disabled_machine']});
 			}
 			setDisplayTemp(temp);
-			setDisplayInfo(temp);
+			setDisplayInfo(temp.slice(0, amountTemp));
+			setMaxPage(Math.ceil(temp.length/amountTemp));
+      		setNextClick(page === Math.ceil(temp.length/amountTemp)? false: true)
 			setResumes(resume_arr);
 		} catch (err) {
 			console.log(err);
@@ -311,6 +329,34 @@ const Resume = () => {
 		const result = await request.get(`/users/machines`);
 		console.log(result)
 		setMachines([...result.data]);
+	}
+
+	const pagePast = () => {
+		if (page !== 1) {
+			let newPage = page - 1;
+			let amount = displayAmount.length !== 0? displayAmount[0].value: amountTemp;
+			setPage(newPage);
+			setDisplayInfo(displayTemp.slice(((newPage - 1)*amount), newPage * amount));
+			setNextClick(true);
+			if (newPage === 1)
+				setPastClick(false);
+			else
+				setPastClick(true);
+		}
+	}
+	
+	const pageNext = () => {
+		if (page !== maxPage){
+			let newPage = page + 1;
+			let amount = displayAmount.length !== 0? displayAmount[0].value: amountTemp;
+			setPage(newPage);
+			setDisplayInfo(displayTemp.slice(((newPage - 1)*amount), newPage * amount));
+			setPastClick(true);
+			if (newPage === maxPage)
+			setNextClick(false);
+			else
+			setNextClick(true);
+		}
 	}
 
 	useEffect(() => {
@@ -466,6 +512,17 @@ const Resume = () => {
 								/>
 							)}
 						</div>
+						<RowBox>
+							<div>
+								Showing {(page - 1)*amountTemp + 1} to {page !== maxPage? page*amountTemp: displayTemp.length}
+									of {page !== maxPage? amountTemp: displayTemp.length - ((page - 1)*amountTemp + 1) + 1} entries
+							</div>
+							<div>
+								<Button margin='5px' width='95px' height='30px' disabled={!pastClick} background_color={pastClick === true? '#FF902B': '#E9ECEF'} color={'#FFFFFF'} onClick={pagePast}>上一頁</Button>
+								{page}
+								<Button margin='5px' width='95px' height='30px' disabled={!nextClick} background_color={nextClick === true? '#FF902B': '#E9ECEF'} color={'#FFFFFF'} onClick={pageNext}>下一頁</Button>
+							</div>
+						</RowBox>
 					</Wrapper>
 				</Col>
 			</Row>

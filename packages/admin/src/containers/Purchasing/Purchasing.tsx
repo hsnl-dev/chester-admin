@@ -60,6 +60,15 @@ const Wrapper = styled('div', () => ({
   marginBottom: '20px',
 }));
 
+const RowBox = styled('div', () => ({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  width: '100%',
+  marginTop: '10px',
+  padding: '0px'
+}));
+
 const Purchasing = () => {
   const column_names = ['廠商編號', '廠商名稱', '進貨日期', '操作'];
   const amountSelectOptions = [
@@ -69,6 +78,7 @@ const Purchasing = () => {
     { value: 100, label: '100' },
   ];
   const [displayAmount, setDisplayAmount] = useState([]);
+  const [amountTemp, setAmountTemp] = useState(10);
   const [commodities, setCommodities] = useState([]);
   const [displayInfo, setDisplayInfo] = useState([]);
   const [displayTemp, setDisplayTemp] = useState([]);
@@ -78,7 +88,10 @@ const Purchasing = () => {
   const history = useHistory();
   const [searchName, setSearchName] = useState("");
   const [searchDate, setSearchDate] = useState(null);
-
+  const [page, setPage] = useState(1);
+  const [maxPage, setMaxPage] = useState(2);
+  const [nextClick, setNextClick] = useState(true);
+  const [pastClick, setPastClick] = useState(false);
   const mb30 = css({
     '@media only screen and (max-width: 990px)': {
       marginBottom: '16px',
@@ -86,13 +99,25 @@ const Purchasing = () => {
   });
 
   function amountChange({ value }) {
-    setDisplayAmount(value);
-    let amount = (value===[])? value[0].value: displayTemp.length;
+    let amount = 0;
+
+    if (value.length !== 0)
+      amount = value[0].value;
+    else
+      amount = 10;
+    
+    setAmountTemp(amount);
+    setDisplayAmount([{ value: amount, label: amount.toString() }]);
+    setMaxPage(Math.ceil(displayTemp.length/amount));
+    setPage(1);
+    setPastClick(false);
     if (displayTemp.length > amount) {
-      setDisplayInfo(displayTemp.slice(amount));
+      setDisplayInfo(displayTemp.slice(0, amount));
+      setNextClick(true);
     }
     else {
       setDisplayInfo(displayTemp);
+      setNextClick(false);
     }
   }
 
@@ -215,12 +240,42 @@ const Purchasing = () => {
           }
         }
       }
-      setDisplayInfo([...displayTemp]);
+      setDisplayInfo(displayTemp.slice(0, amountTemp));
+      setMaxPage(Math.ceil(displayTemp.length/amountTemp));
+      setNextClick(page === Math.ceil(displayTemp.length/amountTemp)? false: true)
       setMergeData(Object.values(merge_data));
       setVendors(vendors_arr);
       setCommodities(commodities_arr);
     } catch (err) {
       console.log(err);
+    }
+  }
+
+  const pagePast = () => {
+    if (page !== 1) {
+      let newPage = page - 1;
+      let amount = displayAmount.length !== 0? displayAmount[0].value: amountTemp;
+      setPage(newPage);
+      setDisplayInfo(displayTemp.slice(((newPage - 1)*amount), newPage * amount));
+      setNextClick(true);
+      if (newPage === 1)
+        setPastClick(false);
+      else
+        setPastClick(true);
+    }
+  }
+
+  const pageNext = () => {
+    if (page !== maxPage){
+      let newPage = page + 1;
+      let amount = displayAmount.length !== 0? displayAmount[0].value: amountTemp;
+      setPage(newPage);
+      setDisplayInfo(displayTemp.slice(((newPage - 1)*amount), newPage * amount));
+      setPastClick(true);
+      if (newPage === maxPage)
+        setNextClick(false);
+      else
+        setNextClick(true);
     }
   }
 
@@ -332,6 +387,17 @@ const Purchasing = () => {
                   />
                 )}
             </div>
+            <RowBox>
+              <div>
+                Showing {(page - 1)*amountTemp + 1} to {page !== maxPage? page*amountTemp: displayTemp.length}
+                      of {page !== maxPage? amountTemp: displayTemp.length - ((page - 1)*amountTemp + 1) + 1} entries
+              </div>
+              <div>
+                <Button margin='5px' width='95px' height='30px' disabled={!pastClick} background_color={pastClick === true? '#FF902B': '#E9ECEF'} color={'#FFFFFF'} onClick={pagePast}>上一頁</Button>
+                {page}
+                <Button margin='5px' width='95px' height='30px' disabled={!nextClick} background_color={nextClick === true? '#FF902B': '#E9ECEF'} color={'#FFFFFF'} onClick={pageNext}>下一頁</Button>
+              </div>
+           </RowBox>
           </Wrapper>
         </Col>
       </Row>

@@ -12,7 +12,6 @@ import { Grid, Row, Col as Column } from '../../components/FlexBox/FlexBox';
 import { useHistory } from 'react-router-dom';
 import { ADDUSER, VIEWUSER } from '../../settings/constants';
 import { request } from '../../utils/request';
-import { userInfo } from 'os';
 
 const Col = withStyle(Column, () => ({
   '@media only screen and (max-width: 767px)': {
@@ -45,6 +44,15 @@ const Text = styled('span', ({ $theme }) => ({
   display: "flex",
 }));
 
+const RowBox = styled('div', () => ({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  width: '100%',
+  marginTop: '10px',
+  padding: '0px'
+}));
+
 export default function Settings() {
   const column_names = ['帳號', '姓名', '權限角色', '操作'];
   const amountSelectOptions = [
@@ -54,6 +62,7 @@ export default function Settings() {
     { value: 100, label: '100' },
   ];
   const [displayAmount, setDisplayAmount] = useState([]);
+  const [amountTemp, setAmountTemp] = useState(10);
   const [members, setMembers] = useState([]);
   const [partner, setPartner] = useState({});
   const [selectUserId, setSelectUserId] = useState();
@@ -62,7 +71,10 @@ export default function Settings() {
   const [isOpen, setIsOpen] = useState(false);
   const [userActivate, setUserActivate] = useState();
   const [role, setRole] = useState([-1]);
-  const [machines, setMachines] = useState([]);
+  const [page, setPage] = useState(1);
+  const [maxPage, setMaxPage] = useState(2);
+  const [nextClick, setNextClick] = useState(true);
+  const [pastClick, setPastClick] = useState(false);
   const history = useHistory();
 
   const close = () => {
@@ -70,13 +82,25 @@ export default function Settings() {
   }
 
   function amountChange({ value }) {
-    setDisplayAmount(value);
-    let amount = (value===[])? value[0].value: displayTemp.length;
+    let amount = 0;
+
+    if (value.length !== 0)
+      amount = value[0].value;
+    else
+      amount = 10;
+    
+    setAmountTemp(amount);
+    setDisplayAmount([{ value: amount, label: amount.toString() }]);
+    setMaxPage(Math.ceil(displayTemp.length/amount));
+    setPage(1);
+    setPastClick(false);
     if (displayTemp.length > amount) {
-      setDisplayMembers(displayTemp.slice(amount));
+      setDisplayMembers(displayTemp.slice(0, amount));
+      setNextClick(true);
     }
     else {
       setDisplayMembers(displayTemp);
+      setNextClick(false);
     }
   }
 
@@ -163,11 +187,41 @@ export default function Settings() {
         if ((role[0] === 0) || (role[0] === 1 && role_ !== "系統維護") || (role[0] === 2 && current_user === member_arr[i]['username'])) 
           displayTemp.push({'index': i, 'username': member_arr[i]['username'], 'name': member_arr[i]['name'], 'role': role_, 'activate': member_arr[i]['activate']})
       }
-      setDisplayMembers(displayTemp);
+      setDisplayMembers(displayTemp.slice(0, amountTemp));
+      setMaxPage(Math.ceil(displayTemp.length/amountTemp));
+      setNextClick(page === Math.ceil(displayTemp.length/amountTemp)? false: true)
       setMembers(member_arr);
       setPartner(member_arr[0]);
     } catch (err) {
       console.log(err);
+    }
+  }
+
+  const pagePast = () => {
+    if (page !== 1) {
+      let newPage = page - 1;
+      let amount = displayAmount.length !== 0? displayAmount[0].value: amountTemp;
+      setPage(newPage);
+      setDisplayMembers(displayTemp.slice(((newPage - 1)*amount), newPage * amount));
+      setNextClick(true);
+      if (newPage === 1)
+        setPastClick(false);
+      else
+        setPastClick(true);
+    }
+  }
+
+  const pageNext = () => {
+    if (page !== maxPage){
+      let newPage = page + 1;
+      let amount = displayAmount.length !== 0? displayAmount[0].value: amountTemp;
+      setPage(newPage);
+      setDisplayMembers(displayTemp.slice(((newPage - 1)*amount), newPage * amount));
+      setPastClick(true);
+      if (newPage === maxPage)
+        setNextClick(false);
+      else
+        setNextClick(true);
     }
   }
 
@@ -275,6 +329,17 @@ export default function Settings() {
                   />
                 )}
             </div>
+            <RowBox>
+              <div>
+                Showing {(page - 1)*amountTemp + 1} to {page !== maxPage? page*amountTemp: displayTemp.length}
+                      of {page !== maxPage? amountTemp: displayTemp.length - ((page - 1)*amountTemp + 1) + 1} entries
+              </div>
+              <div>
+                <Button margin='5px' width='95px' height='30px' disabled={!pastClick} background_color={pastClick === true? '#FF902B': '#E9ECEF'} color={'#FFFFFF'} onClick={pagePast}>上一頁</Button>
+                {page}
+                <Button margin='5px' width='95px' height='30px' disabled={!nextClick} background_color={nextClick === true? '#FF902B': '#E9ECEF'} color={'#FFFFFF'} onClick={pageNext}>下一頁</Button>
+              </div>
+            </RowBox>
           </Wrapper>
         </Col>
       </Row>

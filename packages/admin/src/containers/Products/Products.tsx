@@ -58,6 +58,15 @@ const Wrapper = styled('div', () => ({
   marginBottom: '20px',
 }));
 
+const RowBox = styled('div', () => ({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  width: '100%',
+  marginTop: '10px',
+  padding: '0px'
+}));
+
 const Products = () => {
   const column_names = ['商品編號', '商品名稱', '單價', '規格', '操作'];
   const amountSelectOptions = [
@@ -67,6 +76,7 @@ const Products = () => {
     { value: 100, label: '100' },
   ];
   const [displayAmount, setDisplayAmount] = useState([]);
+  const [amountTemp, setAmountTemp] = useState(10);
   const [products, setProducts] = useState([]);
   const [displayProducts, setDisplayProducts] = useState([]);
   const [displayTemp, setDisplayTemp] = useState([]);
@@ -78,7 +88,11 @@ const Products = () => {
   const [selectId, setSelectId] = useState();
   const [selectActivate, setSelectActivate] = useState();
   const [isOpen, setIsOpen] = useState(false);
-  const data = [{'商品編號': '123456789','商品名稱': 'ABC', '單價': '100', '規格': '規格A'}]
+  const [page, setPage] = useState(1);
+  const [maxPage, setMaxPage] = useState(2);
+  const [nextClick, setNextClick] = useState(true);
+  const [pastClick, setPastClick] = useState(false);
+  // const data = [{'商品編號': '123456789','商品名稱': 'ABC', '單價': '100', '規格': '規格A'}]
   const history = useHistory();
 
   const close = () => {
@@ -86,14 +100,27 @@ const Products = () => {
   }
 
   function amountChange({ value }) {
-    setDisplayAmount(value);
-    let amount = (value===[])? value[0].value: displayTemp.length;
+    let amount = 0;
+
+    if (value.length !== 0)
+      amount = value[0].value;
+    else
+      amount = 10;
+    
+    setAmountTemp(amount);
+    setDisplayAmount([{ value: amount, label: amount.toString() }]);
+    setMaxPage(Math.ceil(displayTemp.length/amount));
+    setPage(1);
+    setPastClick(false);
     if (displayTemp.length > amount) {
-      setDisplayProducts(displayTemp.slice(amount));
+      setDisplayProducts(displayTemp.slice(0, amount));
+      setNextClick(true);
     }
     else {
       setDisplayProducts(displayTemp);
+      setNextClick(false);
     }
+
   }
 
   const checkPurchase = (e) => {
@@ -169,10 +196,6 @@ const Products = () => {
     }
   }
 
-  const handleChange = () => {
-    
-  }
-
   const searchProduct = () =>{
     console.log(searchName)
     console.log(searchNumber)
@@ -206,13 +229,43 @@ const Products = () => {
         temp.push({'index': i, 'product_no': product_arr[i]['product_no'], 'name': product_arr[i]['name'], 'price': product_arr[i]['price'], 'spec': product_arr[i]['spec'], "activate": product_arr[i]['activate']});
       }
       setDisplayTemp(temp);
-      setDisplayProducts(temp);
+      setDisplayProducts(temp.slice(0, amountTemp));
+      setMaxPage(Math.ceil(temp.length/amountTemp));
+      setNextClick(page === Math.ceil(temp.length/amountTemp)? false: true)
       setProducts(product_arr);
       setProductUnit(product_unit_arr);
       setWeightUnit(weight_unit_arr);
       setStorage(storage_arr);
     } catch (err) {
       console.log(err);
+    }
+  }
+
+  const pagePast = () => {
+    if (page !== 1) {
+      let newPage = page - 1;
+      let amount = displayAmount.length !== 0? displayAmount[0].value: amountTemp;
+      setPage(newPage);
+      setDisplayProducts(displayTemp.slice(((newPage - 1)*amount), newPage * amount));
+      setNextClick(true);
+      if (newPage === 1)
+        setPastClick(false);
+      else
+        setPastClick(true);
+    }
+  }
+
+  const pageNext = () => {
+    if (page !== maxPage){
+      let newPage = page + 1;
+      let amount = displayAmount.length !== 0? displayAmount[0].value: amountTemp;
+      setPage(newPage);
+      setDisplayProducts(displayTemp.slice(((newPage - 1)*amount), newPage * amount));
+      setPastClick(true);
+      if (newPage === maxPage)
+        setNextClick(false);
+      else
+        setNextClick(true);
     }
   }
 
@@ -303,6 +356,17 @@ const Products = () => {
               Button3_function = {handleactivateTemp}
               Button3_text = '停用'
             />
+            <RowBox>
+              <div>
+                Showing {(page - 1)*amountTemp + 1} to {page !== maxPage? page*amountTemp: displayTemp.length}
+                      of {page !== maxPage? amountTemp: displayTemp.length - ((page - 1)*amountTemp + 1) + 1} entries
+              </div>
+              <div>
+                <Button margin='5px' width='95px' height='30px' disabled={!pastClick} background_color={pastClick === true? '#FF902B': '#E9ECEF'} color={'#FFFFFF'} onClick={pagePast}>上一頁</Button>
+                {page}
+                <Button margin='5px' width='95px' height='30px' disabled={!nextClick} background_color={nextClick === true? '#FF902B': '#E9ECEF'} color={'#FFFFFF'} onClick={pageNext}>下一頁</Button>
+              </div>
+           </RowBox>
           </Wrapper>
         </Col>
       </Row>
