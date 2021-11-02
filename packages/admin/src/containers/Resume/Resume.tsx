@@ -399,7 +399,7 @@ const Resume = () => {
 								<InputBox>
 									<Text>數量</Text>
 									{displayInfo.length > 0 ? (
-										<Input placeholder = '輸入數量' disabled={displayInfo[selectIndex]['disabled_machine'].includes(item.machine_id)? true: false} onChange = {(e) => {machines[index]['labelAmount'] = e.target.value; setMachines([...machines])}}/>
+										<Input placeholder = '輸入數量' disabled={displayTemp[selectIndex]['disabled_machine'].includes(item.machine_id)? true: false} onChange = {(e) => {machines[index]['labelAmount'] = e.target.value; setMachines([...machines])}}/>
 									): (null)
 									}
 									
