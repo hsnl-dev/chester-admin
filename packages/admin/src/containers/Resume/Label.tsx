@@ -49,7 +49,7 @@ const LabelRowP = styled('div', () => ({
 	flexDirection: 'Row',
 	alignItems: 'center',
     justifyContent: 'space-between',
-	padding: '0px 20px',
+	padding: '0px 8px',
 }));
 
 const LabelRow = styled('div', () => ({
@@ -103,6 +103,11 @@ class ComponentToPrint extends React.Component<props> {
                             <LabelRowP>
                                 <LabelProductBox>
                                     <LabelText>名稱: {item.name}</LabelText>
+                                </LabelProductBox>
+                            </LabelRowP>
+                            <LabelRowP>
+                                
+                                <LabelProductBox>
                                     <LabelText>履歷號碼: {item.traceNumber}</LabelText>
                                     <LabelText>供應商: {item.store}</LabelText>
                                     <LabelText>製造日期: {item.MFG}</LabelText>
