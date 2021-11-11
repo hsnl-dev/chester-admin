@@ -49,7 +49,7 @@ const LabelRowP = styled('div', () => ({
 	flexDirection: 'Row',
 	alignItems: 'center',
     justifyContent: 'space-between',
-	padding: '0px 8px',
+	padding: '0px 20px',
 }));
 
 const LabelRow = styled('div', () => ({
